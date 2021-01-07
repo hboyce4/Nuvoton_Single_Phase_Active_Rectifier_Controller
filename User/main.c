@@ -7,12 +7,14 @@
 *****************************************************************************/
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include "NuMicro.h"
 
 #include "user_sys.h"
 
 
 #define PLL_CLOCK           192000000
+#define UI_FRAME_INTERVAL_MS	200	/* interval between UI refresh */
 
 
 
@@ -20,7 +22,7 @@
 /* Global variables                                                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
 volatile uint64_t g_SysTickIntCnt = 0;
-
+volatile bool UI_new_frame_tick = false;
 
 
 /*---------------------------------------------------------------------------------------------------------*/
@@ -37,13 +39,16 @@ void SysTick_Handler(void)
 {
     g_SysTickIntCnt++;
 
-	update_button_states();/* Copy button SW2 and SW3 states to LEDG and LEDY */
+	update_button_LED_states();/* Copy button SW2 and SW3 states to LEDG and LEDY and flash LEDR */
 
-    if(!(g_SysTickIntCnt%1000)) { /* Every 1000 ms*/
+	static uint16_t UI_refresh_counter = 0;
+	if(!UI_refresh_counter){
+		UI_refresh_counter = UI_FRAME_INTERVAL_MS;
+		UI_new_frame_tick = true;
+	}
+	UI_refresh_counter--;
 
-        PH0 ^= 1; // Access single pin (Toggle red LED)
-        //PH->DOUT ^= BIT0|BIT1|BIT2; // Access digital output register (toggle 3 LEDs)
-    }
+
 }
 
 
@@ -147,18 +152,23 @@ int main()
    delay_ms(1000);
 
     static const char string[] = "This is a DMA transfer\n\r";
-    UART_DMA_Xfer_t t1;
+    push_UART1((char*)string);
+    /*UART_DMA_Xfer_t t1;
     t1.str = string;
     t1.count = strlen(string);
-    start_UART1_DMA_Xfer(t1);
+    start_UART1_DMA_Xfer(t1);*/
 
     delay_ms(1000);
 
-    static const char string2[] = "This is a second DMA transfer\n\r";
-    UART_DMA_Xfer_t t2;
+    static const char string2[] = "This is a second, bigger DMA transfer\n\r";
+    push_UART1((char*)string2);
+    static const char string3[] = "This is a third DMA transfer right away\n\r";
+    push_UART1((char*)string3);
+
+    /*UART_DMA_Xfer_t t2;
     t2.str = string2;
     t2.count = strlen(string2);
-    start_UART1_DMA_Xfer(t2);
+    start_UART1_DMA_Xfer(t2);*/
 
     //PDMA->DSCT[UART1_TX_DMA_CHANNEL].SA = ((uint32_t)string2); 		/* Starting Source address is the beginning of the string we want to send */
     //PDMA->DSCT[UART1_TX_DMA_CHANNEL].CTL = 	(PDMA->DSCT[UART1_TX_DMA_CHANNEL].CTL & ~(PDMA_DSCT_CTL_TXCNT_Msk|PDMA_DSCT_CTL_OPMODE_Msk))|((string2_length-1) << PDMA_DSCT_CTL_TXCNT_Pos)|(0b01 << PDMA_DSCT_CTL_OPMODE_Pos); /* OR the string length in the register and set the operating mode from idle to basic*/
@@ -169,17 +179,27 @@ int main()
 
     delay_ms(1000);
 
-    const static char clear_screen[] = "\x1B[2J";
-    UART_DMA_Xfer_t t3;
-    t3.str = clear_screen;
-    t3.count = strlen(clear_screen);
-    start_UART1_DMA_Xfer(t3);
+    const static char clear_screen_str[] = "\x1B[2J";
+    push_UART1((char*)clear_screen_str);
+    /*UART_DMA_Xfer_t t3;
+    t3.str = clear_screen_str;
+    t3.count = strlen(clear_screen_str);
+    start_UART1_DMA_Xfer(t3);*/
+
+    while(1){
+
+    	if(UI_new_frame_tick){
+    		UI_new_frame_tick = false;
+
+    		//const static char new_frame_and_header_str[] = "\x1B[2J\x1B[H";
 
 
 
 
-    /* Got no where to go, just loop forever */
-    while(1);
+    	}
+
+
+    }
 
 
 }
