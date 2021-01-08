@@ -44,7 +44,7 @@ all: Nuvoton_M48x_UART_Test.elf secondary-outputs
 Nuvoton_M48x_UART_Test.elf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross ARM GNU C Linker'
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Og -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g -T gcc_arm.ld -Xlinker --gc-sections -L"../CMSIS/GCC" -Wl,-Map,"Nuvoton_M48x_UART_Test.map" --specs=nano.specs -o "Nuvoton_M48x_UART_Test.elf" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -u _printf_float -Og -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g -T gcc_arm.ld -Xlinker --gc-sections -L"../CMSIS/GCC" -Wl,-Map,"Nuvoton_M48x_UART_Test.map" --specs=nano.specs -o "Nuvoton_M48x_UART_Test.elf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -56,7 +56,7 @@ Nuvoton_M48x_UART_Test.hex: Nuvoton_M48x_UART_Test.elf
 
 Nuvoton_M48x_UART_Test.siz: Nuvoton_M48x_UART_Test.elf
 	@echo 'Invoking: Cross ARM GNU Print Size'
-	arm-none-eabi-size --format=berkeley "Nuvoton_M48x_UART_Test.elf"
+	arm-none-eabi-size --format=berkeley --totals "Nuvoton_M48x_UART_Test.elf"
 	@echo 'Finished building: $@'
 	@echo ' '
 

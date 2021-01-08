@@ -15,6 +15,8 @@
 
 #define PLL_CLOCK           192000000
 #define UI_FRAME_INTERVAL_MS	200	/* interval between UI refresh */
+#define LINE_WIDTH 40
+#define ESCAPE_SEQUENCE_LENGTH 8
 
 
 
@@ -132,7 +134,7 @@ int main()
     UART_Open(UART1, 115200);
     init_UART1_DMA(); /*Needs SysTick*/
 
-
+/*Test*/
 
     /* Configure PH.0, PH.1 and PH.2 as Output mode for LED blink */
     GPIO_SetMode(PH, BIT0|BIT1|BIT2, GPIO_MODE_OUTPUT); // LED outputs
@@ -153,10 +155,6 @@ int main()
 
     static const char string[] = "This is a DMA transfer\n\r";
     push_UART1((char*)string);
-    /*UART_DMA_Xfer_t t1;
-    t1.str = string;
-    t1.count = strlen(string);
-    start_UART1_DMA_Xfer(t1);*/
 
     delay_ms(1000);
 
@@ -165,37 +163,33 @@ int main()
     static const char string3[] = "This is a third DMA transfer right away\n\r";
     push_UART1((char*)string3);
 
-    /*UART_DMA_Xfer_t t2;
-    t2.str = string2;
-    t2.count = strlen(string2);
-    start_UART1_DMA_Xfer(t2);*/
-
-    //PDMA->DSCT[UART1_TX_DMA_CHANNEL].SA = ((uint32_t)string2); 		/* Starting Source address is the beginning of the string we want to send */
-    //PDMA->DSCT[UART1_TX_DMA_CHANNEL].CTL = 	(PDMA->DSCT[UART1_TX_DMA_CHANNEL].CTL & ~(PDMA_DSCT_CTL_TXCNT_Msk|PDMA_DSCT_CTL_OPMODE_Msk))|((string2_length-1) << PDMA_DSCT_CTL_TXCNT_Pos)|(0b01 << PDMA_DSCT_CTL_OPMODE_Pos); /* OR the string length in the register and set the operating mode from idle to basic*/
-
-    //UART1->INTEN |= (0b1 << UART_INTEN_TXPDMAEN_Pos); 		/* Bit TXPDMAEN is set to one enable PDMA requests */
-    /* The second and subsequent times, the UART1->INTEN write is not necessary*/
-
-
     delay_ms(1000);
 
     const static char clear_screen_str[] = "\x1B[2J";
     push_UART1((char*)clear_screen_str);
-    /*UART_DMA_Xfer_t t3;
-    t3.str = clear_screen_str;
-    t3.count = strlen(clear_screen_str);
-    start_UART1_DMA_Xfer(t3);*/
+
+    float number = 0;
 
     while(1){
 
     	if(UI_new_frame_tick){
     		UI_new_frame_tick = false;
 
-    		//const static char new_frame_and_header_str[] = "\x1B[2J\x1B[H";
+    		const static char new_frame_and_header_str[] = "\x1B[2J\x1B[H****************MENU TEST****************\n\r";
+    		push_UART1((char*)new_frame_and_header_str);
+    		static char value1A[LINE_WIDTH];
+    		static char colour[ESCAPE_SEQUENCE_LENGTH];
+    		static char colour_default[ESCAPE_SEQUENCE_LENGTH] = "\x1B[97m";
+    		if(number > 10){
+    			strcpy(colour,"\x1B[91m");/* Red*/
+    		}else{
+    			strcpy(colour,"\x1B[97m");/* default*/
+    		}
+    		sprintf(value1A,"Value1A: %s%.2f V%s\n\r",colour,number,colour_default);
+    		push_UART1((char*)value1A);
 
 
-
-
+    		number += 0.51;
     	}
 
 
