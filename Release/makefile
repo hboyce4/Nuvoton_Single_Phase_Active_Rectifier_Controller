@@ -31,38 +31,38 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 SECONDARY_FLASH += \
-Test_UART.hex \
+Nuvoton_M48x_UART_Test.hex \
 
 SECONDARY_SIZE += \
-Test_UART.siz \
+Nuvoton_M48x_UART_Test.siz \
 
 
 # All Target
-all: Test_UART.elf secondary-outputs
+all: Nuvoton_M48x_UART_Test.elf secondary-outputs
 
 # Tool invocations
-Test_UART.elf: $(OBJS) $(USER_OBJS)
+Nuvoton_M48x_UART_Test.elf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross ARM GNU C Linker'
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Os -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g -T gcc_arm.ld -Xlinker --gc-sections -L"../CMSIS/GCC" -Wl,-Map,"Test_UART.map" --specs=nano.specs -o "Test_UART.elf" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Os -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g -T gcc_arm.ld -Xlinker --gc-sections -L"../CMSIS/GCC" -Wl,-Map,"Nuvoton_M48x_UART_Test.map" --specs=nano.specs -o "Nuvoton_M48x_UART_Test.elf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
-Test_UART.hex: Test_UART.elf
+Nuvoton_M48x_UART_Test.hex: Nuvoton_M48x_UART_Test.elf
 	@echo 'Invoking: Cross ARM GNU Create Flash Image'
-	arm-none-eabi-objcopy -O ihex "Test_UART.elf"  "Test_UART.hex"
+	arm-none-eabi-objcopy -O ihex "Nuvoton_M48x_UART_Test.elf"  "Nuvoton_M48x_UART_Test.hex"
 	@echo 'Finished building: $@'
 	@echo ' '
 
-Test_UART.siz: Test_UART.elf
+Nuvoton_M48x_UART_Test.siz: Nuvoton_M48x_UART_Test.elf
 	@echo 'Invoking: Cross ARM GNU Print Size'
-	arm-none-eabi-size --format=berkeley "Test_UART.elf"
+	arm-none-eabi-size --format=berkeley "Nuvoton_M48x_UART_Test.elf"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(OBJS)$(SECONDARY_FLASH)$(SECONDARY_SIZE)$(ASM_DEPS)$(S_UPPER_DEPS)$(C_DEPS) Test_UART.elf
+	-$(RM) $(OBJS)$(SECONDARY_FLASH)$(SECONDARY_SIZE)$(ASM_DEPS)$(S_UPPER_DEPS)$(C_DEPS) Nuvoton_M48x_UART_Test.elf
 	-@echo ' '
 
 secondary-outputs: $(SECONDARY_FLASH) $(SECONDARY_SIZE)

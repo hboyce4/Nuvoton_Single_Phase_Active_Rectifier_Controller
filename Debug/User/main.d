@@ -1,4 +1,4 @@
-User/main.o: ../User/main.c \
+User/main.o: ../User/main.c ../User/main.h \
  ../Library/Device/Nuvoton/M480/Include/NuMicro.h \
  ../Library/Device/Nuvoton/M480/Include/M480.h \
  ../Library/CMSIS/Include/core_cm4.h \
@@ -68,7 +68,10 @@ User/main.o: ../User/main.c \
  ../Library/StdDriver/inc/rtc.h ../Library/StdDriver/inc/usci_uart.h \
  ../Library/StdDriver/inc/sdh.h ../Library/StdDriver/inc/usbd.h \
  ../Library/StdDriver/inc/hsusbd.h ../Library/StdDriver/inc/otg.h \
- ../Library/StdDriver/inc/hsotg.h ../User/user_sys.h
+ ../Library/StdDriver/inc/hsotg.h ../User/user_sys.h \
+ ../User/inverter_control.h ../User/PLL.h ../User/UI.h
+
+../User/main.h:
 
 ../Library/Device/Nuvoton/M480/Include/NuMicro.h:
 
@@ -251,3 +254,9 @@ User/main.o: ../User/main.c \
 ../Library/StdDriver/inc/hsotg.h:
 
 ../User/user_sys.h:
+
+../User/inverter_control.h:
+
+../User/PLL.h:
+
+../User/UI.h:

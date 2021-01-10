@@ -5,25 +5,27 @@
  *
  * @copyright (C) 2016 Nuvoton Technology Corp. All rights reserved.
 *****************************************************************************/
+#include "main.h"
+
+/*---------------------------------------------------------------------------------------------------------*/
+/* Includes           				                                                                       */
+/*---------------------------------------------------------------------------------------------------------*/
+
 #include <stdio.h>
-#include <string.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include "NuMicro.h"
 
 #include "user_sys.h"
-
-
-#define PLL_CLOCK           192000000
-#define UI_FRAME_INTERVAL_MS	200	/* interval between UI refresh */
-#define LINE_WIDTH 40
-#define ESCAPE_SEQUENCE_LENGTH 8
-
-
+#include "inverter_control.h"
+#include "PLL.h"
+#include "UI.h"
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
 volatile uint64_t g_SysTickIntCnt = 0;
+
 volatile bool UI_new_frame_tick = false;
 
 
@@ -32,8 +34,6 @@ volatile bool UI_new_frame_tick = false;
 /*---------------------------------------------------------------------------------------------------------*/
 //void PDMA_IRQHandler(void);
 //void UART_PDMATest(void);
-
-
 
 
 
@@ -168,28 +168,15 @@ int main()
     const static char clear_screen_str[] = "\x1B[2J";
     push_UART1((char*)clear_screen_str);
 
-    float number = 0;
+
 
     while(1){
 
     	if(UI_new_frame_tick){
     		UI_new_frame_tick = false;
 
-    		const static char new_frame_and_header_str[] = "\x1B[2J\x1B[H****************MENU TEST****************\n\r";
-    		push_UART1((char*)new_frame_and_header_str);
-    		static char value1A[LINE_WIDTH];
-    		static char colour[ESCAPE_SEQUENCE_LENGTH];
-    		static char colour_default[ESCAPE_SEQUENCE_LENGTH] = "\x1B[97m";
-    		if(number > 10){
-    			strcpy(colour,"\x1B[91m");/* Red*/
-    		}else{
-    			strcpy(colour,"\x1B[97m");/* default*/
-    		}
-    		sprintf(value1A,"Value1A: %s%.2f V%s\n\r",colour,number,colour_default);
-    		push_UART1((char*)value1A);
+    		draw_UI();
 
-
-    		number += 0.51;
     	}
 
 

@@ -15,7 +15,7 @@ struct UART1_DMA_Job_Buffer_{
 	volatile UART_DMA_Xfer_t Buff[UART_DMA_JOB_BUFF_SIZE];
 	volatile uint8_t Head;
 	volatile uint8_t Tail;
-} UART1_DMA_Job_Buffer= {.Head = 0, .Tail = 0};
+} UART1_DMA_Job_Buffer = {.Head = 0, .Tail = 0};
 
 
 /*---------------------------------------------------------------------------------------------------------*/
