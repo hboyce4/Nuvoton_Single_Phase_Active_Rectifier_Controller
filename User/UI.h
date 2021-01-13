@@ -25,7 +25,7 @@
 /*---------------------------------------------------------------------------------------------------------*/
 
 #define UI_FRAME_INTERVAL_MS	200	/* interval between UI refresh */
-#define LINE_WIDTH 40
+#define LINE_WIDTH 64
 #define ESCAPE_SEQUENCE_LENGTH 8
 
 

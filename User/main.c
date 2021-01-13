@@ -50,7 +50,6 @@ void SysTick_Handler(void)
 	}
 	UI_refresh_counter--;
 
-
 }
 
 
@@ -165,8 +164,8 @@ int main()
 
     delay_ms(1000);
 
-    const static char clear_screen_str[] = "\x1B[2J";
-    push_UART1((char*)clear_screen_str);
+    //const static char clear_screen_str[] = "\x1B[2J";
+    //push_UART1((char*)clear_screen_str);
 
 
 

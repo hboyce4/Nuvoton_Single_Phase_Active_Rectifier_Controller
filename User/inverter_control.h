@@ -24,10 +24,11 @@ typedef enum {OPEN = 0, CLOSED = 1, PRECHARGE = 2} contactor_state_t;
 
 typedef struct {
 	volatile bool OV_v_AC;
-	volatile bool OV_v_DC_plus;
-	volatile bool OV_v_DC_minus;
-	volatile bool UV_v_DC_plus;
-	volatile bool UV_v_DC_minus;
+	volatile bool OV_V_DC_plus;
+	volatile bool OV_V_DC_minus;
+	volatile bool UV_V_DC_plus;
+	volatile bool UV_V_DC_minus;
+	volatile bool OV_V_DC_diff;
 	volatile bool OT_Transformer;
 	volatile bool OT_Inverter_PCB;
 	//volatile bool OT_Control_PCB;
