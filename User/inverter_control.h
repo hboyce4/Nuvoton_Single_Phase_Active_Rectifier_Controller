@@ -29,8 +29,10 @@ typedef struct {
 	volatile bool UV_V_DC_plus;
 	volatile bool UV_V_DC_minus;
 	volatile bool OV_V_DC_diff;
+	volatile bool HT_Transformer;
 	volatile bool OT_Transformer;
-	volatile bool OT_Inverter_PCB;
+	volatile bool HT_Inverter;
+	volatile bool OT_Inverter;
 	//volatile bool OT_Control_PCB;
 	volatile contactor_state_t DC_contactor_state;
 	volatile contactor_state_t AC_contactor_state;
@@ -48,6 +50,7 @@ typedef struct inverter_state_variables{
 	volatile float I_D;
 	//volatile float I_Q;
 	volatile float I_AC_RMS;
+	volatile float P_AC_RMS;
 
 	volatile float v_AC;
 	volatile float i_SP;
@@ -63,6 +66,7 @@ float some_float_state_variable;
 typedef struct {
 
 	//volatile float I_Q;
+	volatile bool inverter_active;
 	volatile float some_setpoint;
 
 } inverter_setpoints_t;

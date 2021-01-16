@@ -25,6 +25,7 @@ typedef struct {
 
 	//volatile float I_Q;
 	volatile float some_state_var;
+	volatile bool PLL_sync;
 
 } PLL_state_variables_t;
 

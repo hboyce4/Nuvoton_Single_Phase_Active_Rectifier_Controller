@@ -130,7 +130,7 @@ int main()
     /* Init UART to 115200-8n1 for print message */
     UART_Open(UART0, 115200);
 
-    UART_Open(UART1, 115200);
+    UART_Open(UART1, 460800);
     init_UART1_DMA(); /*Needs SysTick*/
 
 /*Test*/
