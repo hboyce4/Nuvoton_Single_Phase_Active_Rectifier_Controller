@@ -12,7 +12,7 @@
 /*---------------------------------------------------------------------------------------------------------*/
 
 /*---------------------------------------------------------------------------------------------------------*/
-/* Function definitions                                                                                       */
+/* Function definitions                                                                                    */
 /*---------------------------------------------------------------------------------------------------------*/
 
 void draw_UI(void){/* 60-ish characters width*/
@@ -37,11 +37,12 @@ void draw_UI(void){/* 60-ish characters width*/
 	draw_UI_line_7(&line_counter);
 	draw_UI_line_8(&line_counter);
 	draw_UI_line_9(&line_counter);
-	/* 468 bytes (or 4680 bits) sent up to here. 10.15ms @ 460800 baud */
+	draw_UI_line_separator(&line_counter);
 
 
 	/* Menu input*/
-	//draw_UI_line_A(&line_counter,row_sel, col_sel); /* Throws hard fault (???) */
+	draw_UI_line_A(&line_counter,row_sel, col_sel);
+	draw_UI_line_B(&line_counter,row_sel, col_sel);
 
 	/* Last line */
 	static char last_line_str[LINE_WIDTH];
@@ -232,9 +233,19 @@ void draw_UI_line_8(uint8_t* line_counter) {
 void draw_UI_line_9(uint8_t* line_counter) {
 
 	static char line_9_str[LINE_WIDTH];
-	sprintf(line_9_str,"****************************************\n\r");
+
+	sprintf(line_9_str,"PLL freq: %2.2f HZ\n\r",PLL_state_variables.PLL_freq_HZ);
 	(*line_counter)++;
+
 	push_UART1((char*) line_9_str);
+}
+
+void draw_UI_line_separator(uint8_t* line_counter) {
+
+	static char line_separator_str[LINE_WIDTH];
+	sprintf(line_separator_str,"****************************************\n\r");
+	(*line_counter)++;
+	push_UART1((char*) line_separator_str);
 }
 
 void draw_UI_line_A(uint8_t* line_counter, uint8_t row_sel, uint8_t col_sel) {
@@ -244,7 +255,7 @@ void draw_UI_line_A(uint8_t* line_counter, uint8_t row_sel, uint8_t col_sel) {
 	char on_off_str[ESCAPE_SEQUENCE_LENGTH];
 	char colour_v_setpoint_str[ESCAPE_SEQUENCE_LENGTH];
 
-
+	/* Column 0 */
 	if(row_sel == 0 && col_sel == 0){
 		strcpy(colour_on_off_str, COLOUR_SELECTED);
 	}else{
@@ -257,6 +268,7 @@ void draw_UI_line_A(uint8_t* line_counter, uint8_t row_sel, uint8_t col_sel) {
 		strcpy(on_off_str, "OFF");
 	}
 
+	/* Column 1 */
 	if(row_sel == 0 && col_sel == 1){
 		strcpy(colour_v_setpoint_str, COLOUR_SELECTED);
 	}else{
@@ -264,10 +276,40 @@ void draw_UI_line_A(uint8_t* line_counter, uint8_t row_sel, uint8_t col_sel) {
 	}
 
 
-	sprintf(line_A_str,"Inverter: %s%s%s\t\tV setpoint: %s%2.2f V%s\n\r",colour_on_off_str,on_off_str,COLOUR_DEFAULT,
-			colour_v_setpoint_str,COLOUR_DEFAULT);
+	sprintf(line_A_str,"Inverter: %s%s%s\t\tV DC set: %s%2.2f V%s\n\r",colour_on_off_str,on_off_str,COLOUR_DEFAULT,
+			colour_v_setpoint_str,inverter_setpoints.V_DC_total_setpoint,COLOUR_DEFAULT);
 	(*line_counter)++;
 
 	push_UART1((char*) line_A_str);
 
 }
+
+void draw_UI_line_B(uint8_t* line_counter, uint8_t row_sel, uint8_t col_sel) {
+
+	static char line_B_str[LINE_WIDTH];
+	char colour_V_diff_str[ESCAPE_SEQUENCE_LENGTH];
+	//char on_off_str[ESCAPE_SEQUENCE_LENGTH];
+	char colour_other_str[ESCAPE_SEQUENCE_LENGTH];
+
+	/* Column 0 */
+	if(row_sel == 1 && col_sel == 0){
+		strcpy(colour_other_str, COLOUR_SELECTED);
+	}else{
+		strcpy(colour_other_str, COLOUR_NOT_SELECTED);
+	}
+
+	/* Column 1 */
+	if(row_sel == 1 && col_sel == 1){
+		strcpy(colour_V_diff_str, COLOUR_SELECTED);
+	}else{
+		strcpy(colour_V_diff_str, COLOUR_NOT_SELECTED);
+	}
+
+	sprintf(line_B_str,"Other: %s%2.2f%s\t\tV DC diff set: %s%2.2f V%s\n\r",colour_other_str,inverter_setpoints.some_setpoint,COLOUR_DEFAULT,
+			colour_V_diff_str,inverter_setpoints.V_DC_diff_setpoint,COLOUR_DEFAULT);
+	(*line_counter)++;
+
+	push_UART1((char*) line_B_str);
+
+}
+

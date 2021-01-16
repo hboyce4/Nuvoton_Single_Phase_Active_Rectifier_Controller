@@ -68,6 +68,8 @@ typedef struct {
 	//volatile float I_Q;
 	volatile bool inverter_active;
 	volatile float some_setpoint;
+	volatile float V_DC_total_setpoint;
+	volatile float V_DC_diff_setpoint;
 
 } inverter_setpoints_t;
 

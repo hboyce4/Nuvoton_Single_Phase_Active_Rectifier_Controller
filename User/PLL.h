@@ -25,6 +25,7 @@ typedef struct {
 
 	//volatile float I_Q;
 	volatile float some_state_var;
+	volatile float PLL_freq_HZ; /* Frequency value, low pass filtered and converted to hertz*/
 	volatile bool PLL_sync;
 
 } PLL_state_variables_t;

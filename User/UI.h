@@ -57,6 +57,7 @@ void draw_UI_line_6(uint8_t*);
 void draw_UI_line_7(uint8_t*);
 void draw_UI_line_8(uint8_t*);
 void draw_UI_line_9(uint8_t*);
+void draw_UI_line_separator(uint8_t*);
 
 void draw_UI_line_A(uint8_t*,uint8_t,uint8_t);
 
