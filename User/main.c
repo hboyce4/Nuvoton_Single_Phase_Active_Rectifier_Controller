@@ -177,7 +177,8 @@ int main()
     		UI_new_frame_tick = false;
     		draw_UI(row_sel, col_sel);
     	}
-    	read_user_input(&row_sel,&col_sel);
+    	read_user_input(&row_sel,&col_sel);/* Since the chip has a 16 byte hardware FIFO, and we are only expecting
+    	 human input, we don't need interrupts nor DMA. Just run this routine every few milliseconds.*/
     	/* UI end */
 
 
