@@ -133,7 +133,7 @@ int main()
     UART_Open(UART1, 460800);
     init_UART1_DMA(); /*Needs SysTick*/
 
-/*Test*/
+    /*Test*/
 
     /* Configure PH.0, PH.1 and PH.2 as Output mode for LED blink */
     GPIO_SetMode(PH, BIT0|BIT1|BIT2, GPIO_MODE_OUTPUT); // LED outputs
@@ -171,12 +171,14 @@ int main()
 
     while(1){
 
+    	/* UI begin */
+    	int8_t row_sel, col_sel;
     	if(UI_new_frame_tick){
     		UI_new_frame_tick = false;
-
-    		draw_UI();
-
+    		draw_UI(row_sel, col_sel);
     	}
+    	read_user_input(&row_sel,&col_sel);
+    	/* UI end */
 
 
     }
@@ -184,4 +186,4 @@ int main()
 
 }
 
-/*** (C) COPYRIGHT 2016 Nuvoton Technology Corp. ***/
+/*** (C) COPYRIGHT 2021 Hugo Boyce ***/

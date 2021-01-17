@@ -15,38 +15,33 @@
 /* Function definitions                                                                                    */
 /*---------------------------------------------------------------------------------------------------------*/
 
-void draw_UI(void){/* 60-ish characters width*/
+void draw_UI(int8_t row_sel, int8_t col_sel){/* 60-ish characters width*/
 
 	/* Cursor home : \x1B[H */
 
-    uint8_t line_counter = 0;
-    uint8_t row_sel = 0;
-    uint8_t col_sel = 0;
-
-    //static char COLOUR_DEFAULT[2*ESCAPE_SEQUENCE_LENGTH] = "\x1B[97m\x1B[40m";
-    //static char colour_selected[2*ESCAPE_SEQUENCE_LENGTH] = "\x1B[30m\x1B[105m";
-    //static char colour_not_selected[2*ESCAPE_SEQUENCE_LENGTH] = "\x1B[95m\x1B[40m";
+    uint8_t p_line_counter = 0;
 
     /* Current state display */
-	draw_UI_line_0_1(&line_counter);
-	draw_UI_line_2(&line_counter);
-	draw_UI_line_3(&line_counter);
-	draw_UI_line_4(&line_counter);
-	draw_UI_line_5(&line_counter);
-	draw_UI_line_6(&line_counter);
-	draw_UI_line_7(&line_counter);
-	draw_UI_line_8(&line_counter);
-	draw_UI_line_9(&line_counter);
-	draw_UI_line_separator(&line_counter);
+	draw_UI_line_0_1(&p_line_counter);
+	draw_UI_line_2(&p_line_counter);
+	draw_UI_line_3(&p_line_counter);
+	draw_UI_line_4(&p_line_counter);
+	draw_UI_line_5(&p_line_counter);
+	draw_UI_line_6(&p_line_counter);
+	draw_UI_line_7(&p_line_counter);
+	draw_UI_line_8(&p_line_counter);
+	draw_UI_line_9(&p_line_counter);
 
-
+	draw_UI_line_separator(&p_line_counter);
 	/* Menu input*/
-	draw_UI_line_A(&line_counter,row_sel, col_sel);
-	draw_UI_line_B(&line_counter,row_sel, col_sel);
+	draw_UI_line_A(&p_line_counter,row_sel, col_sel);
+	draw_UI_line_B(&p_line_counter,row_sel, col_sel);
+
+	draw_UI_line_separator(&p_line_counter);
 
 	/* Last line */
 	static char last_line_str[LINE_WIDTH];
-	sprintf(last_line_str,"\x1B[%uA",line_counter);
+	sprintf(last_line_str,"\x1B[%uA",p_line_counter);
 	push_UART1((char*)last_line_str);
 	/* End of last line */
 
@@ -56,16 +51,117 @@ void draw_UI(void){/* 60-ish characters width*/
 
 }
 
-void draw_UI_line_0_1(uint8_t* line_counter) {
+void read_user_input(int8_t* p_row_sel, int8_t* p_col_sel){
+
+  	char user_char;
+  	static uint8_t state = 0;
+	uint32_t u32IntSts = UART1->INTSTS;
+
+	if(u32IntSts & UART_INTSTS_RDAIF_Msk){/* If there is data to be read*/
+		user_char = ((char)UART1->DAT); // read out data
+
+		if (state == 0){/* If no characters have been received*/
+			if(user_char == 0x1B){/* If the first character is escape*/
+				state++;/* Go to the next state*/
+			}else if (user_char == '+'){/* If a '+' is received, the selected value is incremented*/
+				increment_UI_value(*p_row_sel,*p_col_sel);
+			}else if (user_char == '-'){/* If a '-' is received, the selected value is decremented*/
+				decrement_UI_value(*p_row_sel,*p_col_sel);
+			}
+
+		} else if (state == 1){/* If the first character of an escape sequence (ESC) has been received*/
+
+			if(user_char == '['){/* If the next received character is the 2nd character of an escape sequence*/
+				state++;/* Go to the next state*/
+			}else{
+				state = 0;/* Else reset the state machine*/
+			}
+		} else if (state == 2){
+
+			if(user_char == 'A'){/* Up */
+				(*p_row_sel)--;/*Move the selection up*/
+				if(*p_row_sel<0){/* If the selection goes past the highest row*/
+					*p_row_sel = 0;/* Stay at the highest row, don't wrap around*/
+				}
+				state = 0;/* Finally, reset the state machine*/
+
+			}else if (user_char == 'B'){ /* Down*/
+				(*p_row_sel)++;/*Move the selection down*/
+				if(*p_row_sel >= UI_MENU_NB_ROWS){/* If the selection goes past the lowest row*/
+					*p_row_sel = (UI_MENU_NB_ROWS-1);/* Stay at the lowest row, don't wrap around*/
+				}
+				state = 0;/* Finally, reset the state machine*/
+
+			}else if (user_char == 'C'){ /* Right */
+				(*p_col_sel)++;/*Move the selection right*/
+				if(*p_col_sel >= UI_MENU_NB_COLUMNS){/* If the selection goes past the lowest row*/
+					*p_col_sel = (UI_MENU_NB_COLUMNS-1);/* Stay at the lowest row, don't wrap around*/
+				}
+				state = 0;/* Finally, reset the state machine*/
+
+			}else if (user_char == 'D'){ /* Left*/
+				(*p_col_sel)--;/*Move the selection left*/
+				if(*p_col_sel<0){/* If the selection goes past the highest row*/
+					*p_col_sel = 0;/* Stay at the highest row, don't wrap around*/
+				}
+				state = 0;/* Finally, reset the state machine*/
+
+			}else{
+				state = 0;/* Else reset the state machine*/
+			}
+
+		}
+
+		//printf("\nReceived character '0x%x' \n", user_char); /* for debug */
+
+	}
+}
+
+void increment_UI_value(int8_t row_sel, int8_t col_sel){
+
+	if(row_sel == 0){
+		if(col_sel == 0){
+			inverter_setpoints.inverter_active = !inverter_setpoints.inverter_active;
+		}else if (col_sel == 1){
+			inverter_setpoints.V_DC_total_setpoint += FLOAT_INCREMENT;
+		}
+	} else if(row_sel == 1){
+		if(col_sel == 0){
+			inverter_setpoints.some_setpoint += FLOAT_INCREMENT;
+		}else if (col_sel == 1){
+			inverter_setpoints.V_DC_diff_setpoint += FLOAT_INCREMENT;
+		}
+	}
+}
+
+void decrement_UI_value(int8_t row_sel, int8_t col_sel){
+
+	if(row_sel == 0){
+		if(col_sel == 0){
+			inverter_setpoints.inverter_active = !inverter_setpoints.inverter_active;
+		}else if (col_sel == 1){
+			inverter_setpoints.V_DC_total_setpoint -= FLOAT_INCREMENT;
+		}
+	} else if(row_sel == 1){
+		if(col_sel == 0){
+			inverter_setpoints.some_setpoint -= FLOAT_INCREMENT;
+		}else if (col_sel == 1){
+			inverter_setpoints.V_DC_diff_setpoint -= FLOAT_INCREMENT;
+		}
+	}
+}
+
+
+void draw_UI_line_0_1(uint8_t* p_line_counter) {
 	/* Line 0 and 1*/
 	static const char line_0_1_str[] =
 			"\x1B[0J\n\r****ACTIVE RECTIFIER CONTROLLER V0.1****\n\r";
 	/*Escape sequence to clear from cursor to end of screen*/
-	*line_counter += 2;
+	*p_line_counter += 2;
 	push_UART1((char*) line_0_1_str);
 }
 
-void draw_UI_line_2(uint8_t* line_counter) {
+void draw_UI_line_2(uint8_t* p_line_counter) {
 
 	static char line_2_str[LINE_WIDTH];
 	static char colour_V_DC_plus[ESCAPE_SEQUENCE_LENGTH];
@@ -94,11 +190,11 @@ void draw_UI_line_2(uint8_t* line_counter) {
 			colour_V_DC_plus, inverter_state_variables.V_DC_plus,
 			COLOUR_DEFAULT, colour_V_DC_minus,
 			inverter_state_variables.V_DC_minus);
-	(*line_counter)++;
+	(*p_line_counter)++;
 	push_UART1((char*) line_2_str);
 }
 
-void draw_UI_line_3(uint8_t* line_counter) {
+void draw_UI_line_3(uint8_t* p_line_counter) {
 
 	static char line_3_str[LINE_WIDTH];
 	static char colour_V_DC_diff[ESCAPE_SEQUENCE_LENGTH];
@@ -111,21 +207,21 @@ void draw_UI_line_3(uint8_t* line_counter) {
 	sprintf(line_3_str, "V bus diff: %s%2.2f V%s\tV bus total: %2.2f V\n\r",
 			colour_V_DC_diff, inverter_state_variables.V_DC_diff,
 			COLOUR_DEFAULT, inverter_state_variables.V_DC_total);
-	(*line_counter)++;
+	(*p_line_counter)++;
 	push_UART1((char*) line_3_str);
 }
 
-void draw_UI_line_4(uint8_t* line_counter) {
+void draw_UI_line_4(uint8_t* p_line_counter) {
 
 	static char line_4_str[LINE_WIDTH];
 	sprintf(line_4_str, "I AC RMS: %2.2f A\tV AC RMS: %2.2f V\n\r",
 			inverter_state_variables.I_AC_RMS,
 			inverter_state_variables.V_AC_RMS);
-	(*line_counter)++;
+	(*p_line_counter)++;
 	push_UART1((char*) line_4_str);
 }
 
-void draw_UI_line_5(uint8_t* line_counter) {
+void draw_UI_line_5(uint8_t* p_line_counter) {
 
 	static char line_5_str[LINE_WIDTH];
 	static char power_flow_dir_str[ESCAPE_SEQUENCE_LENGTH];
@@ -138,11 +234,11 @@ void draw_UI_line_5(uint8_t* line_counter) {
 	}
 	sprintf(line_5_str, "P AC RMS: %2.2f W\tPower flow: DC%sAC\n\r",
 			inverter_state_variables.P_AC_RMS, power_flow_dir_str);
-	(*line_counter)++;
+	(*p_line_counter)++;
 	push_UART1((char*) line_5_str);
 }
 
-void draw_UI_line_6(uint8_t* line_counter) {
+void draw_UI_line_6(uint8_t* p_line_counter) {
 
 	static char line_6_str[LINE_WIDTH];
 	static char xformer_temp_color_str[ESCAPE_SEQUENCE_LENGTH];
@@ -174,11 +270,11 @@ void draw_UI_line_6(uint8_t* line_counter) {
 			xformer_temp_color_str, inverter_state_variables.T_transformer,
 			COLOUR_DEFAULT, inverter_temp_color_str,
 			inverter_state_variables.T_inverter, COLOUR_DEFAULT);
-	(*line_counter)++;
+	(*p_line_counter)++;
 	push_UART1((char*) line_6_str);
 }
 
-void draw_UI_line_7(uint8_t* line_counter) {
+void draw_UI_line_7(uint8_t* p_line_counter) {
 
 	static char line_7_str[LINE_WIDTH];
 	sprintf(line_7_str, "AC Contactor:");
@@ -202,11 +298,11 @@ void draw_UI_line_7(uint8_t* line_counter) {
 	}
 
 	strcat(line_7_str, "\n\r");
-	(*line_counter)++;
+	(*p_line_counter)++;
 	push_UART1((char*) line_7_str);
 }
 
-void draw_UI_line_8(uint8_t* line_counter) {
+void draw_UI_line_8(uint8_t* p_line_counter) {
 
 	static char line_8_str[LINE_WIDTH];
 	sprintf(line_8_str, "PLL sync: ");
@@ -226,29 +322,29 @@ void draw_UI_line_8(uint8_t* line_counter) {
 		strcat(line_8_str, COLOUR_DEFAULT);
 	}
 	strcat(line_8_str, "\n\r");
-	(*line_counter)++;
+	(*p_line_counter)++;
 	push_UART1((char*) line_8_str);
 }
 
-void draw_UI_line_9(uint8_t* line_counter) {
+void draw_UI_line_9(uint8_t* p_line_counter) {
 
 	static char line_9_str[LINE_WIDTH];
 
 	sprintf(line_9_str,"PLL freq: %2.2f HZ\n\r",PLL_state_variables.PLL_freq_HZ);
-	(*line_counter)++;
+	(*p_line_counter)++;
 
 	push_UART1((char*) line_9_str);
 }
 
-void draw_UI_line_separator(uint8_t* line_counter) {
+void draw_UI_line_separator(uint8_t* p_line_counter) {
 
 	static char line_separator_str[LINE_WIDTH];
 	sprintf(line_separator_str,"****************************************\n\r");
-	(*line_counter)++;
+	(*p_line_counter)++;
 	push_UART1((char*) line_separator_str);
 }
 
-void draw_UI_line_A(uint8_t* line_counter, uint8_t row_sel, uint8_t col_sel) {
+void draw_UI_line_A(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel) {
 
 	static char line_A_str[LINE_WIDTH];
 	char colour_on_off_str[ESCAPE_SEQUENCE_LENGTH];
@@ -278,13 +374,13 @@ void draw_UI_line_A(uint8_t* line_counter, uint8_t row_sel, uint8_t col_sel) {
 
 	sprintf(line_A_str,"Inverter: %s%s%s\t\tV DC set: %s%2.2f V%s\n\r",colour_on_off_str,on_off_str,COLOUR_DEFAULT,
 			colour_v_setpoint_str,inverter_setpoints.V_DC_total_setpoint,COLOUR_DEFAULT);
-	(*line_counter)++;
+	(*p_line_counter)++;
 
 	push_UART1((char*) line_A_str);
 
 }
 
-void draw_UI_line_B(uint8_t* line_counter, uint8_t row_sel, uint8_t col_sel) {
+void draw_UI_line_B(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
 
 	static char line_B_str[LINE_WIDTH];
 	char colour_V_diff_str[ESCAPE_SEQUENCE_LENGTH];
@@ -307,7 +403,7 @@ void draw_UI_line_B(uint8_t* line_counter, uint8_t row_sel, uint8_t col_sel) {
 
 	sprintf(line_B_str,"Other: %s%2.2f%s\t\tV DC diff set: %s%2.2f V%s\n\r",colour_other_str,inverter_setpoints.some_setpoint,COLOUR_DEFAULT,
 			colour_V_diff_str,inverter_setpoints.V_DC_diff_setpoint,COLOUR_DEFAULT);
-	(*line_counter)++;
+	(*p_line_counter)++;
 
 	push_UART1((char*) line_B_str);
 

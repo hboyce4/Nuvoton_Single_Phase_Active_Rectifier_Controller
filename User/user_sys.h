@@ -25,6 +25,7 @@
 #define UART1_TX_DMA_CHANNEL 10 /* PDMA->REQSEL8_11 has to be modified by hand if the channel in this macro is changed. I know this is bad.*/
 #define UART_DMA_JOB_BUFF_SIZE 32 /* Must be a power of 2. Max = 256*/
 #define DMA_PRIORITY 5
+#define UART1_PRIORITY 6
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Type definitions           				                                                                       */

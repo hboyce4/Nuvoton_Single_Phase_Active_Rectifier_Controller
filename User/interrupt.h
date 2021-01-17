@@ -12,5 +12,6 @@
 #include "user_sys.h"
 
 void PDMA_IRQHandler(void);
+void UART1_IRQHandler(void);
 
 #endif /* INTERRUPT_H_ */

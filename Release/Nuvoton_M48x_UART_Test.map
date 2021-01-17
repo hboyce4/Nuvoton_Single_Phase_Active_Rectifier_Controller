@@ -99,7 +99,7 @@ Allocating common symbols
 Common symbol       size              file
 
 PLL_state_variables
-                    0x4               ./User/PLL.o
+                    0xc               ./User/PLL.o
 errno               0x4               ./CMSIS/GCC/_syscalls.o
 g_hsusbd_sInfo      0x4               ./Library/StdDriver/src/hsusbd.o
 inverter_limits     0x4               ./User/inverter_control.o
@@ -111,7 +111,7 @@ gUsbCmd             0x8               ./Library/StdDriver/src/hsusbd.o
 g_usbd_sInfo        0x4               ./Library/StdDriver/src/usbd.o
 inverter_state_safety
                     0xe               ./User/inverter_control.o
-inverter_setpoints  0x4               ./User/inverter_control.o
+inverter_setpoints  0x10              ./User/inverter_control.o
 g_ECC_done          0x4               ./Library/StdDriver/src/crypto.o
 some_float_state_variable
                     0x4               ./User/PLL.o
@@ -131,16 +131,6 @@ Discarded input sections
  .text          0x00000000        0x0 ./User/PLL.o
  .data          0x00000000        0x0 ./User/PLL.o
  .bss           0x00000000        0x0 ./User/PLL.o
- .debug_info    0x00000000      0x291 ./User/PLL.o
- .debug_abbrev  0x00000000       0xb0 ./User/PLL.o
- .debug_aranges
-                0x00000000       0x18 ./User/PLL.o
- .debug_line    0x00000000       0x4d ./User/PLL.o
- .debug_str     0x00000000      0x39a ./User/PLL.o
- .comment       0x00000000       0x80 ./User/PLL.o
- .ARM.attributes
-                0x00000000       0x39 ./User/PLL.o
- COMMON         0x00000000        0x8 ./User/PLL.o
  .text          0x00000000        0x0 ./User/UI.o
  .data          0x00000000        0x0 ./User/UI.o
  .bss           0x00000000        0x0 ./User/UI.o
@@ -2409,7 +2399,7 @@ LOAD c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/g
 LOAD c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libnosys.a
 END GROUP
 
-.text           0x00000000     0x2bf8
+.text           0x00000000     0x317c
  *(.vectors)
  .vectors       0x00000000      0x1f4 ./CMSIS/GCC/startup_M480.o
                 0x00000000                __Vectors
@@ -2421,367 +2411,411 @@ END GROUP
  .text          0x00000260       0x74 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard/crt0.o
                 0x00000260                _start
                 0x00000260                _mainCRTStartup
- *fill*         0x000002d4        0x4 
- .text.draw_UI  0x000002d8      0x2a0 ./User/UI.o
-                0x000002d8                draw_UI
+ .text.increment_UI_value
+                0x000002d4       0x60 ./User/UI.o
+                0x000002d4                increment_UI_value
+ .text.decrement_UI_value
+                0x00000334       0x60 ./User/UI.o
+                0x00000334                decrement_UI_value
+ .text.read_user_input
+                0x00000394       0xb0 ./User/UI.o
+                0x00000394                read_user_input
+ .text.draw_UI_line_0_1
+                0x00000444       0x10 ./User/UI.o
+                0x00000444                draw_UI_line_0_1
+ .text.draw_UI_line_2
+                0x00000454       0x98 ./User/UI.o
+                0x00000454                draw_UI_line_2
+ .text.draw_UI_line_3
+                0x000004ec       0x6c ./User/UI.o
+                0x000004ec                draw_UI_line_3
+ .text.draw_UI_line_4
+                0x00000558       0x4c ./User/UI.o
+                0x00000558                draw_UI_line_4
+ .text.draw_UI_line_5
+                0x000005a4       0x60 ./User/UI.o
+                0x000005a4                draw_UI_line_5
+ .text.draw_UI_line_6
+                0x00000604       0xa0 ./User/UI.o
+                0x00000604                draw_UI_line_6
+ .text.draw_UI_line_7
+                0x000006a4       0xa8 ./User/UI.o
+                0x000006a4                draw_UI_line_7
+ .text.draw_UI_line_8
+                0x0000074c       0x84 ./User/UI.o
+                0x0000074c                draw_UI_line_8
+ .text.draw_UI_line_9
+                0x000007d0       0x38 ./User/UI.o
+                0x000007d0                draw_UI_line_9
+ .text.draw_UI_line_separator
+                0x00000808       0x24 ./User/UI.o
+                0x00000808                draw_UI_line_separator
+ .text.draw_UI_line_A
+                0x0000082c       0x9c ./User/UI.o
+                0x0000082c                draw_UI_line_A
+ .text.draw_UI_line_B
+                0x000008c8       0x88 ./User/UI.o
+                0x000008c8                draw_UI_line_B
+ .text.draw_UI  0x00000950       0xac ./User/UI.o
+                0x00000950                draw_UI
  .text.PDMA_IRQHandler
-                0x00000578       0x80 ./User/interrupt.o
-                0x00000578                PDMA_IRQHandler
+                0x000009fc       0x80 ./User/interrupt.o
+                0x000009fc                PDMA_IRQHandler
  .text.SysTick_Handler
-                0x000005f8       0x3c ./User/main.o
-                0x000005f8                SysTick_Handler
+                0x00000a7c       0x3c ./User/main.o
+                0x00000a7c                SysTick_Handler
  .text.SYS_Init
-                0x00000634       0xb4 ./User/main.o
-                0x00000634                SYS_Init
+                0x00000ab8       0xb4 ./User/main.o
+                0x00000ab8                SYS_Init
  .text.startup.main
-                0x000006e8       0xf0 ./User/main.o
-                0x000006e8                main
+                0x00000b6c      0x104 ./User/main.o
+                0x00000b6c                main
  .text.update_button_LED_states
-                0x000007d8       0x4c ./User/user_sys.o
-                0x000007d8                update_button_LED_states
+                0x00000c70       0x4c ./User/user_sys.o
+                0x00000c70                update_button_LED_states
  .text.delay_ms
-                0x00000824       0x24 ./User/user_sys.o
-                0x00000824                delay_ms
+                0x00000cbc       0x24 ./User/user_sys.o
+                0x00000cbc                delay_ms
  .text.init_UART1_DMA
-                0x00000848       0x80 ./User/user_sys.o
-                0x00000848                init_UART1_DMA
+                0x00000ce0       0x80 ./User/user_sys.o
+                0x00000ce0                init_UART1_DMA
  .text.start_UART1_DMA_Xfer
-                0x000008c8       0x38 ./User/user_sys.o
-                0x000008c8                start_UART1_DMA_Xfer
+                0x00000d60       0x38 ./User/user_sys.o
+                0x00000d60                start_UART1_DMA_Xfer
  .text.push_UART1
-                0x00000900       0x74 ./User/user_sys.o
-                0x00000900                push_UART1
+                0x00000d98       0x74 ./User/user_sys.o
+                0x00000d98                push_UART1
  .text.pop_UART1
-                0x00000974       0x3c ./User/user_sys.o
-                0x00000974                pop_UART1
+                0x00000e0c       0x3c ./User/user_sys.o
+                0x00000e0c                pop_UART1
  .text.CLK_EnableXtalRC
-                0x000009b0       0x10 ./Library/StdDriver/src/clk.o
-                0x000009b0                CLK_EnableXtalRC
+                0x00000e48       0x10 ./Library/StdDriver/src/clk.o
+                0x00000e48                CLK_EnableXtalRC
  .text.CLK_DisablePLL
-                0x000009c0       0x10 ./Library/StdDriver/src/clk.o
-                0x000009c0                CLK_DisablePLL
+                0x00000e58       0x10 ./Library/StdDriver/src/clk.o
+                0x00000e58                CLK_DisablePLL
  .text.CLK_WaitClockReady
-                0x000009d0       0x20 ./Library/StdDriver/src/clk.o
-                0x000009d0                CLK_WaitClockReady
+                0x00000e68       0x20 ./Library/StdDriver/src/clk.o
+                0x00000e68                CLK_WaitClockReady
  .text.CLK_SetHCLK
-                0x000009f0       0x4c ./Library/StdDriver/src/clk.o
-                0x000009f0                CLK_SetHCLK
+                0x00000e88       0x4c ./Library/StdDriver/src/clk.o
+                0x00000e88                CLK_SetHCLK
  .text.CLK_GetPLLClockFreq
-                0x00000a3c       0x64 ./Library/StdDriver/src/clk.o
-                0x00000a3c                CLK_GetPLLClockFreq
+                0x00000ed4       0x64 ./Library/StdDriver/src/clk.o
+                0x00000ed4                CLK_GetPLLClockFreq
  .text.CLK_EnablePLL
-                0x00000aa0      0x154 ./Library/StdDriver/src/clk.o
-                0x00000aa0                CLK_EnablePLL
+                0x00000f38      0x154 ./Library/StdDriver/src/clk.o
+                0x00000f38                CLK_EnablePLL
  .text.CLK_SetCoreClock
-                0x00000bf4       0x74 ./Library/StdDriver/src/clk.o
-                0x00000bf4                CLK_SetCoreClock
+                0x0000108c       0x74 ./Library/StdDriver/src/clk.o
+                0x0000108c                CLK_SetCoreClock
  .text.GPIO_SetMode
-                0x00000c68       0x2c ./Library/StdDriver/src/gpio.o
-                0x00000c68                GPIO_SetMode
+                0x00001100       0x2c ./Library/StdDriver/src/gpio.o
+                0x00001100                GPIO_SetMode
  .text.PDMA_EnableInt
-                0x00000c94       0x3c ./Library/StdDriver/src/pdma.o
-                0x00000c94                PDMA_EnableInt
+                0x0000112c       0x3c ./Library/StdDriver/src/pdma.o
+                0x0000112c                PDMA_EnableInt
  .text.Hard_Fault_Handler
-                0x00000cd0       0x70 ./Library/StdDriver/src/retarget.o
-                0x00000cd0                Hard_Fault_Handler
+                0x00001168       0x70 ./Library/StdDriver/src/retarget.o
+                0x00001168                Hard_Fault_Handler
  .text.HardFault_Handler
-                0x00000d40       0x24 ./Library/StdDriver/src/retarget.o
-                0x00000d40                HardFault_Handler
- .text._write   0x00000d64       0x34 ./Library/StdDriver/src/retarget.o
-                0x00000d64                _write
- .text._read    0x00000d98       0x14 ./Library/StdDriver/src/retarget.o
-                0x00000d98                _read
+                0x000011d8       0x24 ./Library/StdDriver/src/retarget.o
+                0x000011d8                HardFault_Handler
+ .text._write   0x000011fc       0x34 ./Library/StdDriver/src/retarget.o
+                0x000011fc                _write
+ .text._read    0x00001230       0x14 ./Library/StdDriver/src/retarget.o
+                0x00001230                _read
  .text.UART_Open
-                0x00000dac      0x10c ./Library/StdDriver/src/uart.o
-                0x00000dac                UART_Open
- .text._close   0x00000eb8       0x10 ./CMSIS/GCC/_syscalls.o
-                0x00000eb8                _close
- .text._fstat   0x00000ec8       0x10 ./CMSIS/GCC/_syscalls.o
-                0x00000ec8                _fstat
- .text._isatty  0x00000ed8        0xe ./CMSIS/GCC/_syscalls.o
-                0x00000ed8                _isatty
- .text._lseek   0x00000ee6       0x10 ./CMSIS/GCC/_syscalls.o
-                0x00000ee6                _lseek
- *fill*         0x00000ef6        0x2 
- .text          0x00000ef8       0x68 ./CMSIS/GCC/startup_M480.o
-                0x00000ef8                Reset_Handler
-                0x00000f5c                BRAKE0_IRQHandler
-                0x00000f5c                SC2_IRQHandler
-                0x00000f5c                DebugMon_Handler
-                0x00000f5c                EPWM1P2_IRQHandler
-                0x00000f5c                ACMP01_IRQHandler
-                0x00000f5c                I2C0_IRQHandler
-                0x00000f5c                EMAC_RX_IRQHandler
-                0x00000f5c                SC0_IRQHandler
-                0x00000f5c                USCI0_IRQHandler
-                0x00000f5c                EADC13_IRQHandler
-                0x00000f5c                PendSV_Handler
-                0x00000f5c                NMI_Handler
-                0x00000f5c                I2C1_IRQHandler
-                0x00000f5c                EINT2_IRQHandler
-                0x00000f5c                UART1_IRQHandler
-                0x00000f5c                CAN1_IRQHandler
-                0x00000f5c                EINT3_IRQHandler
-                0x00000f5c                EADC01_IRQHandler
-                0x00000f5c                I2S0_IRQHandler
-                0x00000f5c                EINT6_IRQHandler
-                0x00000f5c                EPWM1P1_IRQHandler
-                0x00000f5c                UART0_IRQHandler
-                0x00000f5c                BRAKE1_IRQHandler
-                0x00000f5c                GPE_IRQHandler
-                0x00000f5c                EPWM1P0_IRQHandler
-                0x00000f5c                EADC03_IRQHandler
-                0x00000f5c                SDH1_IRQHandler
-                0x00000f5c                USBD_IRQHandler
-                0x00000f5c                EADC12_IRQHandler
-                0x00000f5c                UsageFault_Handler
-                0x00000f5c                EADC10_IRQHandler
-                0x00000f5c                GPB_IRQHandler
-                0x00000f5c                SPI1_IRQHandler
-                0x00000f5c                TAMPER_IRQHandler
-                0x00000f5c                TMR0_IRQHandler
-                0x00000f5c                USCI1_IRQHandler
-                0x00000f5c                SDH0_IRQHandler
-                0x00000f5c                QSPI0_IRQHandler
-                0x00000f5c                EPWM0P1_IRQHandler
-                0x00000f5c                GPA_IRQHandler
-                0x00000f5c                IRC_IRQHandler
-                0x00000f5c                I2C2_IRQHandler
-                0x00000f5c                EINT7_IRQHandler
-                0x00000f5c                EADC02_IRQHandler
-                0x00000f5c                RTC_IRQHandler
-                0x00000f5c                PWRWU_IRQHandler
-                0x00000f5c                EPWM0P2_IRQHandler
-                0x00000f5c                UART5_IRQHandler
-                0x00000f5c                BPWM1_IRQHandler
-                0x00000f5c                EINT1_IRQHandler
-                0x00000f5c                EADC11_IRQHandler
-                0x00000f5c                UART2_IRQHandler
-                0x00000f5c                EHCI_IRQHandler
-                0x00000f5c                GPH_IRQHandler
-                0x00000f5c                UART4_IRQHandler
-                0x00000f5c                GPC_IRQHandler
-                0x00000f5c                OHCI_IRQHandler
-                0x00000f5c                Default_Handler
-                0x00000f5c                QSPI1_IRQHandler
-                0x00000f5c                CKFAIL_IRQHandler
-                0x00000f5c                USBOTG20_IRQHandler
-                0x00000f5c                QEI1_IRQHandler
-                0x00000f5c                TMR2_IRQHandler
-                0x00000f5c                SPIM_IRQHandler
-                0x00000f5c                ECAP0_IRQHandler
-                0x00000f5c                QEI0_IRQHandler
-                0x00000f5c                BPWM0_IRQHandler
-                0x00000f5c                BOD_IRQHandler
-                0x00000f5c                SPI2_IRQHandler
-                0x00000f5c                MemManage_Handler
-                0x00000f5c                WDT_IRQHandler
-                0x00000f5c                SVC_Handler
-                0x00000f5c                USBOTG_IRQHandler
-                0x00000f5c                OPA0_IRQHandler
-                0x00000f5c                EINT4_IRQHandler
-                0x00000f5c                USBD20_IRQHandler
-                0x00000f5c                SC1_IRQHandler
-                0x00000f5c                RAMPE_IRQHandler
-                0x00000f5c                EPWM0P0_IRQHandler
-                0x00000f5c                EINT0_IRQHandler
-                0x00000f5c                EINT5_IRQHandler
-                0x00000f5c                CRYPTO_IRQHandler
-                0x00000f5c                GPG_IRQHandler
-                0x00000f5c                CAN0_IRQHandler
-                0x00000f5c                TMR3_IRQHandler
-                0x00000f5c                DAC_IRQHandler
-                0x00000f5c                EMAC_TX_IRQHandler
-                0x00000f5c                SPI0_IRQHandler
-                0x00000f5c                GPD_IRQHandler
-                0x00000f5c                UART7_IRQHandler
-                0x00000f5c                UART6_IRQHandler
-                0x00000f5c                CCAP_IRQHandler
-                0x00000f5c                ECAP1_IRQHandler
-                0x00000f5c                CAN2_IRQHandler
-                0x00000f5c                GPF_IRQHandler
-                0x00000f5c                BusFault_Handler
-                0x00000f5c                SPI3_IRQHandler
-                0x00000f5c                UART3_IRQHandler
-                0x00000f5c                TMR1_IRQHandler
-                0x00000f5c                TRNG_IRQHandler
-                0x00000f5c                WWDT_IRQHandler
-                0x00000f5c                EADC00_IRQHandler
+                0x00001244      0x10c ./Library/StdDriver/src/uart.o
+                0x00001244                UART_Open
+ .text._close   0x00001350       0x10 ./CMSIS/GCC/_syscalls.o
+                0x00001350                _close
+ .text._fstat   0x00001360       0x10 ./CMSIS/GCC/_syscalls.o
+                0x00001360                _fstat
+ .text._isatty  0x00001370        0xe ./CMSIS/GCC/_syscalls.o
+                0x00001370                _isatty
+ .text._lseek   0x0000137e       0x10 ./CMSIS/GCC/_syscalls.o
+                0x0000137e                _lseek
+ *fill*         0x0000138e        0x2 
+ .text          0x00001390       0x68 ./CMSIS/GCC/startup_M480.o
+                0x00001390                Reset_Handler
+                0x000013f4                BRAKE0_IRQHandler
+                0x000013f4                SC2_IRQHandler
+                0x000013f4                DebugMon_Handler
+                0x000013f4                EPWM1P2_IRQHandler
+                0x000013f4                ACMP01_IRQHandler
+                0x000013f4                I2C0_IRQHandler
+                0x000013f4                EMAC_RX_IRQHandler
+                0x000013f4                SC0_IRQHandler
+                0x000013f4                USCI0_IRQHandler
+                0x000013f4                EADC13_IRQHandler
+                0x000013f4                PendSV_Handler
+                0x000013f4                NMI_Handler
+                0x000013f4                I2C1_IRQHandler
+                0x000013f4                EINT2_IRQHandler
+                0x000013f4                UART1_IRQHandler
+                0x000013f4                CAN1_IRQHandler
+                0x000013f4                EINT3_IRQHandler
+                0x000013f4                EADC01_IRQHandler
+                0x000013f4                I2S0_IRQHandler
+                0x000013f4                EINT6_IRQHandler
+                0x000013f4                EPWM1P1_IRQHandler
+                0x000013f4                UART0_IRQHandler
+                0x000013f4                BRAKE1_IRQHandler
+                0x000013f4                GPE_IRQHandler
+                0x000013f4                EPWM1P0_IRQHandler
+                0x000013f4                EADC03_IRQHandler
+                0x000013f4                SDH1_IRQHandler
+                0x000013f4                USBD_IRQHandler
+                0x000013f4                EADC12_IRQHandler
+                0x000013f4                UsageFault_Handler
+                0x000013f4                EADC10_IRQHandler
+                0x000013f4                GPB_IRQHandler
+                0x000013f4                SPI1_IRQHandler
+                0x000013f4                TAMPER_IRQHandler
+                0x000013f4                TMR0_IRQHandler
+                0x000013f4                USCI1_IRQHandler
+                0x000013f4                SDH0_IRQHandler
+                0x000013f4                QSPI0_IRQHandler
+                0x000013f4                EPWM0P1_IRQHandler
+                0x000013f4                GPA_IRQHandler
+                0x000013f4                IRC_IRQHandler
+                0x000013f4                I2C2_IRQHandler
+                0x000013f4                EINT7_IRQHandler
+                0x000013f4                EADC02_IRQHandler
+                0x000013f4                RTC_IRQHandler
+                0x000013f4                PWRWU_IRQHandler
+                0x000013f4                EPWM0P2_IRQHandler
+                0x000013f4                UART5_IRQHandler
+                0x000013f4                BPWM1_IRQHandler
+                0x000013f4                EINT1_IRQHandler
+                0x000013f4                EADC11_IRQHandler
+                0x000013f4                UART2_IRQHandler
+                0x000013f4                EHCI_IRQHandler
+                0x000013f4                GPH_IRQHandler
+                0x000013f4                UART4_IRQHandler
+                0x000013f4                GPC_IRQHandler
+                0x000013f4                OHCI_IRQHandler
+                0x000013f4                Default_Handler
+                0x000013f4                QSPI1_IRQHandler
+                0x000013f4                CKFAIL_IRQHandler
+                0x000013f4                USBOTG20_IRQHandler
+                0x000013f4                QEI1_IRQHandler
+                0x000013f4                TMR2_IRQHandler
+                0x000013f4                SPIM_IRQHandler
+                0x000013f4                ECAP0_IRQHandler
+                0x000013f4                QEI0_IRQHandler
+                0x000013f4                BPWM0_IRQHandler
+                0x000013f4                BOD_IRQHandler
+                0x000013f4                SPI2_IRQHandler
+                0x000013f4                MemManage_Handler
+                0x000013f4                WDT_IRQHandler
+                0x000013f4                SVC_Handler
+                0x000013f4                USBOTG_IRQHandler
+                0x000013f4                OPA0_IRQHandler
+                0x000013f4                EINT4_IRQHandler
+                0x000013f4                USBD20_IRQHandler
+                0x000013f4                SC1_IRQHandler
+                0x000013f4                RAMPE_IRQHandler
+                0x000013f4                EPWM0P0_IRQHandler
+                0x000013f4                EINT0_IRQHandler
+                0x000013f4                EINT5_IRQHandler
+                0x000013f4                CRYPTO_IRQHandler
+                0x000013f4                GPG_IRQHandler
+                0x000013f4                CAN0_IRQHandler
+                0x000013f4                TMR3_IRQHandler
+                0x000013f4                DAC_IRQHandler
+                0x000013f4                EMAC_TX_IRQHandler
+                0x000013f4                SPI0_IRQHandler
+                0x000013f4                GPD_IRQHandler
+                0x000013f4                UART7_IRQHandler
+                0x000013f4                UART6_IRQHandler
+                0x000013f4                CCAP_IRQHandler
+                0x000013f4                ECAP1_IRQHandler
+                0x000013f4                CAN2_IRQHandler
+                0x000013f4                GPF_IRQHandler
+                0x000013f4                BusFault_Handler
+                0x000013f4                SPI3_IRQHandler
+                0x000013f4                UART3_IRQHandler
+                0x000013f4                TMR1_IRQHandler
+                0x000013f4                TRNG_IRQHandler
+                0x000013f4                WWDT_IRQHandler
+                0x000013f4                EADC00_IRQHandler
  .text.SystemCoreClockUpdate
-                0x00000f60       0x5c ./CMSIS/system_M480.o
-                0x00000f60                SystemCoreClockUpdate
+                0x000013f8       0x5c ./CMSIS/system_M480.o
+                0x000013f8                SystemCoreClockUpdate
  .text.SystemInit
-                0x00000fbc       0x74 ./CMSIS/system_M480.o
-                0x00000fbc                SystemInit
- .text          0x00001030      0x370 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard\libgcc.a(_arm_addsubdf3.o)
-                0x00001030                __aeabi_drsub
-                0x00001038                __aeabi_dsub
-                0x00001038                __subdf3
-                0x0000103c                __aeabi_dadd
-                0x0000103c                __adddf3
-                0x000012b4                __floatunsidf
-                0x000012b4                __aeabi_ui2d
-                0x000012d4                __floatsidf
-                0x000012d4                __aeabi_i2d
-                0x000012f8                __aeabi_f2d
-                0x000012f8                __extendsfdf2
-                0x00001334                __floatundidf
-                0x00001334                __aeabi_ul2d
-                0x00001344                __floatdidf
-                0x00001344                __aeabi_l2d
- .text          0x000013a0       0xa0 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard\libgcc.a(_arm_truncdfsf2.o)
-                0x000013a0                __truncdfsf2
-                0x000013a0                __aeabi_d2f
- .text.__errno  0x00001440        0xc c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-errno.o)
-                0x00001440                __errno
- .text.exit     0x0000144c       0x28 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-exit.o)
-                0x0000144c                exit
+                0x00001454       0x74 ./CMSIS/system_M480.o
+                0x00001454                SystemInit
+ .text          0x000014c8      0x370 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard\libgcc.a(_arm_addsubdf3.o)
+                0x000014c8                __aeabi_drsub
+                0x000014d0                __aeabi_dsub
+                0x000014d0                __subdf3
+                0x000014d4                __aeabi_dadd
+                0x000014d4                __adddf3
+                0x0000174c                __floatunsidf
+                0x0000174c                __aeabi_ui2d
+                0x0000176c                __floatsidf
+                0x0000176c                __aeabi_i2d
+                0x00001790                __aeabi_f2d
+                0x00001790                __extendsfdf2
+                0x000017cc                __floatundidf
+                0x000017cc                __aeabi_ul2d
+                0x000017dc                __floatdidf
+                0x000017dc                __aeabi_l2d
+ .text          0x00001838       0xa0 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard\libgcc.a(_arm_truncdfsf2.o)
+                0x00001838                __truncdfsf2
+                0x00001838                __aeabi_d2f
+ .text.__errno  0x000018d8        0xc c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-errno.o)
+                0x000018d8                __errno
+ .text.exit     0x000018e4       0x28 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-exit.o)
+                0x000018e4                exit
  .text.__libc_init_array
-                0x00001474       0x48 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-init.o)
-                0x00001474                __libc_init_array
- .text.memcpy   0x000014bc       0x16 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memcpy-stub.o)
-                0x000014bc                memcpy
- .text.memset   0x000014d2       0x10 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memset.o)
-                0x000014d2                memset
- *fill*         0x000014e2        0x2 
- .text.printf   0x000014e4       0x30 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-printf.o)
-                0x000014e4                iprintf
-                0x000014e4                printf
- .text._puts_r  0x00001514       0xb8 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-puts.o)
-                0x00001514                _puts_r
- .text.puts     0x000015cc       0x10 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-puts.o)
-                0x000015cc                puts
- .text.sprintf  0x000015dc       0x48 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-sprintf.o)
-                0x000015dc                siprintf
-                0x000015dc                sprintf
- .text.strcat   0x00001624       0x1e c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-strcat.o)
-                0x00001624                strcat
- .text.strcpy   0x00001642       0x10 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-strcpy.o)
-                0x00001642                strcpy
- .text          0x00001652       0x10 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-strlen.o)
-                0x00001652                strlen
- *fill*         0x00001662        0x2 
+                0x0000190c       0x48 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-init.o)
+                0x0000190c                __libc_init_array
+ .text.memcpy   0x00001954       0x16 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memcpy-stub.o)
+                0x00001954                memcpy
+ .text.memset   0x0000196a       0x10 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memset.o)
+                0x0000196a                memset
+ *fill*         0x0000197a        0x2 
+ .text.printf   0x0000197c       0x30 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-printf.o)
+                0x0000197c                iprintf
+                0x0000197c                printf
+ .text._puts_r  0x000019ac       0xb8 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-puts.o)
+                0x000019ac                _puts_r
+ .text.puts     0x00001a64       0x10 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-puts.o)
+                0x00001a64                puts
+ .text.sprintf  0x00001a74       0x48 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-sprintf.o)
+                0x00001a74                siprintf
+                0x00001a74                sprintf
+ .text.strcat   0x00001abc       0x1e c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-strcat.o)
+                0x00001abc                strcat
+ .text.strcpy   0x00001ada       0x10 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-strcpy.o)
+                0x00001ada                strcpy
+ .text          0x00001aea       0x10 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-strlen.o)
+                0x00001aea                strlen
+ *fill*         0x00001afa        0x2 
  .text.__swbuf_r
-                0x00001664       0xa4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-wbuf.o)
-                0x00001664                __swbuf_r
+                0x00001afc       0xa4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-wbuf.o)
+                0x00001afc                __swbuf_r
  .text.__swsetup_r
-                0x00001708       0xdc c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-wsetup.o)
-                0x00001708                __swsetup_r
+                0x00001ba0       0xdc c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-wsetup.o)
+                0x00001ba0                __swsetup_r
  .text.__sflush_r
-                0x000017e4      0x110 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-fflush.o)
-                0x000017e4                __sflush_r
+                0x00001c7c      0x110 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-fflush.o)
+                0x00001c7c                __sflush_r
  .text._fflush_r
-                0x000018f4       0x54 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-fflush.o)
-                0x000018f4                _fflush_r
+                0x00001d8c       0x54 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-fflush.o)
+                0x00001d8c                _fflush_r
  .text._cleanup_r
-                0x00001948        0xc c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-findfp.o)
-                0x00001948                _cleanup_r
+                0x00001de0        0xc c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-findfp.o)
+                0x00001de0                _cleanup_r
  .text.std.isra.0
-                0x00001954       0x48 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-findfp.o)
+                0x00001dec       0x48 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-findfp.o)
  .text.__sfmoreglue
-                0x0000199c       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-findfp.o)
-                0x0000199c                __sfmoreglue
- .text.__sinit  0x000019c8       0x60 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-findfp.o)
-                0x000019c8                __sinit
- .text.__sfp    0x00001a28       0x78 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-findfp.o)
-                0x00001a28                __sfp
+                0x00001e34       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-findfp.o)
+                0x00001e34                __sfmoreglue
+ .text.__sinit  0x00001e60       0x60 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-findfp.o)
+                0x00001e60                __sinit
+ .text.__sfp    0x00001ec0       0x78 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-findfp.o)
+                0x00001ec0                __sfp
  .text._fwalk_reent
-                0x00001aa0       0x3c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-fwalk.o)
-                0x00001aa0                _fwalk_reent
+                0x00001f38       0x3c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-fwalk.o)
+                0x00001f38                _fwalk_reent
  .text.__swhatbuf_r
-                0x00001adc       0x48 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-makebuf.o)
-                0x00001adc                __swhatbuf_r
+                0x00001f74       0x48 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-makebuf.o)
+                0x00001f74                __swhatbuf_r
  .text.__smakebuf_r
-                0x00001b24       0x80 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-makebuf.o)
-                0x00001b24                __smakebuf_r
- .text._free_r  0x00001ba4       0x9c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-freer.o)
-                0x00001ba4                _free_r
+                0x00001fbc       0x80 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-makebuf.o)
+                0x00001fbc                __smakebuf_r
+ .text._free_r  0x0000203c       0x9c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-freer.o)
+                0x0000203c                _free_r
  .text._malloc_r
-                0x00001c40       0xbc c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-mallocr.o)
-                0x00001c40                _malloc_r
+                0x000020d8       0xbc c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-mallocr.o)
+                0x000020d8                _malloc_r
  .text.__ssputs_r
-                0x00001cfc       0xb6 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-svfprintf.o)
-                0x00001cfc                __ssputs_r
- *fill*         0x00001db2        0x2 
+                0x00002194       0xb6 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-svfprintf.o)
+                0x00002194                __ssputs_r
+ *fill*         0x0000224a        0x2 
  .text._svfprintf_r
-                0x00001db4      0x1e8 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-svfprintf.o)
-                0x00001db4                _svfiprintf_r
-                0x00001db4                _svfprintf_r
+                0x0000224c      0x1e8 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-svfprintf.o)
+                0x0000224c                _svfiprintf_r
+                0x0000224c                _svfprintf_r
  .text.__sfputc_r
-                0x00001f9c       0x30 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf.o)
+                0x00002434       0x30 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf.o)
  .text.__sfputs_r
-                0x00001fcc       0x24 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf.o)
-                0x00001fcc                __sfputs_r
+                0x00002464       0x24 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf.o)
+                0x00002464                __sfputs_r
  .text._vfprintf_r
-                0x00001ff0      0x22c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf.o)
-                0x00001ff0                _vfprintf_r
-                0x00001ff0                _vfiprintf_r
+                0x00002488      0x22c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf.o)
+                0x00002488                _vfprintf_r
+                0x00002488                _vfiprintf_r
  .text._printf_common
-                0x0000221c       0xec c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf_i.o)
-                0x0000221c                _printf_common
+                0x000026b4       0xec c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf_i.o)
+                0x000026b4                _printf_common
  .text._printf_i
-                0x00002308      0x240 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf_i.o)
-                0x00002308                _printf_i
- .text._sbrk_r  0x00002548       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-sbrkr.o)
-                0x00002548                _sbrk_r
- .text.__sread  0x00002568       0x22 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-stdio.o)
-                0x00002568                __sread
+                0x000027a0      0x240 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf_i.o)
+                0x000027a0                _printf_i
+ .text._sbrk_r  0x000029e0       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-sbrkr.o)
+                0x000029e0                _sbrk_r
+ .text.__sread  0x00002a00       0x22 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-stdio.o)
+                0x00002a00                __sread
  .text.__swrite
-                0x0000258a       0x38 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-stdio.o)
-                0x0000258a                __swrite
- .text.__sseek  0x000025c2       0x24 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-stdio.o)
-                0x000025c2                __sseek
+                0x00002a22       0x38 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-stdio.o)
+                0x00002a22                __swrite
+ .text.__sseek  0x00002a5a       0x24 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-stdio.o)
+                0x00002a5a                __sseek
  .text.__sclose
-                0x000025e6        0x8 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-stdio.o)
-                0x000025e6                __sclose
- *fill*         0x000025ee        0x2 
+                0x00002a7e        0x8 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-stdio.o)
+                0x00002a7e                __sclose
+ *fill*         0x00002a86        0x2 
  .text._write_r
-                0x000025f0       0x24 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-writer.o)
-                0x000025f0                _write_r
+                0x00002a88       0x24 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-writer.o)
+                0x00002a88                _write_r
  .text._close_r
-                0x00002614       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-closer.o)
-                0x00002614                _close_r
+                0x00002aac       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-closer.o)
+                0x00002aac                _close_r
  .text._fstat_r
-                0x00002634       0x24 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-fstatr.o)
-                0x00002634                _fstat_r
+                0x00002acc       0x24 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-fstatr.o)
+                0x00002acc                _fstat_r
  .text._isatty_r
-                0x00002658       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-isattyr.o)
-                0x00002658                _isatty_r
+                0x00002af0       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-isattyr.o)
+                0x00002af0                _isatty_r
  .text._lseek_r
-                0x00002678       0x24 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-lseekr.o)
-                0x00002678                _lseek_r
- *fill*         0x0000269c        0x4 
- .text          0x000026a0       0xa0 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memchr.o)
-                0x000026a0                memchr
- .text.memmove  0x00002740       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memmove.o)
-                0x00002740                memmove
+                0x00002b10       0x24 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-lseekr.o)
+                0x00002b10                _lseek_r
+ *fill*         0x00002b34        0xc 
+ .text          0x00002b40       0xa0 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memchr.o)
+                0x00002b40                memchr
+ .text.memmove  0x00002be0       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memmove.o)
+                0x00002be0                memmove
  .text.__malloc_lock
-                0x00002774        0x2 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-mlock.o)
-                0x00002774                __malloc_lock
+                0x00002c14        0x2 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-mlock.o)
+                0x00002c14                __malloc_lock
  .text.__malloc_unlock
-                0x00002776        0x2 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-mlock.o)
-                0x00002776                __malloc_unlock
+                0x00002c16        0x2 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-mlock.o)
+                0x00002c16                __malloc_unlock
  .text._realloc_r
-                0x00002778       0x4c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-reallocr.o)
-                0x00002778                _realloc_r
- .text._read_r  0x000027c4       0x24 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-readr.o)
-                0x000027c4                _read_r
+                0x00002c18       0x4c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-reallocr.o)
+                0x00002c18                _realloc_r
+ .text._read_r  0x00002c64       0x24 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-readr.o)
+                0x00002c64                _read_r
  .text._malloc_usable_size_r
-                0x000027e8       0x12 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-msizer.o)
-                0x000027e8                _malloc_usable_size_r
- *fill*         0x000027fa        0x2 
- .text._sbrk    0x000027fc       0x1c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libnosys.a(sbrk.o)
-                0x000027fc                _sbrk
- .text._exit    0x00002818        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libnosys.a(_exit.o)
-                0x00002818                _exit
+                0x00002c88       0x12 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-msizer.o)
+                0x00002c88                _malloc_usable_size_r
+ *fill*         0x00002c9a        0x2 
+ .text._sbrk    0x00002c9c       0x1c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libnosys.a(sbrk.o)
+                0x00002c9c                _sbrk
+ .text._exit    0x00002cb8        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libnosys.a(_exit.o)
+                0x00002cb8                _exit
  *(.init)
- .init          0x0000281c        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crti.o
-                0x0000281c                _init
- .init          0x00002820        0x8 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtn.o
+ .init          0x00002cbc        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crti.o
+                0x00002cbc                _init
+ .init          0x00002cc0        0x8 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtn.o
  *(.fini)
- .fini          0x00002828        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crti.o
-                0x00002828                _fini
- .fini          0x0000282c        0x8 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtn.o
+ .fini          0x00002cc8        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crti.o
+                0x00002cc8                _fini
+ .fini          0x00002ccc        0x8 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtn.o
  *crtbegin.o(.ctors)
  *crtbegin?.o(.ctors)
  *(EXCLUDE_FILE(*crtend.o *crtend?.o) .ctors)
@@ -2794,202 +2828,236 @@ END GROUP
  *(.dtors)
  *(.rodata*)
  .rodata.draw_UI.str1.1
-                0x00002834      0x13a ./User/UI.o
-                                0x13d (size before relaxing)
- .rodata.line_0_1_str.10988
-                0x0000296e       0x31 ./User/UI.o
+                0x00002cd4        0x6 ./User/UI.o
+ .rodata.draw_UI_line_2.str1.1
+                0x00002cda       0x42 ./User/UI.o
+ .rodata.draw_UI_line_3.str1.1
+                0x00002d1c       0x2f ./User/UI.o
+ .rodata.draw_UI_line_4.str1.1
+                0x00002d4b       0x26 ./User/UI.o
+ .rodata.draw_UI_line_5.str1.1
+                0x00002d71       0x2d ./User/UI.o
+ .rodata.draw_UI_line_6.str1.1
+                0x00002d9e       0x3c ./User/UI.o
+ .rodata.draw_UI_line_7.str1.1
+                0x00002dda       0x3a ./User/UI.o
+                                 0x3d (size before relaxing)
+ .rodata.draw_UI_line_8.str1.1
+                0x00002e14       0x27 ./User/UI.o
+ .rodata.draw_UI_line_9.str1.1
+                0x00002e3b       0x15 ./User/UI.o
+ .rodata.draw_UI_line_A.str1.1
+                0x00002e50       0x48 ./User/UI.o
+ .rodata.draw_UI_line_B.str1.1
+                0x00002e98       0x2f ./User/UI.o
+ .rodata.draw_UI_line_separator.str1.1
+                0x00002ec7       0x2b ./User/UI.o
+ .rodata.line_0_1_str.11050
+                0x00002ef2       0x31 ./User/UI.o
  .rodata.PDMA_IRQHandler.str1.1
-                0x0000299f       0x5f ./User/interrupt.o
+                0x00002f23       0x5f ./User/interrupt.o
  .rodata.main.str1.1
-                0x000029fe       0x22 ./User/main.o
- .rodata.string.10994
-                0x00002a20       0x19 ./User/main.o
- .rodata.string2.10995
-                0x00002a39       0x28 ./User/main.o
- .rodata.string3.10996
-                0x00002a61       0x2a ./User/main.o
+                0x00002f82       0x22 ./User/main.o
+ .rodata.string.11037
+                0x00002fa4       0x19 ./User/main.o
+ .rodata.string2.11038
+                0x00002fbd       0x28 ./User/main.o
+ .rodata.string3.11039
+                0x00002fe5       0x2a ./User/main.o
  .rodata.init_str.10949
-                0x00002a8b       0x24 ./User/user_sys.o
+                0x0000300f       0x24 ./User/user_sys.o
  .rodata.push_UART1.str1.1
-                0x00002aaf       0x27 ./User/user_sys.o
+                0x00003033       0x27 ./User/user_sys.o
  .rodata.Hard_Fault_Handler.str1.1
-                0x00002ad6       0x76 ./Library/StdDriver/src/retarget.o
- .rodata        0x00002b4c       0x10 ./Library/StdDriver/src/uart.o
+                0x0000305a       0x76 ./Library/StdDriver/src/retarget.o
+ .rodata        0x000030d0       0x10 ./Library/StdDriver/src/uart.o
  .rodata._global_impure_ptr
-                0x00002b5c        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-impure.o)
-                0x00002b5c                _global_impure_ptr
+                0x000030e0        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-impure.o)
+                0x000030e0                _global_impure_ptr
  .rodata.__sf_fake_stderr
-                0x00002b60       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-findfp.o)
-                0x00002b60                __sf_fake_stderr
+                0x000030e4       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-findfp.o)
+                0x000030e4                __sf_fake_stderr
  .rodata.__sf_fake_stdin
-                0x00002b80       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-findfp.o)
-                0x00002b80                __sf_fake_stdin
+                0x00003104       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-findfp.o)
+                0x00003104                __sf_fake_stdin
  .rodata.__sf_fake_stdout
-                0x00002ba0       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-findfp.o)
-                0x00002ba0                __sf_fake_stdout
+                0x00003124       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-findfp.o)
+                0x00003124                __sf_fake_stdout
  .rodata._svfprintf_r.str1.1
-                0x00002bc0       0x11 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-svfprintf.o)
+                0x00003144       0x11 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-svfprintf.o)
  .rodata._vfprintf_r.str1.1
-                0x00002bd1       0x11 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf.o)
+                0x00003155       0x11 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf.o)
  .rodata._printf_i.str1.1
-                0x00002bd1       0x22 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf_i.o)
+                0x00003155       0x22 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf_i.o)
  *(.eh_frame*)
- *fill*         0x00002bf3        0x1 
- .eh_frame      0x00002bf4        0x0 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtbegin.o
- .eh_frame      0x00002bf4        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtend.o
+ *fill*         0x00003177        0x1 
+ .eh_frame      0x00003178        0x0 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtbegin.o
+ .eh_frame      0x00003178        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtend.o
 
-.glue_7         0x00002bf8        0x0
- .glue_7        0x00002bf8        0x0 linker stubs
+.glue_7         0x0000317c        0x0
+ .glue_7        0x0000317c        0x0 linker stubs
 
-.glue_7t        0x00002bf8        0x0
- .glue_7t       0x00002bf8        0x0 linker stubs
+.glue_7t        0x0000317c        0x0
+ .glue_7t       0x0000317c        0x0 linker stubs
 
-.vfp11_veneer   0x00002bf8        0x0
- .vfp11_veneer  0x00002bf8        0x0 linker stubs
+.vfp11_veneer   0x0000317c        0x0
+ .vfp11_veneer  0x0000317c        0x0 linker stubs
 
-.v4_bx          0x00002bf8        0x0
- .v4_bx         0x00002bf8        0x0 linker stubs
+.v4_bx          0x0000317c        0x0
+ .v4_bx         0x0000317c        0x0 linker stubs
 
-.iplt           0x00002bf8        0x0
- .iplt          0x00002bf8        0x0 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtbegin.o
+.iplt           0x0000317c        0x0
+ .iplt          0x0000317c        0x0 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtbegin.o
 
 .ARM.extab
  *(.ARM.extab* .gnu.linkonce.armextab.*)
-                0x00002bf8                __exidx_start = .
+                0x0000317c                __exidx_start = .
 
-.ARM.exidx      0x00002bf8        0x8
+.ARM.exidx      0x0000317c        0x8
  *(.ARM.exidx* .gnu.linkonce.armexidx.*)
- .ARM.exidx     0x00002bf8        0x8 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard/crt0.o
-                0x00002c00                __exidx_end = .
-                0x00002c00                __etext = .
+ .ARM.exidx     0x0000317c        0x8 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard/crt0.o
+                0x00003184                __exidx_end = .
+                0x00003184                __etext = .
 
-.rel.dyn        0x00002c00        0x0
- .rel.iplt      0x00002c00        0x0 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtbegin.o
+.rel.dyn        0x00003184        0x0
+ .rel.iplt      0x00003184        0x0 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtbegin.o
 
-.data           0x20000000       0xa4 load address 0x00002c00
+.data           0x20000000       0x9c load address 0x00003184
                 0x20000000                __data_start__ = .
  *(vtable)
  *(.data*)
- .data.COLOUR_DEFAULT.10987
-                0x20000000        0x8 ./User/UI.o
  .data.CyclesPerUs
-                0x20000008        0x4 ./CMSIS/system_M480.o
-                0x20000008                CyclesPerUs
+                0x20000000        0x4 ./CMSIS/system_M480.o
+                0x20000000                CyclesPerUs
  .data.PllClock
-                0x2000000c        0x4 ./CMSIS/system_M480.o
-                0x2000000c                PllClock
+                0x20000004        0x4 ./CMSIS/system_M480.o
+                0x20000004                PllClock
  .data.SystemCoreClock
-                0x20000010        0x4 ./CMSIS/system_M480.o
-                0x20000010                SystemCoreClock
+                0x20000008        0x4 ./CMSIS/system_M480.o
+                0x20000008                SystemCoreClock
  .data.gau32ClkSrcTbl
-                0x20000014       0x20 ./CMSIS/system_M480.o
-                0x20000014                gau32ClkSrcTbl
+                0x2000000c       0x20 ./CMSIS/system_M480.o
+                0x2000000c                gau32ClkSrcTbl
  .data._impure_ptr
-                0x20000034        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-impure.o)
-                0x20000034                _impure_ptr
+                0x2000002c        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-impure.o)
+                0x2000002c                _impure_ptr
  .data.impure_data
-                0x20000038       0x60 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-impure.o)
-                0x20000098                . = ALIGN (0x4)
-                0x20000098                PROVIDE (__preinit_array_start, .)
+                0x20000030       0x60 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-impure.o)
+                0x20000090                . = ALIGN (0x4)
+                0x20000090                PROVIDE (__preinit_array_start, .)
  *(.preinit_array)
-                0x20000098                PROVIDE (__preinit_array_end, .)
-                0x20000098                . = ALIGN (0x4)
-                0x20000098                PROVIDE (__init_array_start, .)
+                0x20000090                PROVIDE (__preinit_array_end, .)
+                0x20000090                . = ALIGN (0x4)
+                0x20000090                PROVIDE (__init_array_start, .)
  *(SORT(.init_array.*))
  *(.init_array)
- .init_array    0x20000098        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtbegin.o
-                0x2000009c                PROVIDE (__init_array_end, .)
-                0x2000009c                . = ALIGN (0x4)
+ .init_array    0x20000090        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtbegin.o
+                0x20000094                PROVIDE (__init_array_end, .)
+                0x20000094                . = ALIGN (0x4)
                 [!provide]                PROVIDE (__fini_array_start, .)
  *(SORT(.fini_array.*))
  *(.fini_array)
- .fini_array    0x2000009c        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtbegin.o
+ .fini_array    0x20000094        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtbegin.o
                 [!provide]                PROVIDE (__fini_array_end, .)
  *(.jcr*)
- .jcr           0x200000a0        0x0 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtbegin.o
- .jcr           0x200000a0        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtend.o
-                0x200000a4                . = ALIGN (0x4)
-                0x200000a4                __data_end__ = .
+ .jcr           0x20000098        0x0 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtbegin.o
+ .jcr           0x20000098        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtend.o
+                0x2000009c                . = ALIGN (0x4)
+                0x2000009c                __data_end__ = .
 
-.igot.plt       0x200000a4        0x0 load address 0x00002ca4
- .igot.plt      0x200000a4        0x0 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtbegin.o
+.igot.plt       0x2000009c        0x0 load address 0x00003220
+ .igot.plt      0x2000009c        0x0 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtbegin.o
 
-.bss            0x200000a8      0x37c load address 0x00002ca8
-                0x200000a8                . = ALIGN (0x4)
-                0x200000a8                __bss_start__ = .
+.bss            0x200000a0      0x808 load address 0x00003228
+                0x200000a0                . = ALIGN (0x4)
+                0x200000a0                __bss_start__ = .
  *(.bss*)
- .bss           0x200000a8       0x1c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtbegin.o
- .bss.colour_V_DC_diff.10993
-                0x200000c4        0x8 ./User/UI.o
- .bss.colour_V_DC_minus.10991
-                0x200000cc        0x8 ./User/UI.o
- .bss.colour_V_DC_plus.10990
-                0x200000d4        0x8 ./User/UI.o
- .bss.inverter_temp_color_str.10999
-                0x200000dc        0x8 ./User/UI.o
- .bss.last_line_str.11001
-                0x200000e4       0x40 ./User/UI.o
- .bss.line_2_str.10989
-                0x20000124       0x40 ./User/UI.o
- .bss.line_3_str.10992
-                0x20000164       0x40 ./User/UI.o
- .bss.line_4_str.10994
-                0x200001a4       0x40 ./User/UI.o
- .bss.line_5_str.10995
-                0x200001e4       0x40 ./User/UI.o
- .bss.line_6_str.10997
-                0x20000224       0x40 ./User/UI.o
- .bss.line_7_str.11000
-                0x20000264       0x40 ./User/UI.o
- .bss.power_flow_dir_str.10996
-                0x200002a4        0x8 ./User/UI.o
- .bss.xformer_temp_color_str.10998
-                0x200002ac        0x8 ./User/UI.o
+ .bss           0x200000a0       0x1c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtbegin.o
+ .bss.colour_V_DC_diff.11061
+                0x200000bc       0x10 ./User/UI.o
+ .bss.colour_V_DC_minus.11056
+                0x200000cc       0x10 ./User/UI.o
+ .bss.colour_V_DC_plus.11055
+                0x200000dc       0x10 ./User/UI.o
+ .bss.inverter_temp_color_str.11076
+                0x200000ec       0x10 ./User/UI.o
+ .bss.last_line_str.11031
+                0x200000fc       0x80 ./User/UI.o
+ .bss.line_2_str.11054
+                0x2000017c       0x80 ./User/UI.o
+ .bss.line_3_str.11060
+                0x200001fc       0x80 ./User/UI.o
+ .bss.line_4_str.11065
+                0x2000027c       0x80 ./User/UI.o
+ .bss.line_5_str.11069
+                0x200002fc       0x80 ./User/UI.o
+ .bss.line_6_str.11074
+                0x2000037c       0x80 ./User/UI.o
+ .bss.line_7_str.11080
+                0x200003fc       0x80 ./User/UI.o
+ .bss.line_8_str.11084
+                0x2000047c       0x80 ./User/UI.o
+ .bss.line_9_str.11088
+                0x200004fc       0x80 ./User/UI.o
+ .bss.line_A_str.11098
+                0x2000057c       0x80 ./User/UI.o
+ .bss.line_B_str.11107
+                0x200005fc       0x80 ./User/UI.o
+ .bss.line_separator_str.11092
+                0x2000067c       0x80 ./User/UI.o
+ .bss.power_flow_dir_str.11070
+                0x200006fc       0x10 ./User/UI.o
+ .bss.state.11037
+                0x2000070c        0x1 ./User/UI.o
+ .bss.xformer_temp_color_str.11075
+                0x2000070d       0x10 ./User/UI.o
  .bss.UI_new_frame_tick
-                0x200002b4        0x1 ./User/main.o
-                0x200002b4                UI_new_frame_tick
- *fill*         0x200002b5        0x1 
- .bss.UI_refresh_counter.10988
-                0x200002b6        0x2 ./User/main.o
+                0x2000071d        0x1 ./User/main.o
+                0x2000071d                UI_new_frame_tick
+ .bss.UI_refresh_counter.11031
+                0x2000071e        0x2 ./User/main.o
  .bss.g_SysTickIntCnt
-                0x200002b8        0x8 ./User/main.o
-                0x200002b8                g_SysTickIntCnt
+                0x20000720        0x8 ./User/main.o
+                0x20000720                g_SysTickIntCnt
  .bss.UART1_DMA_Job_Buffer
-                0x200002c0      0x104 ./User/user_sys.o
-                0x200002c0                UART1_DMA_Job_Buffer
+                0x20000728      0x104 ./User/user_sys.o
+                0x20000728                UART1_DMA_Job_Buffer
  .bss.heartbeat_counter.10938
-                0x200003c4        0x2 ./User/user_sys.o
- *fill*         0x200003c6        0x2 
+                0x2000082c        0x2 ./User/user_sys.o
+ *fill*         0x2000082e        0x2 
  .bss.__malloc_free_list
-                0x200003c8        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-mallocr.o)
-                0x200003c8                __malloc_free_list
+                0x20000830        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-mallocr.o)
+                0x20000830                __malloc_free_list
  .bss.__malloc_sbrk_start
-                0x200003cc        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-mallocr.o)
-                0x200003cc                __malloc_sbrk_start
+                0x20000834        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-mallocr.o)
+                0x20000834                __malloc_sbrk_start
  .bss.heap_end.5239
-                0x200003d0        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libnosys.a(sbrk.o)
+                0x20000838        0x4 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libnosys.a(sbrk.o)
  *(COMMON)
- COMMON         0x200003d4       0x4c ./User/inverter_control.o
-                0x200003d4                inverter_limits
-                0x200003d8                inverter_state_variables
-                0x2000040c                inverter_state_safety
-                0x2000041c                inverter_setpoints
- COMMON         0x20000420        0x4 ./CMSIS/GCC/_syscalls.o
-                0x20000420                errno
-                0x20000424                . = ALIGN (0x4)
-                0x20000424                __bss_end__ = .
+ COMMON         0x2000083c       0x10 ./User/PLL.o
+                0x2000083c                PLL_state_variables
+                0x20000848                some_float_state_variable
+ COMMON         0x2000084c       0x58 ./User/inverter_control.o
+                0x2000084c                inverter_limits
+                0x20000850                inverter_state_variables
+                0x20000884                inverter_state_safety
+                0x20000894                inverter_setpoints
+ COMMON         0x200008a4        0x4 ./CMSIS/GCC/_syscalls.o
+                0x200008a4                errno
+                0x200008a8                . = ALIGN (0x4)
+                0x200008a8                __bss_end__ = .
 
-.heap           0x20000428      0x100
-                0x20000428                __HeapBase = .
-                0x20000428                __end__ = .
-                0x20000428                end = __end__
+.heap           0x200008a8      0x100
+                0x200008a8                __HeapBase = .
+                0x200008a8                __end__ = .
+                0x200008a8                end = __end__
  *(.heap*)
- .heap          0x20000428      0x100 ./CMSIS/GCC/startup_M480.o
-                0x20000528                __HeapLimit = .
+ .heap          0x200008a8      0x100 ./CMSIS/GCC/startup_M480.o
+                0x200009a8                __HeapLimit = .
 
-.stack_dummy    0x20000428      0x800
+.stack_dummy    0x200008a8      0x800
  *(.stack*)
- .stack         0x20000428      0x800 ./CMSIS/GCC/startup_M480.o
+ .stack         0x200008a8      0x800 ./CMSIS/GCC/startup_M480.o
                 0x20028000                __StackTop = (ORIGIN (RAM) + LENGTH (RAM))
                 0x20027800                __StackLimit = (__StackTop - SIZEOF (.stack_dummy))
                 0x20028000                PROVIDE (__stack, __StackTop)
@@ -3005,119 +3073,122 @@ OUTPUT(Nuvoton_M48x_UART_Test.elf elf32-littlearm)
  .ARM.attributes
                 0x00000056       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard/crt0.o
  .ARM.attributes
-                0x00000076       0x39 ./User/UI.o
+                0x00000076       0x39 ./User/PLL.o
  .ARM.attributes
-                0x000000af       0x39 ./User/interrupt.o
+                0x000000af       0x39 ./User/UI.o
  .ARM.attributes
-                0x000000e8       0x39 ./User/inverter_control.o
+                0x000000e8       0x39 ./User/interrupt.o
  .ARM.attributes
-                0x00000121       0x39 ./User/main.o
+                0x00000121       0x39 ./User/inverter_control.o
  .ARM.attributes
-                0x0000015a       0x39 ./User/user_sys.o
+                0x0000015a       0x39 ./User/main.o
  .ARM.attributes
-                0x00000193       0x39 ./Library/StdDriver/src/clk.o
+                0x00000193       0x39 ./User/user_sys.o
  .ARM.attributes
-                0x000001cc       0x39 ./Library/StdDriver/src/gpio.o
+                0x000001cc       0x39 ./Library/StdDriver/src/clk.o
  .ARM.attributes
-                0x00000205       0x39 ./Library/StdDriver/src/pdma.o
+                0x00000205       0x39 ./Library/StdDriver/src/gpio.o
  .ARM.attributes
-                0x0000023e       0x39 ./Library/StdDriver/src/retarget.o
+                0x0000023e       0x39 ./Library/StdDriver/src/pdma.o
  .ARM.attributes
-                0x00000277       0x39 ./Library/StdDriver/src/uart.o
+                0x00000277       0x39 ./Library/StdDriver/src/retarget.o
  .ARM.attributes
-                0x000002b0       0x39 ./CMSIS/GCC/_syscalls.o
+                0x000002b0       0x39 ./Library/StdDriver/src/uart.o
  .ARM.attributes
-                0x000002e9       0x1f ./CMSIS/GCC/startup_M480.o
+                0x000002e9       0x39 ./CMSIS/GCC/_syscalls.o
  .ARM.attributes
-                0x00000308       0x39 ./CMSIS/system_M480.o
+                0x00000322       0x1f ./CMSIS/GCC/startup_M480.o
  .ARM.attributes
-                0x00000341       0x22 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard\libgcc.a(_arm_addsubdf3.o)
+                0x00000341       0x39 ./CMSIS/system_M480.o
  .ARM.attributes
-                0x00000363       0x22 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard\libgcc.a(_arm_truncdfsf2.o)
+                0x0000037a       0x22 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard\libgcc.a(_arm_addsubdf3.o)
  .ARM.attributes
-                0x00000385       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-errno.o)
+                0x0000039c       0x22 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard\libgcc.a(_arm_truncdfsf2.o)
  .ARM.attributes
-                0x000003b9       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-exit.o)
+                0x000003be       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-errno.o)
  .ARM.attributes
-                0x000003ed       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-impure.o)
+                0x000003f2       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-exit.o)
  .ARM.attributes
-                0x00000421       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-init.o)
+                0x00000426       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-impure.o)
  .ARM.attributes
-                0x00000455       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memcpy-stub.o)
+                0x0000045a       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-init.o)
  .ARM.attributes
-                0x00000489       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memset.o)
+                0x0000048e       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memcpy-stub.o)
  .ARM.attributes
-                0x000004bd       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-printf.o)
+                0x000004c2       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memset.o)
  .ARM.attributes
-                0x000004f1       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-puts.o)
+                0x000004f6       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-printf.o)
  .ARM.attributes
-                0x00000525       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-sprintf.o)
+                0x0000052a       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-puts.o)
  .ARM.attributes
-                0x00000559       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-strcat.o)
+                0x0000055e       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-sprintf.o)
  .ARM.attributes
-                0x0000058d       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-strcpy.o)
+                0x00000592       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-strcat.o)
  .ARM.attributes
-                0x000005c1       0x1b c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-strlen.o)
+                0x000005c6       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-strcpy.o)
  .ARM.attributes
-                0x000005dc       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-wbuf.o)
+                0x000005fa       0x1b c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-strlen.o)
  .ARM.attributes
-                0x00000610       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-wsetup.o)
+                0x00000615       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-wbuf.o)
  .ARM.attributes
-                0x00000644       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-fflush.o)
+                0x00000649       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-wsetup.o)
  .ARM.attributes
-                0x00000678       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-findfp.o)
+                0x0000067d       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-fflush.o)
  .ARM.attributes
-                0x000006ac       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-fwalk.o)
+                0x000006b1       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-findfp.o)
  .ARM.attributes
-                0x000006e0       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-makebuf.o)
+                0x000006e5       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-fwalk.o)
  .ARM.attributes
-                0x00000714       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-freer.o)
+                0x00000719       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-makebuf.o)
  .ARM.attributes
-                0x00000748       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-mallocr.o)
+                0x0000074d       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-freer.o)
  .ARM.attributes
-                0x0000077c       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-svfprintf.o)
+                0x00000781       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-mallocr.o)
  .ARM.attributes
-                0x000007b0       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf.o)
+                0x000007b5       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-svfprintf.o)
  .ARM.attributes
-                0x000007e4       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf_i.o)
+                0x000007e9       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf.o)
  .ARM.attributes
-                0x00000818       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-sbrkr.o)
+                0x0000081d       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf_i.o)
  .ARM.attributes
-                0x0000084c       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-stdio.o)
+                0x00000851       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-sbrkr.o)
  .ARM.attributes
-                0x00000880       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-writer.o)
+                0x00000885       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-stdio.o)
  .ARM.attributes
-                0x000008b4       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-closer.o)
+                0x000008b9       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-writer.o)
  .ARM.attributes
-                0x000008e8       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-fstatr.o)
+                0x000008ed       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-closer.o)
  .ARM.attributes
-                0x0000091c       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-isattyr.o)
+                0x00000921       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-fstatr.o)
  .ARM.attributes
-                0x00000950       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-lseekr.o)
+                0x00000955       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-isattyr.o)
  .ARM.attributes
-                0x00000984       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memchr.o)
+                0x00000989       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-lseekr.o)
  .ARM.attributes
-                0x000009a4       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memmove.o)
+                0x000009bd       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memchr.o)
  .ARM.attributes
-                0x000009d8       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-mlock.o)
+                0x000009dd       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memmove.o)
  .ARM.attributes
-                0x00000a0c       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-reallocr.o)
+                0x00000a11       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-mlock.o)
  .ARM.attributes
-                0x00000a40       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-readr.o)
+                0x00000a45       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-reallocr.o)
  .ARM.attributes
-                0x00000a74       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-msizer.o)
+                0x00000a79       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-readr.o)
  .ARM.attributes
-                0x00000aa8       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtend.o
+                0x00000aad       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-msizer.o)
  .ARM.attributes
-                0x00000adc       0x22 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtn.o
+                0x00000ae1       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtend.o
  .ARM.attributes
-                0x00000afe       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libnosys.a(sbrk.o)
+                0x00000b15       0x22 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard/crtn.o
  .ARM.attributes
-                0x00000b32       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libnosys.a(_exit.o)
+                0x00000b37       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libnosys.a(sbrk.o)
+ .ARM.attributes
+                0x00000b6b       0x34 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libnosys.a(_exit.o)
 
 .comment        0x00000000       0x7f
- .comment       0x00000000       0x7f ./User/UI.o
+ .comment       0x00000000       0x7f ./User/PLL.o
                                  0x80 (size before relaxing)
+ .comment       0x0000007f       0x80 ./User/UI.o
  .comment       0x0000007f       0x80 ./User/interrupt.o
  .comment       0x0000007f       0x80 ./User/inverter_control.o
  .comment       0x0000007f       0x80 ./User/main.o
@@ -3130,177 +3201,184 @@ OUTPUT(Nuvoton_M48x_UART_Test.elf elf32-littlearm)
  .comment       0x0000007f       0x80 ./CMSIS/GCC/_syscalls.o
  .comment       0x0000007f       0x80 ./CMSIS/system_M480.o
 
-.debug_info     0x00000000     0xe5aa
- .debug_info    0x00000000     0x12f2 ./User/UI.o
- .debug_info    0x000012f2      0xff0 ./User/interrupt.o
- .debug_info    0x000022e2      0x28d ./User/inverter_control.o
- .debug_info    0x0000256f     0x1f54 ./User/main.o
- .debug_info    0x000044c3     0x1942 ./User/user_sys.o
- .debug_info    0x00005e05     0x1c83 ./Library/StdDriver/src/clk.o
- .debug_info    0x00007a88      0xdde ./Library/StdDriver/src/gpio.o
- .debug_info    0x00008866     0x12fb ./Library/StdDriver/src/pdma.o
- .debug_info    0x00009b61     0x1031 ./Library/StdDriver/src/retarget.o
- .debug_info    0x0000ab92     0x1379 ./Library/StdDriver/src/uart.o
- .debug_info    0x0000bf0b     0x115b ./CMSIS/GCC/_syscalls.o
- .debug_info    0x0000d066       0x78 ./CMSIS/GCC/startup_M480.o
- .debug_info    0x0000d0de     0x14cc ./CMSIS/system_M480.o
+.debug_info     0x00000000     0xf210
+ .debug_info    0x00000000      0x2cd ./User/PLL.o
+ .debug_info    0x000002cd     0x1bd2 ./User/UI.o
+ .debug_info    0x00001e9f      0xff0 ./User/interrupt.o
+ .debug_info    0x00002e8f      0x2b1 ./User/inverter_control.o
+ .debug_info    0x00003140     0x1fe9 ./User/main.o
+ .debug_info    0x00005129     0x1942 ./User/user_sys.o
+ .debug_info    0x00006a6b     0x1c83 ./Library/StdDriver/src/clk.o
+ .debug_info    0x000086ee      0xdde ./Library/StdDriver/src/gpio.o
+ .debug_info    0x000094cc     0x12fb ./Library/StdDriver/src/pdma.o
+ .debug_info    0x0000a7c7     0x1031 ./Library/StdDriver/src/retarget.o
+ .debug_info    0x0000b7f8     0x1379 ./Library/StdDriver/src/uart.o
+ .debug_info    0x0000cb71     0x115b ./CMSIS/GCC/_syscalls.o
+ .debug_info    0x0000dccc       0x78 ./CMSIS/GCC/startup_M480.o
+ .debug_info    0x0000dd44     0x14cc ./CMSIS/system_M480.o
 
-.debug_abbrev   0x00000000     0x1fe0
- .debug_abbrev  0x00000000      0x250 ./User/UI.o
- .debug_abbrev  0x00000250      0x23f ./User/interrupt.o
- .debug_abbrev  0x0000048f       0xb0 ./User/inverter_control.o
- .debug_abbrev  0x0000053f      0x34a ./User/main.o
- .debug_abbrev  0x00000889      0x32f ./User/user_sys.o
- .debug_abbrev  0x00000bb8      0x3e3 ./Library/StdDriver/src/clk.o
- .debug_abbrev  0x00000f9b      0x206 ./Library/StdDriver/src/gpio.o
- .debug_abbrev  0x000011a1      0x25a ./Library/StdDriver/src/pdma.o
- .debug_abbrev  0x000013fb      0x3a4 ./Library/StdDriver/src/retarget.o
- .debug_abbrev  0x0000179f      0x2a9 ./Library/StdDriver/src/uart.o
- .debug_abbrev  0x00001a48      0x324 ./CMSIS/GCC/_syscalls.o
- .debug_abbrev  0x00001d6c       0x14 ./CMSIS/GCC/startup_M480.o
- .debug_abbrev  0x00001d80      0x260 ./CMSIS/system_M480.o
+.debug_abbrev   0x00000000     0x21a7
+ .debug_abbrev  0x00000000       0xb0 ./User/PLL.o
+ .debug_abbrev  0x000000b0      0x353 ./User/UI.o
+ .debug_abbrev  0x00000403      0x23f ./User/interrupt.o
+ .debug_abbrev  0x00000642       0xb0 ./User/inverter_control.o
+ .debug_abbrev  0x000006f2      0x35e ./User/main.o
+ .debug_abbrev  0x00000a50      0x32f ./User/user_sys.o
+ .debug_abbrev  0x00000d7f      0x3e3 ./Library/StdDriver/src/clk.o
+ .debug_abbrev  0x00001162      0x206 ./Library/StdDriver/src/gpio.o
+ .debug_abbrev  0x00001368      0x25a ./Library/StdDriver/src/pdma.o
+ .debug_abbrev  0x000015c2      0x3a4 ./Library/StdDriver/src/retarget.o
+ .debug_abbrev  0x00001966      0x2a9 ./Library/StdDriver/src/uart.o
+ .debug_abbrev  0x00001c0f      0x324 ./CMSIS/GCC/_syscalls.o
+ .debug_abbrev  0x00001f33       0x14 ./CMSIS/GCC/startup_M480.o
+ .debug_abbrev  0x00001f47      0x260 ./CMSIS/system_M480.o
 
-.debug_loc      0x00000000     0x20bb
- .debug_loc     0x00000000       0x8c ./User/UI.o
- .debug_loc     0x0000008c       0x29 ./User/interrupt.o
- .debug_loc     0x000000b5       0x88 ./User/main.o
- .debug_loc     0x0000013d      0x120 ./User/user_sys.o
- .debug_loc     0x0000025d      0xb7b ./Library/StdDriver/src/clk.o
- .debug_loc     0x00000dd8       0xc0 ./Library/StdDriver/src/gpio.o
- .debug_loc     0x00000e98      0x632 ./Library/StdDriver/src/pdma.o
- .debug_loc     0x000014ca      0x100 ./Library/StdDriver/src/retarget.o
- .debug_loc     0x000015ca      0x6df ./Library/StdDriver/src/uart.o
- .debug_loc     0x00001ca9      0x3ff ./CMSIS/GCC/_syscalls.o
- .debug_loc     0x000020a8       0x13 ./CMSIS/system_M480.o
+.debug_aranges  0x00000000      0x4f8
+ .debug_aranges
+                0x00000000       0x18 ./User/PLL.o
+ .debug_aranges
+                0x00000018       0x98 ./User/UI.o
+ .debug_aranges
+                0x000000b0       0x20 ./User/interrupt.o
+ .debug_aranges
+                0x000000d0       0x18 ./User/inverter_control.o
+ .debug_aranges
+                0x000000e8       0x30 ./User/main.o
+ .debug_aranges
+                0x00000118       0x48 ./User/user_sys.o
+ .debug_aranges
+                0x00000160      0x100 ./Library/StdDriver/src/clk.o
+ .debug_aranges
+                0x00000260       0x40 ./Library/StdDriver/src/gpio.o
+ .debug_aranges
+                0x000002a0       0x88 ./Library/StdDriver/src/pdma.o
+ .debug_aranges
+                0x00000328       0x60 ./Library/StdDriver/src/retarget.o
+ .debug_aranges
+                0x00000388       0x88 ./Library/StdDriver/src/uart.o
+ .debug_aranges
+                0x00000410       0xa0 ./CMSIS/GCC/_syscalls.o
+ .debug_aranges
+                0x000004b0       0x20 ./CMSIS/GCC/startup_M480.o
+ .debug_aranges
+                0x000004d0       0x28 ./CMSIS/system_M480.o
 
-.debug_aranges  0x00000000      0x468
- .debug_aranges
-                0x00000000       0x20 ./User/UI.o
- .debug_aranges
-                0x00000020       0x20 ./User/interrupt.o
- .debug_aranges
-                0x00000040       0x18 ./User/inverter_control.o
- .debug_aranges
-                0x00000058       0x30 ./User/main.o
- .debug_aranges
-                0x00000088       0x48 ./User/user_sys.o
- .debug_aranges
-                0x000000d0      0x100 ./Library/StdDriver/src/clk.o
- .debug_aranges
-                0x000001d0       0x40 ./Library/StdDriver/src/gpio.o
- .debug_aranges
-                0x00000210       0x88 ./Library/StdDriver/src/pdma.o
- .debug_aranges
-                0x00000298       0x60 ./Library/StdDriver/src/retarget.o
- .debug_aranges
-                0x000002f8       0x88 ./Library/StdDriver/src/uart.o
- .debug_aranges
-                0x00000380       0xa0 ./CMSIS/GCC/_syscalls.o
- .debug_aranges
-                0x00000420       0x20 ./CMSIS/GCC/startup_M480.o
- .debug_aranges
-                0x00000440       0x28 ./CMSIS/system_M480.o
+.debug_line     0x00000000     0x2a12
+ .debug_line    0x00000000       0x4d ./User/PLL.o
+ .debug_line    0x0000004d      0x540 ./User/UI.o
+ .debug_line    0x0000058d      0x28a ./User/interrupt.o
+ .debug_line    0x00000817       0x51 ./User/inverter_control.o
+ .debug_line    0x00000868      0x375 ./User/main.o
+ .debug_line    0x00000bdd      0x3ab ./User/user_sys.o
+ .debug_line    0x00000f88      0x5b5 ./Library/StdDriver/src/clk.o
+ .debug_line    0x0000153d      0x2c0 ./Library/StdDriver/src/gpio.o
+ .debug_line    0x000017fd      0x394 ./Library/StdDriver/src/pdma.o
+ .debug_line    0x00001b91      0x39f ./Library/StdDriver/src/retarget.o
+ .debug_line    0x00001f30      0x43e ./Library/StdDriver/src/uart.o
+ .debug_line    0x0000236e      0x37b ./CMSIS/GCC/_syscalls.o
+ .debug_line    0x000026e9       0x7f ./CMSIS/GCC/startup_M480.o
+ .debug_line    0x00002768      0x2aa ./CMSIS/system_M480.o
 
-.debug_ranges   0x00000000      0x398
- .debug_ranges  0x00000000       0x10 ./User/UI.o
- .debug_ranges  0x00000010       0x10 ./User/interrupt.o
- .debug_ranges  0x00000020       0x20 ./User/main.o
- .debug_ranges  0x00000040       0x50 ./User/user_sys.o
- .debug_ranges  0x00000090       0xf0 ./Library/StdDriver/src/clk.o
- .debug_ranges  0x00000180       0x30 ./Library/StdDriver/src/gpio.o
- .debug_ranges  0x000001b0       0x78 ./Library/StdDriver/src/pdma.o
- .debug_ranges  0x00000228       0x50 ./Library/StdDriver/src/retarget.o
- .debug_ranges  0x00000278       0x78 ./Library/StdDriver/src/uart.o
- .debug_ranges  0x000002f0       0x90 ./CMSIS/GCC/_syscalls.o
- .debug_ranges  0x00000380       0x18 ./CMSIS/system_M480.o
-
-.debug_line     0x00000000     0x27ce
- .debug_line    0x00000000      0x34e ./User/UI.o
- .debug_line    0x0000034e      0x28a ./User/interrupt.o
- .debug_line    0x000005d8       0x51 ./User/inverter_control.o
- .debug_line    0x00000629      0x370 ./User/main.o
- .debug_line    0x00000999      0x3ab ./User/user_sys.o
- .debug_line    0x00000d44      0x5b5 ./Library/StdDriver/src/clk.o
- .debug_line    0x000012f9      0x2c0 ./Library/StdDriver/src/gpio.o
- .debug_line    0x000015b9      0x394 ./Library/StdDriver/src/pdma.o
- .debug_line    0x0000194d      0x39f ./Library/StdDriver/src/retarget.o
- .debug_line    0x00001cec      0x43e ./Library/StdDriver/src/uart.o
- .debug_line    0x0000212a      0x37b ./CMSIS/GCC/_syscalls.o
- .debug_line    0x000024a5       0x7f ./CMSIS/GCC/startup_M480.o
- .debug_line    0x00002524      0x2aa ./CMSIS/system_M480.o
-
-.debug_str      0x00000000     0x24d2
- .debug_str     0x00000000      0xb4b ./User/UI.o
-                                0xc2a (size before relaxing)
- .debug_str     0x00000b4b      0x196 ./User/interrupt.o
+.debug_str      0x00000000     0x26bc
+ .debug_str     0x00000000      0x3b9 ./User/PLL.o
+                                0x3dd (size before relaxing)
+ .debug_str     0x000003b9      0x9fb ./User/UI.o
+                                0xeb3 (size before relaxing)
+ .debug_str     0x00000db4      0x189 ./User/interrupt.o
                                 0xa25 (size before relaxing)
- .debug_str     0x00000ce1       0x1b ./User/inverter_control.o
-                                0x36e (size before relaxing)
- .debug_str     0x00000cfc      0x9e8 ./User/main.o
-                               0x158f (size before relaxing)
- .debug_str     0x000016e4       0xd1 ./User/user_sys.o
+ .debug_str     0x00000f3d       0x1b ./User/inverter_control.o
+                                0x3a5 (size before relaxing)
+ .debug_str     0x00000f58      0x97f ./User/main.o
+                               0x1602 (size before relaxing)
+ .debug_str     0x000018d7       0xc8 ./User/user_sys.o
                                0x111f (size before relaxing)
- .debug_str     0x000017b5      0x3c0 ./Library/StdDriver/src/clk.o
+ .debug_str     0x0000199f      0x3c0 ./Library/StdDriver/src/clk.o
                                 0xff5 (size before relaxing)
- .debug_str     0x00001b75       0x85 ./Library/StdDriver/src/gpio.o
+ .debug_str     0x00001d5f       0x85 ./Library/StdDriver/src/gpio.o
                                 0x94f (size before relaxing)
- .debug_str     0x00001bfa      0x1f4 ./Library/StdDriver/src/pdma.o
+ .debug_str     0x00001de4      0x1f4 ./Library/StdDriver/src/pdma.o
                                 0xb8b (size before relaxing)
- .debug_str     0x00001dee       0xb0 ./Library/StdDriver/src/retarget.o
+ .debug_str     0x00001fd8       0xb0 ./Library/StdDriver/src/retarget.o
                                 0x9ac (size before relaxing)
- .debug_str     0x00001e9e      0x1f2 ./Library/StdDriver/src/uart.o
+ .debug_str     0x00002088      0x1f2 ./Library/StdDriver/src/uart.o
                                 0xc1b (size before relaxing)
- .debug_str     0x00002090      0x2a3 ./CMSIS/GCC/_syscalls.o
+ .debug_str     0x0000227a      0x2a3 ./CMSIS/GCC/_syscalls.o
                                 0x8c8 (size before relaxing)
- .debug_str     0x00002333      0x19f ./CMSIS/system_M480.o
+ .debug_str     0x0000251d      0x19f ./CMSIS/system_M480.o
                                 0xc19 (size before relaxing)
 
-.debug_frame    0x00000000     0x14b0
- .debug_frame   0x00000000       0x3c ./User/UI.o
- .debug_frame   0x0000003c       0x30 ./User/interrupt.o
- .debug_frame   0x0000006c       0x58 ./User/main.o
- .debug_frame   0x000000c4       0xa4 ./User/user_sys.o
- .debug_frame   0x00000168      0x2c4 ./Library/StdDriver/src/clk.o
- .debug_frame   0x0000042c       0x98 ./Library/StdDriver/src/gpio.o
- .debug_frame   0x000004c4      0x13c ./Library/StdDriver/src/pdma.o
- .debug_frame   0x00000600       0xbc ./Library/StdDriver/src/retarget.o
- .debug_frame   0x000006bc      0x154 ./Library/StdDriver/src/uart.o
- .debug_frame   0x00000810      0x228 ./CMSIS/GCC/_syscalls.o
- .debug_frame   0x00000a38       0x38 ./CMSIS/system_M480.o
- .debug_frame   0x00000a70       0xac c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard\libgcc.a(_arm_addsubdf3.o)
- .debug_frame   0x00000b1c       0x24 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard\libgcc.a(_arm_truncdfsf2.o)
- .debug_frame   0x00000b40       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-errno.o)
- .debug_frame   0x00000b60       0x28 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-exit.o)
- .debug_frame   0x00000b88       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-init.o)
- .debug_frame   0x00000bb4       0x28 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memcpy-stub.o)
- .debug_frame   0x00000bdc       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memset.o)
- .debug_frame   0x00000bfc       0x74 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-printf.o)
- .debug_frame   0x00000c70       0x3c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-puts.o)
- .debug_frame   0x00000cac       0x70 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-sprintf.o)
- .debug_frame   0x00000d1c       0x28 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-strcat.o)
- .debug_frame   0x00000d44       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-strcpy.o)
- .debug_frame   0x00000d64       0x40 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-wbuf.o)
- .debug_frame   0x00000da4       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-wsetup.o)
- .debug_frame   0x00000dd0       0x68 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-fflush.o)
- .debug_frame   0x00000e38      0x11c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-findfp.o)
- .debug_frame   0x00000f54       0x54 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-fwalk.o)
- .debug_frame   0x00000fa8       0x58 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-makebuf.o)
- .debug_frame   0x00001000       0x38 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-freer.o)
- .debug_frame   0x00001038       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-mallocr.o)
- .debug_frame   0x00001064       0x90 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-svfprintf.o)
- .debug_frame   0x000010f4       0xac c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf.o)
- .debug_frame   0x000011a0       0x60 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf_i.o)
- .debug_frame   0x00001200       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-sbrkr.o)
- .debug_frame   0x0000122c       0x88 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-stdio.o)
- .debug_frame   0x000012b4       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-writer.o)
- .debug_frame   0x000012e0       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-closer.o)
- .debug_frame   0x0000130c       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-fstatr.o)
- .debug_frame   0x00001338       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-isattyr.o)
- .debug_frame   0x00001364       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-lseekr.o)
- .debug_frame   0x00001390       0x28 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memmove.o)
- .debug_frame   0x000013b8       0x30 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-mlock.o)
- .debug_frame   0x000013e8       0x3c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-reallocr.o)
- .debug_frame   0x00001424       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-readr.o)
- .debug_frame   0x00001450       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-msizer.o)
- .debug_frame   0x00001470       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libnosys.a(sbrk.o)
- .debug_frame   0x00001490       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libnosys.a(_exit.o)
+.debug_loc      0x00000000     0x24f9
+ .debug_loc     0x00000000      0x4ca ./User/UI.o
+ .debug_loc     0x000004ca       0x29 ./User/interrupt.o
+ .debug_loc     0x000004f3       0x88 ./User/main.o
+ .debug_loc     0x0000057b      0x120 ./User/user_sys.o
+ .debug_loc     0x0000069b      0xb7b ./Library/StdDriver/src/clk.o
+ .debug_loc     0x00001216       0xc0 ./Library/StdDriver/src/gpio.o
+ .debug_loc     0x000012d6      0x632 ./Library/StdDriver/src/pdma.o
+ .debug_loc     0x00001908      0x100 ./Library/StdDriver/src/retarget.o
+ .debug_loc     0x00001a08      0x6df ./Library/StdDriver/src/uart.o
+ .debug_loc     0x000020e7      0x3ff ./CMSIS/GCC/_syscalls.o
+ .debug_loc     0x000024e6       0x13 ./CMSIS/system_M480.o
+
+.debug_ranges   0x00000000      0x428
+ .debug_ranges  0x00000000       0x88 ./User/UI.o
+ .debug_ranges  0x00000088       0x10 ./User/interrupt.o
+ .debug_ranges  0x00000098       0x38 ./User/main.o
+ .debug_ranges  0x000000d0       0x50 ./User/user_sys.o
+ .debug_ranges  0x00000120       0xf0 ./Library/StdDriver/src/clk.o
+ .debug_ranges  0x00000210       0x30 ./Library/StdDriver/src/gpio.o
+ .debug_ranges  0x00000240       0x78 ./Library/StdDriver/src/pdma.o
+ .debug_ranges  0x000002b8       0x50 ./Library/StdDriver/src/retarget.o
+ .debug_ranges  0x00000308       0x78 ./Library/StdDriver/src/uart.o
+ .debug_ranges  0x00000380       0x90 ./CMSIS/GCC/_syscalls.o
+ .debug_ranges  0x00000410       0x18 ./CMSIS/system_M480.o
+
+.debug_frame    0x00000000     0x16a4
+ .debug_frame   0x00000000      0x230 ./User/UI.o
+ .debug_frame   0x00000230       0x30 ./User/interrupt.o
+ .debug_frame   0x00000260       0x58 ./User/main.o
+ .debug_frame   0x000002b8       0xa4 ./User/user_sys.o
+ .debug_frame   0x0000035c      0x2c4 ./Library/StdDriver/src/clk.o
+ .debug_frame   0x00000620       0x98 ./Library/StdDriver/src/gpio.o
+ .debug_frame   0x000006b8      0x13c ./Library/StdDriver/src/pdma.o
+ .debug_frame   0x000007f4       0xbc ./Library/StdDriver/src/retarget.o
+ .debug_frame   0x000008b0      0x154 ./Library/StdDriver/src/uart.o
+ .debug_frame   0x00000a04      0x228 ./CMSIS/GCC/_syscalls.o
+ .debug_frame   0x00000c2c       0x38 ./CMSIS/system_M480.o
+ .debug_frame   0x00000c64       0xac c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard\libgcc.a(_arm_addsubdf3.o)
+ .debug_frame   0x00000d10       0x24 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/thumb/v7e-m/fpv4-sp/hard\libgcc.a(_arm_truncdfsf2.o)
+ .debug_frame   0x00000d34       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-errno.o)
+ .debug_frame   0x00000d54       0x28 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-exit.o)
+ .debug_frame   0x00000d7c       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-init.o)
+ .debug_frame   0x00000da8       0x28 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memcpy-stub.o)
+ .debug_frame   0x00000dd0       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memset.o)
+ .debug_frame   0x00000df0       0x74 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-printf.o)
+ .debug_frame   0x00000e64       0x3c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-puts.o)
+ .debug_frame   0x00000ea0       0x70 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-sprintf.o)
+ .debug_frame   0x00000f10       0x28 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-strcat.o)
+ .debug_frame   0x00000f38       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-strcpy.o)
+ .debug_frame   0x00000f58       0x40 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-wbuf.o)
+ .debug_frame   0x00000f98       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-wsetup.o)
+ .debug_frame   0x00000fc4       0x68 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-fflush.o)
+ .debug_frame   0x0000102c      0x11c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-findfp.o)
+ .debug_frame   0x00001148       0x54 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-fwalk.o)
+ .debug_frame   0x0000119c       0x58 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-makebuf.o)
+ .debug_frame   0x000011f4       0x38 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-freer.o)
+ .debug_frame   0x0000122c       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-mallocr.o)
+ .debug_frame   0x00001258       0x90 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-svfprintf.o)
+ .debug_frame   0x000012e8       0xac c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf.o)
+ .debug_frame   0x00001394       0x60 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-vfprintf_i.o)
+ .debug_frame   0x000013f4       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-sbrkr.o)
+ .debug_frame   0x00001420       0x88 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-stdio.o)
+ .debug_frame   0x000014a8       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-writer.o)
+ .debug_frame   0x000014d4       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-closer.o)
+ .debug_frame   0x00001500       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-fstatr.o)
+ .debug_frame   0x0000152c       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-isattyr.o)
+ .debug_frame   0x00001558       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-lseekr.o)
+ .debug_frame   0x00001584       0x28 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-memmove.o)
+ .debug_frame   0x000015ac       0x30 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-mlock.o)
+ .debug_frame   0x000015dc       0x3c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-reallocr.o)
+ .debug_frame   0x00001618       0x2c c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-readr.o)
+ .debug_frame   0x00001644       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libg_nano.a(lib_a-nano-msizer.o)
+ .debug_frame   0x00001664       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libnosys.a(sbrk.o)
+ .debug_frame   0x00001684       0x20 c:/program files (x86)/gnu tools arm embedded/6 2017-q1-update/bin/../lib/gcc/arm-none-eabi/6.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard\libnosys.a(_exit.o)

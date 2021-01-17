@@ -43,3 +43,16 @@ void PDMA_IRQHandler(void){
         printf("unknown PDMA int.!!\n");
     }
 }
+
+//void UART1_IRQHandler(void)
+//{
+//    uint32_t u32DAT;
+//    uint32_t u32IntSts = UART1->INTSTS;
+//
+//    if(u32IntSts & UART_INTSTS_RDAIF_Msk)
+//    {
+//        u32DAT = UART1->DAT; // read out data
+//        printf("\nReceived character '0x%x' \n", u32DAT);
+//
+//    }
+//}

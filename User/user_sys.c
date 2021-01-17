@@ -74,14 +74,19 @@ void init_UART1_DMA(void){
 
 	    PDMA->DSCT[UART1_TX_DMA_CHANNEL].SA = ((uint32_t)init_str); 		/* Starting Source address is the beginning of the string we want to send */
 
-	    UART1->INTEN |= (0b1 << UART_INTEN_TXPDMAEN_Pos); 		/* Bit TXPDMAEN is set to one enable PDMA requests */
+	    UART1->INTEN |= (UART_INTEN_TXPDMAEN_Msk /*| UART_INTEN_RDAIEN_Msk*/); 		/* Bit TXPDMAEN is set to one enable PDMA requests. RDAIEN is set to generate interrupt on character receive*/
 	    /* The fist time the DMA is used, the UARTn->INTEN write must absolutely be done at the end */
 
 	    delay_ms(10); /* Make sure the init string is transferred before anything else happens*/
 
 	    PDMA_EnableInt(PDMA,UART1_TX_DMA_CHANNEL, PDMA_INT_TRANS_DONE);
 	    NVIC_EnableIRQ(PDMA_IRQn);
+	    //NVIC_EnableIRQ(UART1_IRQn);
+
 	    NVIC_SetPriority(PDMA_IRQn, DMA_PRIORITY);
+	    //NVIC_SetPriority(UART1_IRQn, UART1_PRIORITY);
+
+
 
 }
 
