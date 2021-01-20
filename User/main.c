@@ -78,6 +78,8 @@ void SYS_Init(void)
     /* Enable IP clock */
     //CLK_EnableModuleClock(UART0_MODULE);
     //CLK_EnableModuleClock(TMR0_MODULE);
+    //CLK_EnableModuleClock(EPWM0_MODULE);
+    CLK->APBCLK1 |= CLK_APBCLK1_EPWM1CKEN_Msk; /* EPWM 1 Clock enable*/
     CLK->APBCLK0 |= CLK_APBCLK0_TMR0CKEN_Msk; // UART0 Clock Enable
     CLK->APBCLK0 |= CLK_APBCLK0_UART0CKEN_Msk; // UART0 Clock Enable
     CLK->APBCLK0 |= CLK_APBCLK0_UART1CKEN_Msk; // UART1 Clock Enable
@@ -93,7 +95,8 @@ void SYS_Init(void)
     CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL1_UART0SEL_Msk) | (0x0 << CLK_CLKSEL1_UART0SEL_Pos);
     /* Select UART1 clock source is HXT (0x0 for HXT) */
     CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL1_UART1SEL_Msk) | (0x0 << CLK_CLKSEL1_UART1SEL_Pos);
-
+    /* Set EPWM1 clock source as PLL  (0x0 for PLL, 0x1 for PCLK0) */
+    CLK->CLKSEL2 = (CLK->CLKSEL2 & ~CLK_CLKSEL2_EPWM1SEL_Msk) | (0x0 << CLK_CLKSEL2_EPWM1SEL_Msk);
 
     /* Update System Core Clock */
     /* User can use SystemCoreClockUpdate() to calculate SystemCoreClock. */
@@ -107,6 +110,10 @@ void SYS_Init(void)
     /* Set PA multi-function pins for UART1 TXD and RXD*/
      SYS->GPA_MFPL &= ~(SYS_GPA_MFPL_PA2MFP_Msk | SYS_GPA_MFPL_PA3MFP_Msk);
      SYS->GPA_MFPL |= (0x8 << SYS_GPA_MFPL_PA2MFP_Pos) | (0x8 << SYS_GPA_MFPL_PA3MFP_Pos);
+
+     /* Set PB.14 as output from EPWM1_CH1 */
+     SYS->GPB_MFPH &= ~(SYS_GPB_MFPH_PB14MFP_Msk);
+     SYS->GPB_MFPH |= SYS_GPB_MFPH_PB14MFP_EPWM1_CH1;
 
     /* Lock protected registers */
     SYS_LockReg();
@@ -140,7 +147,7 @@ int main()
     GPIO_SetMode(PG, BIT15, GPIO_MODE_INPUT); // Configure pin as input for Button 1
     GPIO_SetMode(PF, BIT11, GPIO_MODE_INPUT); // Configure pin as input for Button 2
 
-
+    start_PWModulator_carrier(); /* Begin to output the carrier waveform for the analog hardware PWModulator on PB.14 (pin 133 on the M487JIDAE) */
 
     /* Connect UART to PC, and open a terminal tool to receive following message */
     printf("Hello World\n");
@@ -175,7 +182,9 @@ int main()
     	int8_t row_sel, col_sel;
     	if(UI_new_frame_tick){
     		UI_new_frame_tick = false;
+    		PH->DOUT &= ~(BIT1);
     		draw_UI(row_sel, col_sel);
+    		PH->DOUT |= BIT1;
     	}
     	read_user_input(&row_sel,&col_sel);/* Since the chip has a 16 byte hardware FIFO, and we are only expecting
     	 human input, we don't need interrupts nor DMA. Just run this routine every few milliseconds.*/

@@ -27,6 +27,8 @@
 #define DMA_PRIORITY 5
 #define UART1_PRIORITY 6
 
+#define PWM_CARRIER_FREQ 400000
+
 /*---------------------------------------------------------------------------------------------------------*/
 /* Type definitions           				                                                                       */
 /*---------------------------------------------------------------------------------------------------------*/
@@ -54,5 +56,7 @@ void init_UART1_DMA(void); /* Needs SysTick!! */
 void start_UART1_DMA_Xfer(UART_DMA_Xfer_t);
 int8_t push_UART1(char*);
 int8_t pop_UART1(UART_DMA_Xfer_t*);
+
+void start_PWModulator_carrier(void);
 
 #endif /* USER_SYS_H_ */

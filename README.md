@@ -1,3 +1,7 @@
-An attempt at making an "interactive" console to control and monitor the chip over UART1 and DMA. For futher integration in an upcoming project.
+Nuvoton M48x Single Phase Active Rectifier Controller (NuvoSPARC I guess?)
+
+An attempt at implementing a power electronics controller on a cheap Cortex-M4 microcontroller instead of an expensive TI DSP.
 
 Developpped on a NuMaker-ETM-M487 (with an M487JIDAE chip) using NuEclipse.
+
+Protoype will most likely be an M481LIDAE.

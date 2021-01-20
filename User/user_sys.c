@@ -31,8 +31,8 @@ void update_button_LED_states() {
 	button_state <<= 1; // Move PG15 state to bit 1
 	button_state |= PF11;
 	button_state <<= 1; //  Move BTN states to bit 1 and bit 2
-	PH->DOUT &= ~(BIT1 | BIT2);
-	PH->DOUT |= button_state;
+	PH->DOUT &= ~(/*BIT1 |*/ BIT2);
+	PH->DOUT |= (button_state & BIT2);
 
 
 	static uint16_t heartbeat_counter = 0;
@@ -145,5 +145,19 @@ int8_t pop_UART1(UART_DMA_Xfer_t* p_Xfer){
 		UART1_DMA_Job_Buffer.Tail = Next;
 
 		return 0;	// return Success -HB
+
+}
+
+void start_PWModulator_carrier(void){
+	/* Begin to output the carrier waveform for the analog hardware PWModulator on PB.14 (pin 133 on the M487JIDAE) */
+
+	PB->SLEWCTL |= (GPIO_SLEWCTL_HIGH << 2*14); /*Set PB14 to "High" slew rate.*/
+	/* For some reason "High" mode seems faster than "Fast" mode. Most likely it's just my probing setup (signal reflexions and such) */
+
+	EPWM_ConfigOutputChannel(EPWM1, 1, PWM_CARRIER_FREQ, 50); /* Set prescaler to 1, CNT to 480 */
+
+	EPWM1->POEN |= 0b10; /* Enable CH1 (set 1 at bit position 1)*/
+
+	EPWM1->CNTEN |= 0b10; /* Start the counter (set 1 at bit position 1)*/
 
 }

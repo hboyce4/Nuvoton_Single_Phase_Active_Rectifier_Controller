@@ -15,6 +15,8 @@
 /* Function definitions                                                                                    */
 /*---------------------------------------------------------------------------------------------------------*/
 
+
+/* 363us in Debug, 219us in Release ( -O2 ) */
 void draw_UI(int8_t row_sel, int8_t col_sel){/* 60-ish characters width*/
 
 	/* Cursor home : \x1B[H */
@@ -63,10 +65,6 @@ void read_user_input(int8_t* p_row_sel, int8_t* p_col_sel){
 		if (state == 0){/* If no characters have been received*/
 			if(user_char == 0x1B){/* If the first character is escape*/
 				state++;/* Go to the next state*/
-			}else if (user_char == '+'){/* If a '+' is received, the selected value is incremented*/
-				increment_UI_value(*p_row_sel,*p_col_sel);
-			}else if (user_char == '-'){/* If a '-' is received, the selected value is decremented*/
-				decrement_UI_value(*p_row_sel,*p_col_sel);
 			}
 
 		} else if (state == 1){/* If the first character of an escape sequence (ESC) has been received*/
@@ -112,6 +110,11 @@ void read_user_input(int8_t* p_row_sel, int8_t* p_col_sel){
 
 		}
 
+		if(user_char == '+'){/* If a '+' is received, the selected value is incremented*/
+			increment_UI_value(*p_row_sel,*p_col_sel);
+		}else if (user_char == '-'){/* If a '-' is received, the selected value is decremented*/
+			decrement_UI_value(*p_row_sel,*p_col_sel);
+		}
 		//printf("\nReceived character '0x%x' \n", user_char); /* for debug */
 
 	}
