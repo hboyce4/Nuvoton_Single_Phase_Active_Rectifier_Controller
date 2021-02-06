@@ -48,7 +48,7 @@ void draw_UI(int8_t row_sel, int8_t col_sel){/* 60-ish characters width*/
 	/* End of last line */
 
 
-	inverter_state_variables.V_DC_plus += 0.51;
+	//inverter_state_variables.V_DC_plus += 0.51; //debug
 
 
 }
@@ -309,7 +309,7 @@ void draw_UI_line_8(uint8_t* p_line_counter) {
 
 	static char line_8_str[LINE_WIDTH];
 	sprintf(line_8_str, "PLL sync: ");
-	if (PLL_state_variables.PLL_sync) {
+	if (PLL_state_variables.sync) {
 		strcat(line_8_str, "\x1B[92mYES"); /* Green YES*/
 		strcat(line_8_str, COLOUR_DEFAULT);
 	} else {
@@ -333,7 +333,7 @@ void draw_UI_line_9(uint8_t* p_line_counter) {
 
 	static char line_9_str[LINE_WIDTH];
 
-	sprintf(line_9_str,"PLL freq: %2.2f HZ\n\r",PLL_state_variables.PLL_freq_HZ);
+	sprintf(line_9_str,"PLL freq: %2.2f Hz\n\r",PLL_state_variables.freq_Hz);
 	(*p_line_counter)++;
 
 	push_UART1((char*) line_9_str);

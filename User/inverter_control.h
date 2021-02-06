@@ -1,5 +1,5 @@
 /*
- * inverter_control.h
+  * inverter_control.h
  *
  *  Created on: Jan 8, 2021
  *      Author: Hugo Boyce
@@ -53,6 +53,7 @@ typedef struct inverter_state_variables{
 	volatile float P_AC_RMS;
 
 	volatile float v_AC;
+	volatile float v_AC_n; /* v_AC normalized to a peak amplitude of one */
 	volatile float i_SP;
 	volatile float i_PV;
 

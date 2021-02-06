@@ -1,12 +1,12 @@
 /*
- * user_sys.h
+ * analog.h
  *
- *  Created on: Jan 5, 2021
+ *  Created on: Feb 6, 2021
  *      Author: Hugo Boyce
  */
 
-#ifndef USER_SYS_H_
-#define USER_SYS_H_
+#ifndef ANALOG_H_
+#define ANALOG_H_
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Includes           				                                                                      */
@@ -14,33 +14,39 @@
 
 #include <string.h>
 #include <stdbool.h>
+#include <math.h>
 #include "NuMicro.h"
 #include "main.h"
+#include "PLL.h"
+#include "inverter_control.h"
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Macros           				                                                                      */
 /*---------------------------------------------------------------------------------------------------------*/
-#define HEARTBEAT_INTERVAL_MS 1000
-
-#define UART1_TX_DMA_CHANNEL 10 /* PDMA->REQSEL8_11 has to be modified by hand if the channel in this macro is changed. I know this is bad.*/
-#define UART_DMA_JOB_BUFF_SIZE 32 /* Must be a power of 2. Max = 256*/
-#define DMA_INTERRUPT_PRIORITY 5
-
-
-#define PWM_CARRIER_FREQ 400000
 
 #define EADC_DMA_CHANNEL 2
 #define EADC_OVERSAMPLING_NUMBER 4
 #define EADC_TOTAL_CHANNELS 8
+#define VREF_VOLTAGE 3.239 /*[V] Voltage of the chip's analog voltage reference (Vref)*/
+#define ADC_RES 4096.0
+
+
+/*ADC Channels*/
+#define VBUS_PLUS_CHANNEL 0
+#define VBUS_MINUS_CHANNEL 1
+#define V_AC_CHANNEL 2
+
+/* Gains */
+#define VBUS_GAIN 0.1 /* [V/V] Gain of the analog front end for the bus voltages. The negative bus's front end has a gain of -VBUS_GAIN*/
+#define V_AC_GAIN 0.058824 /* [V/V] Gain of the AC voltage front end*/
+#define V_AC_OFFSET 28.05 /* [V] Offset of the AC voltage front end*/
+#define V_AC_NOMINAL_RMS_VALUE 12 /* Nominal RMS value of the input voltage (ex.: 12V AC rms)*/
+
+
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Type definitions           				                                                                       */
 /*---------------------------------------------------------------------------------------------------------*/
-typedef struct
-{
-	volatile char * str;
-	volatile uint16_t count;
-} UART_DMA_Xfer_t;
 
 
 /*---------------------------------------------------------------------------------------------------------*/
@@ -53,15 +59,13 @@ typedef struct
 /* Functions declaration                                                                              */
 /*---------------------------------------------------------------------------------------------------------*/
 
+void init_ADC(void);
+void run_ADC_cal(void);
+//void init_ADC_DMA(void);
+//void reload_ADC_DMA(void);
 
-void update_button_LED_states(void);
-void delay_ms(uint32_t time); /*Generates a milliseconds delay. NOT ACCURATE. Use a hardware timer for accuracy*/
-void init_UART1_DMA(void); /* Needs SysTick!! */
-void start_UART1_DMA_Xfer(UART_DMA_Xfer_t);
-int8_t push_UART1(char*);
-int8_t pop_UART1(UART_DMA_Xfer_t*);
-
-void start_PWModulator_carrier(void);
+void convert_from_ADC(void);
+void convert_to_DAC(void);
 
 
-#endif /* USER_SYS_H_ */
+#endif /* ANALOG_H_ */

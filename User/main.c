@@ -20,6 +20,7 @@
 #include "inverter_control.h"
 #include "PLL.h"
 #include "UI.h"
+#include "analog.h"
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
@@ -50,6 +51,10 @@ void SysTick_Handler(void)
 	}
 	UI_refresh_counter--;
 
+	PH->DOUT &= ~(BIT1);//Timing measurements
+	convert_from_ADC();
+	PLL_main();
+	PH->DOUT |= BIT1;	//Timing measurements
 }
 
 
@@ -173,6 +178,7 @@ int main()
     start_PWModulator_carrier(); /* Begin to output the carrier waveform for the analog hardware PWModulator on PB.14 (pin 133 on the M487JIDAE) */
 
     init_ADC();
+    init_sin_table(sin_table,SIN_TABLE_SIZE);	// Initialise le tableau de référence pour la fonction sinus (Look-up table, LUT)
 
     /* Connect UART to PC, and open a terminal tool to receive following message */
     printf("Hello World\n");
@@ -185,9 +191,9 @@ int main()
     	int8_t row_sel, col_sel;
     	if(UI_new_frame_tick){
     		UI_new_frame_tick = false;
-    		PH->DOUT &= ~(BIT1);
+    		//PH->DOUT &= ~(BIT1); //Timing measurements
     		draw_UI(row_sel, col_sel);
-    		PH->DOUT |= BIT1;
+    		//PH->DOUT |= BIT1;	//Timing measurements
     	}
     	read_user_input(&row_sel,&col_sel);/* Since the chip has a 16 byte hardware FIFO, and we are only expecting
     	 human input, we don't need interrupts nor DMA. Just run this routine every few milliseconds.*/

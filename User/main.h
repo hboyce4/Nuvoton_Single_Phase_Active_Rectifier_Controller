@@ -15,7 +15,8 @@
 /*---------------------------------------------------------------------------------------------------------*/
 
 #define PLL_CLOCK           192000000
-
+#define F_CALC				1000						// [HZ] Fréquence de traitement du signal. doit être un multiple entier de 4 * NETWORK_FREQ pour que DELAY_ARRAY_SIZE soit un entier.
+#define T_CALC				(1.0/F_CALC)				// [s] Période de calcul du traitement de signal. Inverse de F_CALC
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Type definitions           				                                                               */
