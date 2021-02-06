@@ -44,7 +44,7 @@ all: Nuvoton_Single_Phase_Active_Rectifier_Controller.elf secondary-outputs
 Nuvoton_Single_Phase_Active_Rectifier_Controller.elf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross ARM GNU C Linker'
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Os -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g -T gcc_arm.ld -Xlinker --gc-sections -L"../CMSIS/GCC" -Wl,-Map,"Nuvoton_Single_Phase_Active_Rectifier_Controller.map" --specs=nano.specs -o "Nuvoton_Single_Phase_Active_Rectifier_Controller.elf" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O0 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -Ofast -T gcc_arm.ld -Xlinker --gc-sections -L"../CMSIS/GCC" -Wl,-Map,"Nuvoton_Single_Phase_Active_Rectifier_Controller.map" --specs=nano.specs -u _printf_float -o "Nuvoton_Single_Phase_Active_Rectifier_Controller.elf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -24,10 +24,14 @@
 
 #define UART1_TX_DMA_CHANNEL 10 /* PDMA->REQSEL8_11 has to be modified by hand if the channel in this macro is changed. I know this is bad.*/
 #define UART_DMA_JOB_BUFF_SIZE 32 /* Must be a power of 2. Max = 256*/
-#define DMA_PRIORITY 5
-#define UART1_PRIORITY 6
+#define DMA_INTERRUPT_PRIORITY 5
+
 
 #define PWM_CARRIER_FREQ 400000
+
+#define EADC_DMA_CHANNEL 2
+#define EADC_OVERSAMPLING_NUMBER 4
+#define EADC_TOTAL_CHANNELS 8
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Type definitions           				                                                                       */
@@ -58,5 +62,10 @@ int8_t push_UART1(char*);
 int8_t pop_UART1(UART_DMA_Xfer_t*);
 
 void start_PWModulator_carrier(void);
+
+void init_ADC(void);
+void run_ADC_cal(void);
+//void init_ADC_DMA(void);
+//void reload_ADC_DMA(void);
 
 #endif /* USER_SYS_H_ */

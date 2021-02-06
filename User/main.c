@@ -72,22 +72,26 @@ void SYS_Init(void)
 
     /* Set core clock as PLL_CLOCK from PLL */
     CLK_SetCoreClock(PLL_CLOCK);
-    /* Set PCLK0/PCLK1 to HCLK/2 */
-    CLK->PCLKDIV = (CLK_PCLKDIV_APB0DIV_DIV2 | CLK_PCLKDIV_APB1DIV_DIV2);
+    /* Set PCLK0 to HCLK/2 (96MHz) and PCLK1 to HCLK/4(48MHz) */
+    CLK->PCLKDIV = (CLK_PCLKDIV_APB0DIV_DIV2 | CLK_PCLKDIV_APB1DIV_DIV4);
 
     /* Enable IP clock */
     //CLK_EnableModuleClock(UART0_MODULE);
     //CLK_EnableModuleClock(TMR0_MODULE);
     //CLK_EnableModuleClock(EPWM0_MODULE);
-    CLK->APBCLK1 |= CLK_APBCLK1_EPWM1CKEN_Msk; /* EPWM 1 Clock enable*/
     CLK->APBCLK0 |= CLK_APBCLK0_TMR0CKEN_Msk; // UART0 Clock Enable
     CLK->APBCLK0 |= CLK_APBCLK0_UART0CKEN_Msk; // UART0 Clock Enable
     CLK->APBCLK0 |= CLK_APBCLK0_UART1CKEN_Msk; // UART1 Clock Enable
+    CLK->APBCLK0 |= CLK_APBCLK0_EADCCKEN_Msk; /* EADC0 Clock Enable*/
+
+    CLK->APBCLK1 |= CLK_APBCLK1_EPWM1CKEN_Msk; /* EPWM 1 Clock enable*/
+
     CLK->AHBCLK  |= CLK_AHBCLK_PDMACKEN_Msk; // PDMA Clock Enable
 
     /* Select IP clock source from HXT */
     //CLK_SetModuleClock(UART0_MODULE, CLK_CLKSEL1_UART0SEL_HXT, CLK_CLKDIV0_UART0(1));
     //CLK_SetModuleClock(TMR0_MODULE, CLK_CLKSEL1_TMR0SEL_HXT, 0);
+    //CLK_SetModuleClock(EADC_MODULE, 0, CLK_CLKDIV0_EADC(1));
 
     /* Select TMR0 clock source as HXT (0x0 for HXT) */
     CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL1_TMR0SEL_Msk) | (0x0 << CLK_CLKSEL1_TMR0SEL_Pos);
@@ -97,6 +101,12 @@ void SYS_Init(void)
     CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL1_UART1SEL_Msk) | (0x0 << CLK_CLKSEL1_UART1SEL_Pos);
     /* Set EPWM1 clock source as PLL  (0x0 for PLL, 0x1 for PCLK0) */
     CLK->CLKSEL2 = (CLK->CLKSEL2 & ~CLK_CLKSEL2_EPWM1SEL_Msk) | (0x0 << CLK_CLKSEL2_EPWM1SEL_Msk);
+
+    /* EADC clock has only one source: PCLK1, so no need to select it.*/
+    /* Set divider for EADC */
+    CLK->CLKDIV0 &= ~(CLK_CLKDIV0_EADCDIV_Msk);/* Reset EADCDIV */
+    CLK->CLKDIV0 |= 0 << CLK_CLKDIV0_EADCDIV_Pos; /* EADC divider is EADCDIV + 1 . So EADC Clock will be PCLK1/1 (48MHz/1 = 48MHz) */
+
 
     /* Update System Core Clock */
     /* User can use SystemCoreClockUpdate() to calculate SystemCoreClock. */
@@ -114,6 +124,19 @@ void SYS_Init(void)
      /* Set PB.14 as output from EPWM1_CH1 */
      SYS->GPB_MFPH &= ~(SYS_GPB_MFPH_PB14MFP_Msk);
      SYS->GPB_MFPH |= SYS_GPB_MFPH_PB14MFP_EPWM1_CH1;
+
+     /* EADC: Set PB.0 ~ PB.7 to input mode */
+	 PB->MODE &= ~(GPIO_MODE_MODE0_Msk | GPIO_MODE_MODE1_Msk | GPIO_MODE_MODE2_Msk | GPIO_MODE_MODE3_Msk |
+			 GPIO_MODE_MODE4_Msk | GPIO_MODE_MODE5_Msk | GPIO_MODE_MODE6_Msk | GPIO_MODE_MODE7_Msk);
+	 /* EADC: Configure the GPB0 - GPB7 ADC analog input pins. (Multi Function Pins) */
+	 SYS->GPB_MFPL &= ~(SYS_GPB_MFPL_PB0MFP_Msk | SYS_GPB_MFPL_PB1MFP_Msk | SYS_GPB_MFPL_PB2MFP_Msk | SYS_GPB_MFPL_PB3MFP_Msk
+			 |SYS_GPB_MFPL_PB4MFP_Msk | SYS_GPB_MFPL_PB5MFP_Msk | SYS_GPB_MFPL_PB6MFP_Msk | SYS_GPB_MFPL_PB7MFP_Msk);
+	 SYS->GPB_MFPL |= (SYS_GPB_MFPL_PB0MFP_EADC0_CH0 | SYS_GPB_MFPL_PB1MFP_EADC0_CH1 | SYS_GPB_MFPL_PB2MFP_EADC0_CH2 |
+			 SYS_GPB_MFPL_PB3MFP_EADC0_CH3 | SYS_GPB_MFPL_PB4MFP_EADC0_CH4 | SYS_GPB_MFPL_PB5MFP_EADC0_CH5 | SYS_GPB_MFPL_PB6MFP_EADC0_CH6 |
+			 SYS_GPB_MFPL_PB7MFP_EADC0_CH7);
+	 /* EADC: Disable the GPB0 - GPB7 digital input path to avoid the leakage current. */
+	 GPIO_DISABLE_DIGITAL_PATH(PB, BIT7|BIT6|BIT5|BIT4|BIT3|BIT2|BIT1|BIT0);
+
 
     /* Lock protected registers */
     SYS_LockReg();
@@ -149,31 +172,11 @@ int main()
 
     start_PWModulator_carrier(); /* Begin to output the carrier waveform for the analog hardware PWModulator on PB.14 (pin 133 on the M487JIDAE) */
 
+    init_ADC();
+
     /* Connect UART to PC, and open a terminal tool to receive following message */
     printf("Hello World\n");
-    //printf("\033[2J");
-
-    delay_ms(1000);
-
-   printf("Hello World, delayed.\n");
-
-   delay_ms(1000);
-
-    static const char string[] = "This is a DMA transfer\n\r";
-    push_UART1((char*)string);
-
-    delay_ms(1000);
-
-    static const char string2[] = "This is a second, bigger DMA transfer\n\r";
-    push_UART1((char*)string2);
-    static const char string3[] = "This is a third DMA transfer right away\n\r";
-    push_UART1((char*)string3);
-
-    delay_ms(1000);
-
-    //const static char clear_screen_str[] = "\x1B[2J";
-    //push_UART1((char*)clear_screen_str);
-
+    printf("\033[2J");
 
 
     while(1){

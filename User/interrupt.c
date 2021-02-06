@@ -25,6 +25,12 @@ void PDMA_IRQHandler(void){
             		}/* else, popping from the buffer didn't not succeed, it means there's no transfer jobs left */
 
 
+//        }else if(PDMA_GET_TD_STS(PDMA) & (1 << EADC_DMA_CHANNEL)){
+//        	PDMA_CLR_TD_FLAG(PDMA,1 << EADC_DMA_CHANNEL);
+//
+//        	/* EADC Transfer complete */
+//
+//
         }else{
         	printf("PDMA int. from unknown ch.!!\n");
         	PDMA_CLR_TD_FLAG(PDMA,PDMA_GET_TD_STS(PDMA));
@@ -43,6 +49,12 @@ void PDMA_IRQHandler(void){
         printf("unknown PDMA int.!!\n");
     }
 }
+
+//void EADC00_IRQHandler(void)
+//{
+//    //g_u32AdcIntFlag = 1;
+//    EADC_CLR_INT_FLAG(EADC, EADC_STATUS2_ADIF0_Msk);      /* Clear the A/D ADINT0 interrupt flag */
+//}
 
 //void UART1_IRQHandler(void)
 //{
