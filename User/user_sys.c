@@ -18,23 +18,29 @@ struct UART1_DMA_Job_Buffer_{
 } UART1_DMA_Job_Buffer = {.Head = 0, .Tail = 0};
 
 
-uint16_t ADC_raw_val_buff[(EADC_OVERSAMPLING_NUMBER+1)*EADC_TOTAL_CHANNELS];
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Function definitions                                                                                       */
 /*---------------------------------------------------------------------------------------------------------*/
 
+void init_buttons_LEDs(void){
 
-void update_button_LED_states() {
+    /* Configure PH.0, PH.1 and PH.2 as Output mode for LED blink */
+    GPIO_SetMode(PH, BIT0|BIT1|BIT2, GPIO_MODE_OUTPUT); // LED outputs
+    GPIO_SetMode(PG, BIT15, GPIO_MODE_INPUT); // Configure pin as input for Button 1
+    GPIO_SetMode(PF, BIT11, GPIO_MODE_INPUT); // Configure pin as input for Button 2
 
-	/* Copy button SW2 and SW3 states to LEDG and LEDY */
-	uint32_t button_state = PG15;
-	// Acquire PG15(BTN1) state in new var at bit 0
+}
+
+void update_buttons_LEDs_state() {
+
+	/* Copy button SW2 state to LEDG */
+	uint32_t button_state = PG15;// Acquire PG15 (Button 1) state in new var at bit 0
 	button_state <<= 1; // Move PG15 state to bit 1
-	button_state |= PF11;
+	button_state |= PF11; /*Button 2*/
 	button_state <<= 1; //  Move BTN states to bit 1 and bit 2
-	PH->DOUT &= ~(/*BIT1 |*/ BIT2);
-	PH->DOUT |= (button_state & BIT2);
+	//PH->DOUT &= ~(/*BIT1 |*/ BIT2);
+	//PH->DOUT |= (button_state & BIT2);
 
 
 	static uint16_t heartbeat_counter = 0;
@@ -48,7 +54,7 @@ void update_button_LED_states() {
 
 }
 
-void delay_ms(uint32_t delay){ /*Generates a millisecons delay. NOT ACCURATE. Use a hardware timer for accuracy*/
+void delay_ms(uint32_t delay){ /*Generates a milliseconds delay. NOT ACCURATE. Use a hardware timer for accuracy*/
 
 	uint64_t end_time = g_SysTickIntCnt + ((uint64_t)delay);
 
@@ -84,7 +90,7 @@ void init_UART1_DMA(void){
 	    PDMA_EnableInt(PDMA,UART1_TX_DMA_CHANNEL, PDMA_INT_TRANS_DONE);
 	    NVIC_EnableIRQ(PDMA_IRQn);
 
-	    NVIC_SetPriority(PDMA_IRQn, DMA_INTERRUPT_PRIORITY);
+	    NVIC_SetPriority(PDMA_IRQn, PDMA_INT_PRIORITY);
 
 
 
@@ -148,17 +154,17 @@ int8_t pop_UART1(UART_DMA_Xfer_t* p_Xfer){
 
 }
 
-void start_PWModulator_carrier(void){
-	/* Begin to output the carrier waveform for the analog hardware PWModulator on PB.14 (pin 133 on the M487JIDAE) */
-
-	PB->SLEWCTL |= (GPIO_SLEWCTL_HIGH << 2*14); /*Set PB14 to "High" slew rate.*/
-	/* For some reason "High" mode seems faster than "Fast" mode. Most likely it's just my probing setup (signal reflexions and such) */
-
-	EPWM_ConfigOutputChannel(EPWM1, 1, PWM_CARRIER_FREQ, 50); /* Set prescaler to 1, CNT to 480 */
-
-	EPWM1->POEN |= 0b10; /* Enable CH1 (set 1 at bit position 1)*/
-
-	EPWM1->CNTEN |= 0b10; /* Start the counter (set 1 at bit position 1)*/
-
-}
+//void start_PWModulator_carrier(void){ /* This uses EPWM1 */
+//	/* Begin to output the carrier waveform for the analog hardware PWModulator on PB.14 (pin 133 on the M487JIDAE) */
+//
+//	PB->SLEWCTL |= (GPIO_SLEWCTL_HIGH << 2*14); /*Set PB14 to "High" slew rate.*/
+//	/* For some reason "High" mode seems faster than "Fast" mode. Most likely it's just my probing setup (signal reflexions and such) */
+//
+//	EPWM_ConfigOutputChannel(EPWM1, 1, PWM_CARRIER_FREQ, 50); /* Set prescaler to 1, CNT to 480 */
+//
+//	EPWM1->POEN |= 0b10; /* Enable CH1 (set 1 at bit position 1)*/
+//
+//	EPWM1->CNTEN |= 0b10; /* Start the counter (set 1 at bit position 1)*/
+//
+//}
 

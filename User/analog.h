@@ -25,7 +25,8 @@
 /*---------------------------------------------------------------------------------------------------------*/
 
 #define EADC_DMA_CHANNEL 2
-#define EADC_OVERSAMPLING_NUMBER 4
+#define EADC_OVERSAMPLING_NUMBER 16 /* MAX = 16 !!! 2^EADC_SHIFT_FOR_OVERSAMPLING_DIVISION = EADC_OVERSAMPLING_NUMBER*/
+#define EADC_SHIFT_FOR_OVERSAMPLING_DIVISION 4  /* MAX = 4 !!! Log base 2 of EADC_OVERSAMPLING_NUMBER equals EADC_SHIFT_FOR_OVERSAMPLING_DIVISION */
 #define EADC_TOTAL_CHANNELS 8
 #define VREF_VOLTAGE 3.239 /*[V] Voltage of the chip's analog voltage reference (Vref)*/
 #define ADC_RES 4096.0
@@ -53,7 +54,8 @@
 /* Global variables to be made available externally                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
 
-
+extern volatile uint16_t ADC_acq_buff[EADC_TOTAL_CHANNELS];
+extern volatile uint8_t ADC_acq_count;
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Functions declaration                                                                              */
@@ -64,7 +66,9 @@ void run_ADC_cal(void);
 //void init_ADC_DMA(void);
 //void reload_ADC_DMA(void);
 
-void convert_from_ADC(void);
+void process_ADC(void);
+
+void convert_to_float(void);
 void convert_to_DAC(void);
 
 

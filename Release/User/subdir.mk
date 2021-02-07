@@ -6,6 +6,7 @@
 C_SRCS += \
 ../User/PLL.c \
 ../User/UI.c \
+../User/analog.c \
 ../User/interrupt.c \
 ../User/inverter_control.c \
 ../User/main.c \
@@ -14,6 +15,7 @@ C_SRCS += \
 OBJS += \
 ./User/PLL.o \
 ./User/UI.o \
+./User/analog.o \
 ./User/interrupt.o \
 ./User/inverter_control.o \
 ./User/main.o \
@@ -22,6 +24,7 @@ OBJS += \
 C_DEPS += \
 ./User/PLL.d \
 ./User/UI.d \
+./User/analog.d \
 ./User/interrupt.d \
 ./User/inverter_control.d \
 ./User/main.d \
@@ -32,7 +35,7 @@ C_DEPS += \
 User/%.o: ../User/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: Cross ARM GNU C Compiler'
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O0 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -Ofast -I"../Library/CMSIS/Include" -I"../Library/Device/Nuvoton/M480/Include" -I"../Library/StdDriver/inc" -std=gnu11 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<"
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O3 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -I"../Library/CMSIS/Include" -I"../Library/Device/Nuvoton/M480/Include" -I"../Library/StdDriver/inc" -std=gnu11 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

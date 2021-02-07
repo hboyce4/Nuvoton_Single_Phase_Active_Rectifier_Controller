@@ -12,7 +12,9 @@
 /*---------------------------------------------------------------------------------------------------------*/
 
 
-int32_t ADC_raw_val_buff[EADC_OVERSAMPLING_NUMBER*EADC_TOTAL_CHANNELS];
+volatile int32_t ADC_raw_val[EADC_TOTAL_CHANNELS];
+volatile uint16_t ADC_acq_buff[EADC_TOTAL_CHANNELS];
+volatile uint8_t ADC_acq_count;
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Function definitions                                                                                       */
@@ -67,25 +69,39 @@ void run_ADC_cal(void){
 	/* EADCDIV must be zero to run calibration */
 }
 
-void convert_from_ADC(void){
+void process_ADC(void){
 
-	int8_t channel;
-	for(channel = 0; channel < EADC_TOTAL_CHANNELS;channel++){/* Acquire latest data from ADC, filtering out status bits*/
+	/* Divide,copy and reset */
+	uint8_t channel;
+	for(channel = 0; channel < EADC_TOTAL_CHANNELS;channel++){/* For every channel */
 
-		ADC_raw_val_buff[channel]= (int32_t)((EADC->DAT[channel])&0xFFFF);/* Only keep the lowest 16 bits of the register*/
+		/* this step could be skipped by integrating this calculation in the float conversion step*/
+		ADC_raw_val[channel]= (ADC_acq_buff[channel] >> EADC_SHIFT_FOR_OVERSAMPLING_DIVISION); /* Copy the acquisition buffer, dividing by the number of oversamples. */
 
+		ADC_acq_buff[channel] = 0;
 	}
 
+	/* Start ADC acquisition batch*/
+	ADC_acq_count = EADC_OVERSAMPLING_NUMBER;
+	PH->DOUT &= ~(BIT2);//Timing measurements
+	EADC_CLR_INT_FLAG(EADC, EADC_STATUS2_ADIF0_Msk);      /* Clear the A/D ADINT0 interrupt flag */
+	NVIC_EnableIRQ(EADC00_IRQn);
+
+}
+
+
+void convert_to_float(void){
+
 	/* Vbus plus */
-	inverter_state_variables.V_DC_plus = ((float)ADC_raw_val_buff[VBUS_PLUS_CHANNEL])*(VREF_VOLTAGE/(ADC_RES*VBUS_GAIN));
+	inverter_state_variables.V_DC_plus = ((float)ADC_raw_val[VBUS_PLUS_CHANNEL])*(VREF_VOLTAGE/(ADC_RES*VBUS_GAIN));
 	/* Vbus minus */
-	inverter_state_variables.V_DC_minus = -((float)ADC_raw_val_buff[VBUS_MINUS_CHANNEL])*(VREF_VOLTAGE/(ADC_RES*VBUS_GAIN));
+	inverter_state_variables.V_DC_minus = -((float)ADC_raw_val[VBUS_MINUS_CHANNEL])*(VREF_VOLTAGE/(ADC_RES*VBUS_GAIN));
 	/* Vbus total */
 	inverter_state_variables.V_DC_total = inverter_state_variables.V_DC_plus + (-1*inverter_state_variables.V_DC_minus);
 	/* Vbus diff */
 	inverter_state_variables.V_DC_diff = inverter_state_variables.V_DC_plus - inverter_state_variables.V_DC_minus;
 	/* V AC */
-	inverter_state_variables.v_AC = ((float)ADC_raw_val_buff[V_AC_CHANNEL])*(VREF_VOLTAGE/(ADC_RES*V_AC_GAIN))-V_AC_OFFSET;
+	inverter_state_variables.v_AC = ((float)ADC_raw_val[V_AC_CHANNEL])*(VREF_VOLTAGE/(ADC_RES*V_AC_GAIN))-V_AC_OFFSET;
 	/* V AC normalized*/
 	inverter_state_variables.v_AC_n = inverter_state_variables.v_AC*(1/(V_AC_NOMINAL_RMS_VALUE*M_SQRT2)); /* needs math.h */
 }

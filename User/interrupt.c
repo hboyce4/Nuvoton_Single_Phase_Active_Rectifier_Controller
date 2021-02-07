@@ -50,11 +50,44 @@ void PDMA_IRQHandler(void){
     }
 }
 
-//void EADC00_IRQHandler(void)
-//{
-//    //g_u32AdcIntFlag = 1;
-//    EADC_CLR_INT_FLAG(EADC, EADC_STATUS2_ADIF0_Msk);      /* Clear the A/D ADINT0 interrupt flag */
-//}
+void TMR1_IRQHandler(void){
+
+    if(TIMER_GetIntFlag(TIMER1) == 1)
+    {
+        /* Clear Timer1 time-out interrupt flag, or else interrupt is executed forever */
+        TIMER_ClearIntFlag(TIMER1);
+
+
+        /* Begin control loop iteration */
+        PH->DOUT &= ~(BIT1);//Timing measurements
+		process_ADC();
+        convert_to_float();
+		PLL_main();
+		PH->DOUT |= BIT1;	//Timing measurements
+    }
+
+
+}
+
+void EADC00_IRQHandler(void){ /* Very high frequency interrupt. Keep very light!!! */
+
+    EADC_CLR_INT_FLAG(EADC, EADC_STATUS2_ADIF0_Msk);      /* Clear the A/D ADINT0 interrupt flag */
+
+	uint8_t channel;
+	for(channel = 0; channel < EADC_TOTAL_CHANNELS;channel++){/* Acquire latest data from ADC, filtering out status bits*/
+
+		ADC_acq_buff[channel] += (uint16_t)(EADC->DAT[channel]);/* Only keep the lowest 16 bits of the register*/
+
+	}
+
+	ADC_acq_count--;/* Decrease the number of acquisitions left to make*/
+
+    if(!ADC_acq_count){/* If zero acquisitions left to do */
+    	NVIC_DisableIRQ(EADC00_IRQn); /* Stop the interrupt */
+    	PH->DOUT |= BIT2;	//Timing measurements
+    }
+
+}
 
 //void UART1_IRQHandler(void)
 //{

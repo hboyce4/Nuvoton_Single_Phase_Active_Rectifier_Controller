@@ -15,8 +15,14 @@
 /*---------------------------------------------------------------------------------------------------------*/
 
 #define PLL_CLOCK           192000000
-#define F_CALC				1000						// [HZ] Fréquence de traitement du signal. doit être un multiple entier de 4 * NETWORK_FREQ pour que DELAY_ARRAY_SIZE soit un entier.
+#define F_CALC				12000						// [HZ] Fréquence de traitement du signal. doit être un multiple entier de 4 * NETWORK_FREQ pour que DELAY_ARRAY_SIZE soit un entier.
 #define T_CALC				(1.0/F_CALC)				// [s] Période de calcul du traitement de signal. Inverse de F_CALC
+
+/* Interrupt prioritires */
+
+#define TMR1_INT_PRIORITY 0 /* Triggers the control loop, so it has to have the highest priority*/
+#define SYSTICK_INT_PRIORITY 1
+#define PDMA_INT_PRIORITY 5
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Type definitions           				                                                               */

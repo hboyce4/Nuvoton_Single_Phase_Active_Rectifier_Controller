@@ -42,7 +42,7 @@ void SysTick_Handler(void)
 {
     g_SysTickIntCnt++;
 
-	update_button_LED_states();/* Copy button SW2 and SW3 states to LEDG and LEDY and flash LEDR */
+	update_buttons_LEDs_state();/* Copy button SW2 and SW3 states to LEDG and LEDY and flash LEDR */
 
 	static uint16_t UI_refresh_counter = 0;
 	if(!UI_refresh_counter){
@@ -51,10 +51,6 @@ void SysTick_Handler(void)
 	}
 	UI_refresh_counter--;
 
-	PH->DOUT &= ~(BIT1);//Timing measurements
-	convert_from_ADC();
-	PLL_main();
-	PH->DOUT |= BIT1;	//Timing measurements
 }
 
 
@@ -84,10 +80,12 @@ void SYS_Init(void)
     //CLK_EnableModuleClock(UART0_MODULE);
     //CLK_EnableModuleClock(TMR0_MODULE);
     //CLK_EnableModuleClock(EPWM0_MODULE);
+    //CLK_EnableModuleClock(TMR1_MODULE);
     CLK->APBCLK0 |= CLK_APBCLK0_TMR0CKEN_Msk; // UART0 Clock Enable
     CLK->APBCLK0 |= CLK_APBCLK0_UART0CKEN_Msk; // UART0 Clock Enable
     CLK->APBCLK0 |= CLK_APBCLK0_UART1CKEN_Msk; // UART1 Clock Enable
     CLK->APBCLK0 |= CLK_APBCLK0_EADCCKEN_Msk; /* EADC0 Clock Enable*/
+    CLK->APBCLK0 |= CLK_APBCLK0_TMR1CKEN_Msk; /* TMR1 Clock Enable*/
 
     CLK->APBCLK1 |= CLK_APBCLK1_EPWM1CKEN_Msk; /* EPWM 1 Clock enable*/
 
@@ -99,13 +97,18 @@ void SYS_Init(void)
     //CLK_SetModuleClock(EADC_MODULE, 0, CLK_CLKDIV0_EADC(1));
 
     /* Select TMR0 clock source as HXT (0x0 for HXT) */
-    CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL1_TMR0SEL_Msk) | (0x0 << CLK_CLKSEL1_TMR0SEL_Pos);
+    CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL1_TMR0SEL_Msk) | CLK_CLKSEL1_TMR0SEL_HXT;
     /* Select UART0 clock source is HXT (0x0 for HXT) */
-    CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL1_UART0SEL_Msk) | (0x0 << CLK_CLKSEL1_UART0SEL_Pos);
+    CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL1_UART0SEL_Msk) | CLK_CLKSEL1_UART0SEL_HXT;
     /* Select UART1 clock source is HXT (0x0 for HXT) */
-    CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL1_UART1SEL_Msk) | (0x0 << CLK_CLKSEL1_UART1SEL_Pos);
-    /* Set EPWM1 clock source as PLL  (0x0 for PLL, 0x1 for PCLK0) */
-    CLK->CLKSEL2 = (CLK->CLKSEL2 & ~CLK_CLKSEL2_EPWM1SEL_Msk) | (0x0 << CLK_CLKSEL2_EPWM1SEL_Msk);
+    CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL1_UART1SEL_Msk) | CLK_CLKSEL1_UART1SEL_HXT;
+    /* Select TMR1 clock source as HXT (0x0 for HXT) */
+    CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL1_TMR1SEL_Msk) | CLK_CLKSEL1_TMR1SEL_HXT;
+    /* Set EPWM1 clock source as PLL  (0x0 for PLL) */
+    CLK->CLKSEL2 = (CLK->CLKSEL2 & ~CLK_CLKSEL2_EPWM1SEL_Msk) | CLK_CLKSEL2_EPWM1SEL_PLL;
+
+    //CLK_SetModuleClock(TMR1_MODULE, CLK_CLKSEL1_TMR1SEL_PCLK0, 0);
+
 
     /* EADC clock has only one source: PCLK1, so no need to select it.*/
     /* Set divider for EADC */
@@ -161,6 +164,7 @@ int main()
     SYS_Init();
     /* SysTick 1m second interrupts  */
     SysTick_Config(SystemCoreClock / 1000);
+    NVIC_SetPriority(SysTick_IRQn, SYSTICK_INT_PRIORITY);
 
     /* Init UART to 115200-8n1 for print message */
     UART_Open(UART0, 115200);
@@ -168,17 +172,12 @@ int main()
     UART_Open(UART1, 460800);
     init_UART1_DMA(); /*Needs SysTick*/
 
-    /*Test*/
-
-    /* Configure PH.0, PH.1 and PH.2 as Output mode for LED blink */
-    GPIO_SetMode(PH, BIT0|BIT1|BIT2, GPIO_MODE_OUTPUT); // LED outputs
-    GPIO_SetMode(PG, BIT15, GPIO_MODE_INPUT); // Configure pin as input for Button 1
-    GPIO_SetMode(PF, BIT11, GPIO_MODE_INPUT); // Configure pin as input for Button 2
-
-    start_PWModulator_carrier(); /* Begin to output the carrier waveform for the analog hardware PWModulator on PB.14 (pin 133 on the M487JIDAE) */
+    init_buttons_LEDs();
 
     init_ADC();
     init_sin_table(sin_table,SIN_TABLE_SIZE);	// Initialise le tableau de référence pour la fonction sinus (Look-up table, LUT)
+
+    init_inverter_control();
 
     /* Connect UART to PC, and open a terminal tool to receive following message */
     printf("Hello World\n");

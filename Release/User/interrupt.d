@@ -68,7 +68,8 @@ User/interrupt.o: ../User/interrupt.c ../User/interrupt.h \
  ../Library/StdDriver/inc/rtc.h ../Library/StdDriver/inc/usci_uart.h \
  ../Library/StdDriver/inc/sdh.h ../Library/StdDriver/inc/usbd.h \
  ../Library/StdDriver/inc/hsusbd.h ../Library/StdDriver/inc/otg.h \
- ../Library/StdDriver/inc/hsotg.h ../User/user_sys.h ../User/main.h
+ ../Library/StdDriver/inc/hsotg.h ../User/user_sys.h ../User/main.h \
+ ../User/analog.h ../User/PLL.h ../User/inverter_control.h
 
 ../User/interrupt.h:
 
@@ -255,3 +256,9 @@ User/interrupt.o: ../User/interrupt.c ../User/interrupt.h \
 ../User/user_sys.h:
 
 ../User/main.h:
+
+../User/analog.h:
+
+../User/PLL.h:
+
+../User/inverter_control.h:
