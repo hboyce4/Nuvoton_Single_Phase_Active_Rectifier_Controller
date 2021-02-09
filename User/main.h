@@ -20,8 +20,9 @@
 
 /* Interrupt prioritires */
 
-#define TMR1_INT_PRIORITY 0 /* Triggers the control loop, so it has to have the highest priority*/
-#define SYSTICK_INT_PRIORITY 1
+#define ADC_INT_PRIORITY 0	/* Needed for the control loop, so it has to have the highest priority*/
+#define TMR1_INT_PRIORITY 1 /* Triggers the control loop, so it has to have high priority*/
+#define SYSTICK_INT_PRIORITY 2
 #define PDMA_INT_PRIORITY 5
 
 /*---------------------------------------------------------------------------------------------------------*/

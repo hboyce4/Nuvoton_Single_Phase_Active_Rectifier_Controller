@@ -39,9 +39,13 @@
 
 /* Gains */
 #define VBUS_GAIN 0.1 /* [V/V] Gain of the analog front end for the bus voltages. The negative bus's front end has a gain of -VBUS_GAIN*/
-#define V_AC_GAIN 0.058824 /* [V/V] Gain of the AC voltage front end*/
-#define V_AC_OFFSET 28.05 /* [V] Offset of the AC voltage front end*/
-#define V_AC_NOMINAL_RMS_VALUE 12 /* Nominal RMS value of the input voltage (ex.: 12V AC rms)*/
+
+#define V_AC_GAIN 0.058824 			/* [V/V] Gain of the AC voltage front end*/
+#define V_AC_OFFSET 28.05 			/* [V] Offset of the AC voltage front end*/
+#define V_AC_NOMINAL_RMS_VALUE 12 	/* Nominal RMS value of the input voltage (ex.: 12V AC rms)*/
+
+#define I_SP_GAIN 0.033				/* [V/A] Gain of the current setpoint command */
+#define I_SP_OFFSET 2048			/* [LSB] Offset of the current setpoint command */
 
 
 
@@ -62,6 +66,7 @@ extern volatile uint8_t ADC_acq_count;
 /*---------------------------------------------------------------------------------------------------------*/
 
 void init_ADC(void);
+void init_DAC(void);
 void run_ADC_cal(void);
 //void init_ADC_DMA(void);
 //void reload_ADC_DMA(void);
@@ -69,7 +74,7 @@ void run_ADC_cal(void);
 void process_ADC(void);
 
 void convert_to_float(void);
-void convert_to_DAC(void);
+void convert_to_int_write_DAC(void);
 
 
 #endif /* ANALOG_H_ */

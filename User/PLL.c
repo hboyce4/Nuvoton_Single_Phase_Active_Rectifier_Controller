@@ -97,6 +97,9 @@ void PLL_main(void){
 /**************************Output integrator end***************************************/
 
 	//return a_beta; /* Return whatever state variable we are interested in monitoring */
+
+	inverter_state_variables.i_SP = 33*b_beta;//Test
+
 	PLL_state_variables.freq_Hz = PLL_state_variables.w_est*(1/(2*M_PI));
 }
 

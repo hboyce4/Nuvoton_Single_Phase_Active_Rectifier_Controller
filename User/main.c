@@ -88,6 +88,7 @@ void SYS_Init(void)
     CLK->APBCLK0 |= CLK_APBCLK0_TMR1CKEN_Msk; /* TMR1 Clock Enable*/
 
     CLK->APBCLK1 |= CLK_APBCLK1_EPWM1CKEN_Msk; /* EPWM 1 Clock enable*/
+    CLK->APBCLK1 |= CLK_APBCLK1_DACCKEN_Msk;	/* DAC 0 & 1  Clock enable*/
 
     CLK->AHBCLK  |= CLK_AHBCLK_PDMACKEN_Msk; // PDMA Clock Enable
 
@@ -146,6 +147,14 @@ void SYS_Init(void)
 	 GPIO_DISABLE_DIGITAL_PATH(PB, BIT7|BIT6|BIT5|BIT4|BIT3|BIT2|BIT1|BIT0);
 
 
+	 /* DAC: Set pins as input to prevent writing to them */
+	 PB->MODE &= ~(GPIO_MODE_MODE12_Msk | GPIO_MODE_MODE13_Msk);
+	 /* DAC: Set PB multi-function pins for DAC voltage output */
+	 SYS->GPB_MFPH |= SYS_GPB_MFPH_PB12MFP_DAC0_OUT | SYS_GPB_MFPH_PB13MFP_DAC1_OUT;
+	 /* DAC: Disable digital input path of analog pin DAC0_OUT and DAC1_OUT to prevent leakage */
+	 GPIO_DISABLE_DIGITAL_PATH(PB, BIT12 | BIT13);
+
+
     /* Lock protected registers */
     SYS_LockReg();
 }
@@ -175,6 +184,7 @@ int main()
     init_buttons_LEDs();
 
     init_ADC();
+    init_DAC();
     init_sin_table(sin_table,SIN_TABLE_SIZE);	// Initialise le tableau de référence pour la fonction sinus (Look-up table, LUT)
 
     init_inverter_control();

@@ -63,6 +63,7 @@ void TMR1_IRQHandler(void){
 		process_ADC();
         convert_to_float();
 		PLL_main();
+		convert_to_int_write_DAC();
 		PH->DOUT |= BIT1;	//Timing measurements
     }
 

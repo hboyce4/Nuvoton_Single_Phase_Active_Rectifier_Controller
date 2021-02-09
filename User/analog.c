@@ -50,17 +50,43 @@ void init_ADC(void){
     /* Enable the sample module 7 interrupt */
     EADC_ENABLE_INT(EADC, BIT0);//Enable sample module  A/D ADINT0 interrupt.
     EADC_ENABLE_SAMPLE_MODULE_INT(EADC, 0, BIT7);//Enable sample module 7 interrupt.
-    //NVIC_EnableIRQ(EADC00_IRQn);
+    NVIC_SetPriority(EADC00_IRQn, ADC_INT_PRIORITY);
 
     /* Reset the ADC indicator and trigger sample module 7 to start A/D conversion */
     //g_u32AdcIntFlag = 0;
     //g_u32COVNUMFlag = 0;
     EADC_START_CONV(EADC, BIT7);
 
+#ifdef DEBUG_TIMINGS
+
+
+#endif
     //__WFI();
 
     /* Disable the sample module 7 interrupt */
     //EADC_DISABLE_SAMPLE_MODULE_INT(EADC, 0, BIT7);
+}
+
+void init_DAC(void){
+
+	/* Set the software trigger DAC and enable D/A converter */
+	DAC_Open(DAC0, 0, DAC_SOFTWARE_TRIGGER);
+	DAC_Open(DAC1, 0, DAC_SOFTWARE_TRIGGER);
+
+	DAC0->CTL |= BIT8; /* Set Bit 8 of the control register to disable the output buffer*/
+
+	/* Enable DAC to work in group mode, once group mode enabled, DAC1 is configured by DAC0 registers */
+	DAC_ENABLE_GROUP_MODE(DAC0);
+
+    /* The DAC conversion settling time is 1us */
+    DAC_SetDelayTime(DAC0, 1);
+
+    /* Set DAC 12-bit holding data */
+    //DAC_WRITE_DATA(DAC0, 0, sine[0]);
+    //DAC_WRITE_DATA(DAC1, 0, sine[array_size / 2]);
+
+    DAC_START_CONV(DAC0);
+
 }
 
 void run_ADC_cal(void){
@@ -106,8 +132,23 @@ void convert_to_float(void){
 	inverter_state_variables.v_AC_n = inverter_state_variables.v_AC*(1/(V_AC_NOMINAL_RMS_VALUE*M_SQRT2)); /* needs math.h */
 }
 
-void convert_to_DAC(void){
+void convert_to_int_write_DAC(void){
 
+	int32_t i_sp_val, d_ff_val;
+
+	/* Convert the current setpoint from float to int*/
+	i_sp_val = 	(int32_t)(inverter_state_variables.i_SP*I_SP_GAIN*(ADC_RES/VREF_VOLTAGE));
+	i_sp_val += I_SP_OFFSET;
+
+	/* Convert the duty cycle feedforward value from int to float */
+
+	d_ff_val = I_SP_OFFSET;/*To be implemented*/
+
+
+	/* Write to DAC */
+	DAC0->DAT = (uint16_t)i_sp_val;
+	DAC1->DAT = d_ff_val;
+	DAC_START_CONV(DAC0); /* Trigger conversion on DAC0. DAC1 will trigger also because of grouped mode */
 
 }
 
