@@ -29,7 +29,7 @@
 #define EADC_SHIFT_FOR_OVERSAMPLING_DIVISION 4  /* MAX = 4 !!! Log base 2 of EADC_OVERSAMPLING_NUMBER equals EADC_SHIFT_FOR_OVERSAMPLING_DIVISION */
 #define EADC_TOTAL_CHANNELS 8
 #define VREF_VOLTAGE 3.239 /*[V] Voltage of the chip's analog voltage reference (Vref)*/
-#define ADC_RES 4096.0
+#define RES_12BIT 4096.0
 
 
 /*ADC Channels*/
@@ -74,7 +74,7 @@ void run_ADC_cal(void);
 void process_ADC(void);
 
 void convert_to_float(void);
-void convert_to_int_write_DAC(void);
+void convert_to_int_write_analog(void);
 
 
 #endif /* ANALOG_H_ */

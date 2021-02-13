@@ -73,8 +73,8 @@ void SYS_Init(void)
 
     /* Set core clock as PLL_CLOCK from PLL */
     CLK_SetCoreClock(PLL_CLOCK);
-    /* Set PCLK0 to HCLK/2 (96MHz) and PCLK1 to HCLK/4(48MHz) */
-    CLK->PCLKDIV = (CLK_PCLKDIV_APB0DIV_DIV2 | CLK_PCLKDIV_APB1DIV_DIV4);
+    /* Set PCLK0 to HCLK/2 (96MHz) and PCLK1 to HCLK/2(96MHz) */
+    CLK->PCLKDIV = (CLK_PCLKDIV_APB0DIV_DIV2 | CLK_PCLKDIV_APB1DIV_DIV2);
 
     /* Enable IP clock */
     //CLK_EnableModuleClock(UART0_MODULE);
@@ -87,8 +87,12 @@ void SYS_Init(void)
     CLK->APBCLK0 |= CLK_APBCLK0_EADCCKEN_Msk; /* EADC0 Clock Enable*/
     CLK->APBCLK0 |= CLK_APBCLK0_TMR1CKEN_Msk; /* TMR1 Clock Enable*/
 
+#ifdef PWM_DAC // If PWM DAC is used
     CLK->APBCLK1 |= CLK_APBCLK1_EPWM1CKEN_Msk; /* EPWM 1 Clock enable*/
+#else
     CLK->APBCLK1 |= CLK_APBCLK1_DACCKEN_Msk;	/* DAC 0 & 1  Clock enable*/
+#endif
+    CLK->APBCLK1 |= CLK_APBCLK1_BPWM1CKEN_Msk; /* BPWM 1 Clock enable*/
 
     CLK->AHBCLK  |= CLK_AHBCLK_PDMACKEN_Msk; // PDMA Clock Enable
 
@@ -105,16 +109,18 @@ void SYS_Init(void)
     CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL1_UART1SEL_Msk) | CLK_CLKSEL1_UART1SEL_HXT;
     /* Select TMR1 clock source as HXT (0x0 for HXT) */
     CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL1_TMR1SEL_Msk) | CLK_CLKSEL1_TMR1SEL_HXT;
+#ifdef PWM_DAC // If PWM DAC is used
     /* Set EPWM1 clock source as PLL  (0x0 for PLL) */
     CLK->CLKSEL2 = (CLK->CLKSEL2 & ~CLK_CLKSEL2_EPWM1SEL_Msk) | CLK_CLKSEL2_EPWM1SEL_PLL;
-
+#endif
+    CLK->CLKSEL2 = (CLK->CLKSEL2 & ~CLK_CLKSEL2_BPWM1SEL_Msk) | CLK_CLKSEL2_BPWM1SEL_PLL;
     //CLK_SetModuleClock(TMR1_MODULE, CLK_CLKSEL1_TMR1SEL_PCLK0, 0);
 
 
     /* EADC clock has only one source: PCLK1, so no need to select it.*/
     /* Set divider for EADC */
     CLK->CLKDIV0 &= ~(CLK_CLKDIV0_EADCDIV_Msk);/* Reset EADCDIV */
-    CLK->CLKDIV0 |= 0 << CLK_CLKDIV0_EADCDIV_Pos; /* EADC divider is EADCDIV + 1 . So EADC Clock will be PCLK1/1 (48MHz/1 = 48MHz) */
+    CLK->CLKDIV0 |= 1 << CLK_CLKDIV0_EADCDIV_Pos; /* EADC divider is EADCDIV + 1 . So EADC Clock will be PCLK1/2 (48MHz/1 = 48MHz) */
 
 
     /* Update System Core Clock */
@@ -130,9 +136,20 @@ void SYS_Init(void)
      SYS->GPA_MFPL &= ~(SYS_GPA_MFPL_PA2MFP_Msk | SYS_GPA_MFPL_PA3MFP_Msk);
      SYS->GPA_MFPL |= (0x8 << SYS_GPA_MFPL_PA2MFP_Pos) | (0x8 << SYS_GPA_MFPL_PA3MFP_Pos);
 
-     /* Set PB.14 as output from EPWM1_CH1 */
-     SYS->GPB_MFPH &= ~(SYS_GPB_MFPH_PB14MFP_Msk);
-     SYS->GPB_MFPH |= SYS_GPB_MFPH_PB14MFP_EPWM1_CH1;
+     /* Set PA.15 as output from BPWM1_CH5 for hardware PWModulator carrier*/
+     SYS->GPA_MFPH &= ~(SYS_GPA_MFPH_PA15MFP_Msk);
+     SYS->GPA_MFPH |= SYS_GPA_MFPH_PA15MFP_BPWM1_CH5;
+     PA->SLEWCTL |= (GPIO_SLEWCTL_HIGH << 2*15); /*Set PA15 to "High" slew rate.*/
+     	/* For some reason "High" mode seems faster than "Fast" mode. Most likely it's just my probing setup (signal reflexions and such) */
+
+#ifdef PWM_DAC // If PWM DAC is used
+     SYS->GPB_MFPH &= ~(SYS_GPB_MFPH_PB12MFP_Msk|SYS_GPB_MFPH_PB13MFP_Msk); /* Setup DAC pins as PWM outputs*/
+     SYS->GPB_MFPH |= SYS_GPB_MFPH_PB12MFP_EPWM1_CH3|SYS_GPB_MFPH_PB13MFP_EPWM1_CH2;
+     PB->SLEWCTL |= (GPIO_SLEWCTL_HIGH << 2*12)|(GPIO_SLEWCTL_HIGH << 2*13); /*Set PB12 & PB13 to "High" slew rate.*/
+     /* For some reason "High" mode seems faster than "Fast" mode. Most likely it's just my probing setup (signal reflexions and such) */
+#endif
+
+
 
      /* EADC: Set PB.0 ~ PB.7 to input mode */
 	 PB->MODE &= ~(GPIO_MODE_MODE0_Msk | GPIO_MODE_MODE1_Msk | GPIO_MODE_MODE2_Msk | GPIO_MODE_MODE3_Msk |
@@ -146,14 +163,14 @@ void SYS_Init(void)
 	 /* EADC: Disable the GPB0 - GPB7 digital input path to avoid the leakage current. */
 	 GPIO_DISABLE_DIGITAL_PATH(PB, BIT7|BIT6|BIT5|BIT4|BIT3|BIT2|BIT1|BIT0);
 
-
+#ifndef PWM_DAC // If PWM DAC isn't used
 	 /* DAC: Set pins as input to prevent writing to them */
-	 PB->MODE &= ~(GPIO_MODE_MODE12_Msk | GPIO_MODE_MODE13_Msk);
+	 PB->MODE &= ~(/*GPIO_MODE_MODE12_Msk |*/ GPIO_MODE_MODE13_Msk);
 	 /* DAC: Set PB multi-function pins for DAC voltage output */
-	 SYS->GPB_MFPH |= SYS_GPB_MFPH_PB12MFP_DAC0_OUT | SYS_GPB_MFPH_PB13MFP_DAC1_OUT;
+	 SYS->GPB_MFPH |= /*SYS_GPB_MFPH_PB12MFP_DAC0_OUT |*/ SYS_GPB_MFPH_PB13MFP_DAC1_OUT;
 	 /* DAC: Disable digital input path of analog pin DAC0_OUT and DAC1_OUT to prevent leakage */
-	 GPIO_DISABLE_DIGITAL_PATH(PB, BIT12 | BIT13);
-
+	 GPIO_DISABLE_DIGITAL_PATH(PB, /*BIT12 |*/ BIT13);
+#endif
 
     /* Lock protected registers */
     SYS_LockReg();
@@ -184,7 +201,9 @@ int main()
     init_buttons_LEDs();
 
     init_ADC();
+#ifndef PWM_DAC
     init_DAC();
+#endif
     init_sin_table(sin_table,SIN_TABLE_SIZE);	// Initialise le tableau de référence pour la fonction sinus (Look-up table, LUT)
 
     init_inverter_control();

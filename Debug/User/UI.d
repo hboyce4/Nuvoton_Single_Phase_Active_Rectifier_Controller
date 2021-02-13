@@ -69,7 +69,7 @@ User/UI.o: ../User/UI.c ../User/UI.h ../User/user_sys.h \
  ../Library/StdDriver/inc/sdh.h ../Library/StdDriver/inc/usbd.h \
  ../Library/StdDriver/inc/hsusbd.h ../Library/StdDriver/inc/otg.h \
  ../Library/StdDriver/inc/hsotg.h ../User/main.h ../User/PLL.h \
- ../User/inverter_control.h
+ ../User/inverter_control.h ../User/analog.h
 
 ../User/UI.h:
 
@@ -260,3 +260,5 @@ User/UI.o: ../User/UI.c ../User/UI.h ../User/user_sys.h \
 ../User/PLL.h:
 
 ../User/inverter_control.h:
+
+../User/analog.h:

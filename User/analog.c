@@ -70,23 +70,31 @@ void init_ADC(void){
 void init_DAC(void){
 
 	/* Set the software trigger DAC and enable D/A converter */
-	DAC_Open(DAC0, 0, DAC_SOFTWARE_TRIGGER);
+	//DAC_Open(DAC0, 0, DAC_SOFTWARE_TRIGGER);
 	DAC_Open(DAC1, 0, DAC_SOFTWARE_TRIGGER);
 
-	DAC0->CTL |= BIT8; /* Set Bit 8 of the control register to disable the output buffer*/
+	//DAC0->CTL |= BIT8; /* Set Bit 8 of the control register to disable the output buffer*/
+	//DAC1->CTL |= BIT8; /* Set Bit 8 of the control register to disable the output buffer*/
 
 	/* Enable DAC to work in group mode, once group mode enabled, DAC1 is configured by DAC0 registers */
-	DAC_ENABLE_GROUP_MODE(DAC0);
+	//DAC_ENABLE_GROUP_MODE(DAC0);
 
     /* The DAC conversion settling time is 1us */
-    DAC_SetDelayTime(DAC0, 1);
+    //DAC_SetDelayTime(DAC0, 1);
+    DAC_SetDelayTime(DAC1, 6);
 
     /* Set DAC 12-bit holding data */
-    //DAC_WRITE_DATA(DAC0, 0, sine[0]);
-    //DAC_WRITE_DATA(DAC1, 0, sine[array_size / 2]);
+    DAC_WRITE_DATA(DAC1, 0, 0x400);
 
-    DAC_START_CONV(DAC0);
+    /* Clear the DAC conversion complete finish flag for safe */
+    DAC_CLR_INT_FLAG(DAC1, 0);
 
+    /* Enable the DAC interrupt */
+    DAC_ENABLE_INT(DAC1, 0);
+    NVIC_EnableIRQ(DAC_IRQn);
+
+    /* Start A/D conversion */
+    DAC_START_CONV(DAC1);
 }
 
 void run_ADC_cal(void){
@@ -119,36 +127,42 @@ void process_ADC(void){
 void convert_to_float(void){
 
 	/* Vbus plus */
-	inverter_state_variables.V_DC_plus = ((float)ADC_raw_val[VBUS_PLUS_CHANNEL])*(VREF_VOLTAGE/(ADC_RES*VBUS_GAIN));
+	inverter_state_variables.V_DC_plus = ((float)ADC_raw_val[VBUS_PLUS_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*VBUS_GAIN));
 	/* Vbus minus */
-	inverter_state_variables.V_DC_minus = -((float)ADC_raw_val[VBUS_MINUS_CHANNEL])*(VREF_VOLTAGE/(ADC_RES*VBUS_GAIN));
+	inverter_state_variables.V_DC_minus = -((float)ADC_raw_val[VBUS_MINUS_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*VBUS_GAIN));
 	/* Vbus total */
 	inverter_state_variables.V_DC_total = inverter_state_variables.V_DC_plus + (-1*inverter_state_variables.V_DC_minus);
 	/* Vbus diff */
 	inverter_state_variables.V_DC_diff = inverter_state_variables.V_DC_plus - inverter_state_variables.V_DC_minus;
 	/* V AC */
-	inverter_state_variables.v_AC = ((float)ADC_raw_val[V_AC_CHANNEL])*(VREF_VOLTAGE/(ADC_RES*V_AC_GAIN))-V_AC_OFFSET;
+	inverter_state_variables.v_AC = ((float)ADC_raw_val[V_AC_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*V_AC_GAIN))-V_AC_OFFSET;
 	/* V AC normalized*/
 	inverter_state_variables.v_AC_n = inverter_state_variables.v_AC*(1/(V_AC_NOMINAL_RMS_VALUE*M_SQRT2)); /* needs math.h */
 }
 
-void convert_to_int_write_DAC(void){
+
+
+void convert_to_int_write_analog(void){
 
 	int32_t i_sp_val, d_ff_val;
 
 	/* Convert the current setpoint from float to int*/
-	i_sp_val = 	(int32_t)(inverter_state_variables.i_SP*I_SP_GAIN*(ADC_RES/VREF_VOLTAGE));
+	i_sp_val = 	(int32_t)(inverter_state_variables.i_SP*I_SP_GAIN*(RES_12BIT/VREF_VOLTAGE));
 	i_sp_val += I_SP_OFFSET;
 
 	/* Convert the duty cycle feedforward value from int to float */
 
 	d_ff_val = I_SP_OFFSET;/*To be implemented*/
 
+#ifdef PWM_DAC
 
-	/* Write to DAC */
-	DAC0->DAT = (uint16_t)i_sp_val;
-	DAC1->DAT = d_ff_val;
-	DAC_START_CONV(DAC0); /* Trigger conversion on DAC0. DAC1 will trigger also because of grouped mode */
+	EPWM1->CMPDAT[2] = (uint32_t)i_sp_val;/* DAC1 pin */
+	EPWM1->CMPDAT[3] = (uint32_t)d_ff_val;/* DAC0 pin */
+#else
+	 DAC_WRITE_DATA(DAC1, 0, i_sp_val);
+	 DAC_START_CONV(DAC1);
+#endif
+
 
 }
 

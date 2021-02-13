@@ -15,6 +15,9 @@
 void PDMA_IRQHandler(void);
 void TMR1_IRQHandler(void);
 void EADC00_IRQHandler(void);
+#ifndef PWM_DAC
+void DAC_IRQHandler(void);
+#endif
 //void EADC00_IRQHandler(void);
 //void UART1_IRQHandler(void);
 

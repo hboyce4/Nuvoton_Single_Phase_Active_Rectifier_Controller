@@ -63,7 +63,7 @@ void TMR1_IRQHandler(void){
 		process_ADC();
         convert_to_float();
 		PLL_main();
-		convert_to_int_write_DAC();
+		convert_to_int_write_analog();
 		PH->DOUT |= BIT1;	//Timing measurements
     }
 
@@ -89,6 +89,18 @@ void EADC00_IRQHandler(void){ /* Very high frequency interrupt. Keep very light!
     }
 
 }
+
+#ifndef PWM_DAC
+void DAC_IRQHandler(void)
+{
+    if(DAC_GET_INT_FLAG(DAC1, 0)){
+    	/* Clear flag */
+    	 DAC_CLR_INT_FLAG(DAC1, 0);
+
+    }
+    return;
+}
+#endif
 
 //void UART1_IRQHandler(void)
 //{

@@ -13,6 +13,8 @@
 /*---------------------------------------------------------------------------------------------------------*/
 /* Macros           				                                                                       */
 /*---------------------------------------------------------------------------------------------------------*/
+#define PWM_DAC //uncomment for PWM DAC
+
 
 #define PLL_CLOCK           192000000
 #define F_CALC				12000						// [HZ] Fréquence de traitement du signal. doit être un multiple entier de 4 * NETWORK_FREQ pour que DELAY_ARRAY_SIZE soit un entier.
