@@ -219,9 +219,14 @@ int main()
     	int8_t row_sel, col_sel;
     	if(UI_new_frame_tick){
     		UI_new_frame_tick = false;
-    		//PH->DOUT &= ~(BIT1); //Timing measurements
+#ifdef TIMING_DEBUG
+        PH->DOUT &= ~(BIT4);//Timing measurements
+#endif
     		draw_UI(row_sel, col_sel);
-    		//PH->DOUT |= BIT1;	//Timing measurements
+
+#ifdef TIMING_DEBUG
+		PH->DOUT |= BIT4;	//Timing measurements
+#endif
     	}
     	read_user_input(&row_sel,&col_sel);/* Since the chip has a 16 byte hardware FIFO, and we are only expecting
     	 human input, we don't need interrupts nor DMA. Just run this routine every few milliseconds.*/

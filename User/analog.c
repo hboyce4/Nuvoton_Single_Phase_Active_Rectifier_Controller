@@ -117,7 +117,7 @@ void process_ADC(void){
 
 	/* Start ADC acquisition batch*/
 	ADC_acq_count = EADC_OVERSAMPLING_NUMBER;
-	PH->DOUT &= ~(BIT2);//Timing measurements
+
 	EADC_CLR_INT_FLAG(EADC, EADC_STATUS2_ADIF0_Msk);      /* Clear the A/D ADINT0 interrupt flag */
 	NVIC_EnableIRQ(EADC00_IRQn);
 

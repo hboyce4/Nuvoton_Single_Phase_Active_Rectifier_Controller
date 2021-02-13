@@ -10,6 +10,10 @@
 
 void PDMA_IRQHandler(void){
 
+#ifdef TIMING_DEBUG
+        PH->DOUT &= ~(BIT3);//Timing measurements
+#endif
+
     uint32_t status = PDMA_GET_INT_STATUS(PDMA);
 
     if (status & 0x2){     /* If the interrupt is "Transfer Done" */
@@ -48,6 +52,11 @@ void PDMA_IRQHandler(void){
     }else{
         printf("unknown PDMA int.!!\n");
     }
+
+#ifdef TIMING_DEBUG
+		PH->DOUT |= BIT3;	//Timing measurements
+#endif
+
 }
 
 void TMR1_IRQHandler(void){
@@ -59,12 +68,16 @@ void TMR1_IRQHandler(void){
 
 
         /* Begin control loop iteration */
+#ifdef TIMING_DEBUG
         PH->DOUT &= ~(BIT1);//Timing measurements
+#endif
 		process_ADC();
         convert_to_float();
 		PLL_main();
 		convert_to_int_write_analog();
+#ifdef TIMING_DEBUG
 		PH->DOUT |= BIT1;	//Timing measurements
+#endif
     }
 
 
@@ -72,6 +85,9 @@ void TMR1_IRQHandler(void){
 
 void EADC00_IRQHandler(void){ /* Very high frequency interrupt. Keep very light!!! */
 
+#ifdef TIMING_DEBUG
+	PH->DOUT &= ~(BIT2);//Timing measurements
+#endif
     EADC_CLR_INT_FLAG(EADC, EADC_STATUS2_ADIF0_Msk);      /* Clear the A/D ADINT0 interrupt flag */
 
 	uint8_t channel;
@@ -85,9 +101,11 @@ void EADC00_IRQHandler(void){ /* Very high frequency interrupt. Keep very light!
 
     if(!ADC_acq_count){/* If zero acquisitions left to do */
     	NVIC_DisableIRQ(EADC00_IRQn); /* Stop the interrupt */
-    	PH->DOUT |= BIT2;	//Timing measurements
-    }
 
+    }
+#ifdef TIMING_DEBUG
+    PH->DOUT |= BIT2;	//Timing measurements
+#endif
 }
 
 #ifndef PWM_DAC

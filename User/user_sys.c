@@ -26,7 +26,12 @@ struct UART1_DMA_Job_Buffer_{
 void init_buttons_LEDs(void){
 
     /* Configure PH.0, PH.1 and PH.2 as Output mode for LED blink */
+#ifdef TIMING_DEBUG
+	GPIO_SetMode(PH, 0xFF, GPIO_MODE_OUTPUT); // 8 first bits of the port as timing debug outputs
+#else
     GPIO_SetMode(PH, BIT0|BIT1|BIT2, GPIO_MODE_OUTPUT); // LED outputs
+#endif
+
     GPIO_SetMode(PG, BIT15, GPIO_MODE_INPUT); // Configure pin as input for Button 1
     GPIO_SetMode(PF, BIT11, GPIO_MODE_INPUT); // Configure pin as input for Button 2
 
@@ -47,7 +52,9 @@ void update_buttons_LEDs_state() {
 
 	if(!heartbeat_counter){
 		heartbeat_counter = HEARTBEAT_INTERVAL_MS;
+#ifdef TIMING_DEBUG
 		PH0 ^= 1; // Access single pin (Toggle red LED)
+#endif
         //PH->DOUT ^= BIT0|BIT1|BIT2; // Access digital output register (toggle 3 LEDs)
 	}
 	heartbeat_counter--;

@@ -68,7 +68,8 @@ User/PLL.o: ../User/PLL.c ../User/PLL.h ../User/inverter_control.h \
  ../Library/StdDriver/inc/rtc.h ../Library/StdDriver/inc/usci_uart.h \
  ../Library/StdDriver/inc/sdh.h ../Library/StdDriver/inc/usbd.h \
  ../Library/StdDriver/inc/hsusbd.h ../Library/StdDriver/inc/otg.h \
- ../Library/StdDriver/inc/hsotg.h ../User/main.h ../User/user_sys.h
+ ../Library/StdDriver/inc/hsotg.h ../User/main.h ../User/user_sys.h \
+ ../User/analog.h
 
 ../User/PLL.h:
 
@@ -257,3 +258,5 @@ User/PLL.o: ../User/PLL.c ../User/PLL.h ../User/inverter_control.h \
 ../User/main.h:
 
 ../User/user_sys.h:
+
+../User/analog.h:

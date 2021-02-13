@@ -14,6 +14,7 @@
 /* Macros           				                                                                       */
 /*---------------------------------------------------------------------------------------------------------*/
 #define PWM_DAC //uncomment for PWM DAC
+#define TIMING_DEBUG // Uncomment to enable pin toggling on port H for timing debug
 
 
 #define PLL_CLOCK           192000000
