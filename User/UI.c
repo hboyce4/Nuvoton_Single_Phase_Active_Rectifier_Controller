@@ -48,7 +48,7 @@ void draw_UI(int8_t row_sel, int8_t col_sel){/* 60-ish characters width*/
 	/* End of last line */
 
 
-	//inverter_state_variables.V_DC_plus += 0.51; //debug
+	//inverter.V_DC_plus += 0.51; //debug
 
 
 }
@@ -169,20 +169,20 @@ void draw_UI_line_2(uint8_t* p_line_counter) {
 	static char line_2_str[LINE_WIDTH];
 	static char colour_V_DC_plus[ESCAPE_SEQUENCE_LENGTH];
 	static char colour_V_DC_minus[ESCAPE_SEQUENCE_LENGTH];
-	if (inverter_state_safety.OV_V_DC_plus) {
+	if (inverter_safety.OV_V_DC_plus) {
 		/* if overvoltage */
 		strcpy(colour_V_DC_plus, "\x1B[91m"); /* Red*/
-	} else if (inverter_state_safety.UV_V_DC_plus) {
+	} else if (inverter_safety.UV_V_DC_plus) {
 		/* if undervoltage */
 		strcpy(colour_V_DC_plus, "\x1B[96m"); /* Cyan*/
 	} else {
 		strcpy(colour_V_DC_plus, COLOUR_DEFAULT); /* default*/
 	}
 
-	if (inverter_state_safety.OV_V_DC_minus) {
+	if (inverter_safety.OV_V_DC_minus) {
 		/* if overvoltage */
 		strcpy(colour_V_DC_minus, "\x1B[91m"); /* Red*/
-	} else if (inverter_state_safety.UV_V_DC_minus) {
+	} else if (inverter_safety.UV_V_DC_minus) {
 		/* if undervoltage */
 		strcpy(colour_V_DC_minus, "\x1B[96m"); /* Cyan*/
 	} else {
@@ -190,9 +190,9 @@ void draw_UI_line_2(uint8_t* p_line_counter) {
 	}
 
 	sprintf(line_2_str, "V bus +: %s%2.2f V%s \tV bus -: %s%2.2f V\n\r",
-			colour_V_DC_plus, inverter_state_variables.V_DC_plus,
+			colour_V_DC_plus, inverter.V_DC_plus,
 			COLOUR_DEFAULT, colour_V_DC_minus,
-			inverter_state_variables.V_DC_minus);
+			inverter.V_DC_minus);
 	(*p_line_counter)++;
 	push_UART1((char*) line_2_str);
 }
@@ -201,15 +201,15 @@ void draw_UI_line_3(uint8_t* p_line_counter) {
 
 	static char line_3_str[LINE_WIDTH];
 	static char colour_V_DC_diff[ESCAPE_SEQUENCE_LENGTH];
-	if (inverter_state_safety.OV_V_DC_diff) {
+	if (inverter_safety.OV_V_DC_diff) {
 		/* if the two halves of the bus are too unbalanced */
 		strcpy(colour_V_DC_diff, "\x1B[91m"); /* Red*/
 	} else {
 		strcpy(colour_V_DC_diff, COLOUR_DEFAULT); /* default*/
 	}
 	sprintf(line_3_str, "V bus diff: %s%2.2f V%s\tV bus total: %2.2f V\n\r",
-			colour_V_DC_diff, inverter_state_variables.V_DC_diff,
-			COLOUR_DEFAULT, inverter_state_variables.V_DC_total);
+			colour_V_DC_diff, inverter.V_DC_diff,
+			COLOUR_DEFAULT, inverter.V_DC_total);
 	(*p_line_counter)++;
 	push_UART1((char*) line_3_str);
 }
@@ -218,8 +218,8 @@ void draw_UI_line_4(uint8_t* p_line_counter) {
 
 	static char line_4_str[LINE_WIDTH];
 	sprintf(line_4_str, "I AC RMS: %2.2f A\tV AC RMS: %2.2f V\n\r",
-			inverter_state_variables.I_AC_RMS,
-			inverter_state_variables.V_AC_RMS);
+			inverter.I_AC_RMS,
+			inverter.V_AC_RMS);
 	(*p_line_counter)++;
 	push_UART1((char*) line_4_str);
 }
@@ -228,7 +228,7 @@ void draw_UI_line_5(uint8_t* p_line_counter) {
 
 	static char line_5_str[LINE_WIDTH];
 	static char power_flow_dir_str[ESCAPE_SEQUENCE_LENGTH];
-	if (inverter_state_variables.P_AC_RMS > 0) {
+	if (inverter.P_AC_RMS > 0) {
 		/* If power is positive */
 		strcpy(power_flow_dir_str, "->"); /* DC towards AC */
 	} else {
@@ -236,7 +236,7 @@ void draw_UI_line_5(uint8_t* p_line_counter) {
 		strcpy(power_flow_dir_str, "<-"); /* AC towards DC */
 	}
 	sprintf(line_5_str, "P AC RMS: %2.2f W\tPower flow: DC%sAC\n\r",
-			inverter_state_variables.P_AC_RMS, power_flow_dir_str);
+			inverter.P_AC_RMS, power_flow_dir_str);
 	(*p_line_counter)++;
 	push_UART1((char*) line_5_str);
 }
@@ -246,10 +246,10 @@ void draw_UI_line_6(uint8_t* p_line_counter) {
 	static char line_6_str[LINE_WIDTH];
 	static char xformer_temp_color_str[ESCAPE_SEQUENCE_LENGTH];
 	static char inverter_temp_color_str[ESCAPE_SEQUENCE_LENGTH];
-	if (inverter_state_safety.OT_Transformer) {
+	if (inverter_safety.OT_Transformer) {
 		/* If transformer is over temperature */
 		strcpy(xformer_temp_color_str, "\x1B[91m"); /* Red */
-	} else if (inverter_state_safety.HT_Transformer) {
+	} else if (inverter_safety.HT_Transformer) {
 		/* Else if the transformer has a high temperature*/
 		strcpy(xformer_temp_color_str, "\x1B[93m"); /* Yellow */
 	} else {
@@ -257,10 +257,10 @@ void draw_UI_line_6(uint8_t* p_line_counter) {
 		strcpy(xformer_temp_color_str, COLOUR_DEFAULT); /* default*/
 	}
 
-	if (inverter_state_safety.OT_Inverter) {
+	if (inverter_safety.OT_Inverter) {
 		/* If transformer is over temperature */
 		strcpy(inverter_temp_color_str, "\x1B[91m"); /* Red */
-	} else if (inverter_state_safety.HT_Inverter) {
+	} else if (inverter_safety.HT_Inverter) {
 		/* Else if the transformer has a high temperature*/
 		strcpy(inverter_temp_color_str, "\x1B[93m"); /* Yellow */
 	} else {
@@ -270,9 +270,9 @@ void draw_UI_line_6(uint8_t* p_line_counter) {
 
 	sprintf(line_6_str,
 			"Xformer temp: %s%2.1fC%s\tInverter temp: %s%2.1fC%s \n\r",
-			xformer_temp_color_str, inverter_state_variables.T_transformer,
+			xformer_temp_color_str, inverter.T_transformer,
 			COLOUR_DEFAULT, inverter_temp_color_str,
-			inverter_state_variables.T_inverter, COLOUR_DEFAULT);
+			inverter.T_inverter, COLOUR_DEFAULT);
 	(*p_line_counter)++;
 	push_UART1((char*) line_6_str);
 }
@@ -281,22 +281,22 @@ void draw_UI_line_7(uint8_t* p_line_counter) {
 
 	static char line_7_str[LINE_WIDTH];
 	sprintf(line_7_str, "AC Contactor:");
-	if (inverter_state_safety.AC_contactor_state == CLOSED) {
+	if (inverter_safety.AC_contactor_state == CLOSED) {
 		strcat(line_7_str, " Closed");
-	} else if (inverter_state_safety.AC_contactor_state == PRECHARGE) {
+	} else if (inverter_safety.AC_contactor_state == PRECHARGE) {
 		strcat(line_7_str, "\x1B[93mPrecharge"); /*Yellow Precharge*/
 		strcat(line_7_str, COLOUR_DEFAULT);
-	} else if (inverter_state_safety.AC_contactor_state == OPEN) {
+	} else if (inverter_safety.AC_contactor_state == OPEN) {
 		strcat(line_7_str, " Open");
 	}
 
 	strcat(line_7_str, "\tDC Contactor:");
-	if (inverter_state_safety.DC_contactor_state == CLOSED) {
+	if (inverter_safety.DC_contactor_state == CLOSED) {
 		strcat(line_7_str, " Closed");
-	} else if (inverter_state_safety.DC_contactor_state == PRECHARGE) {
+	} else if (inverter_safety.DC_contactor_state == PRECHARGE) {
 		strcat(line_7_str, "\x1B[93mPrecharge"); /*Yellow Precharge*/
 		strcat(line_7_str, COLOUR_DEFAULT);
-	} else if (inverter_state_safety.DC_contactor_state == OPEN) {
+	} else if (inverter_safety.DC_contactor_state == OPEN) {
 		strcat(line_7_str, " Open");
 	}
 
@@ -309,7 +309,7 @@ void draw_UI_line_8(uint8_t* p_line_counter) {
 
 	static char line_8_str[LINE_WIDTH];
 	sprintf(line_8_str, "PLL sync: ");
-	if (PLL_state_variables.sync) {
+	if (PLL.sync) {
 		strcat(line_8_str, "\x1B[92mYES"); /* Green YES*/
 		strcat(line_8_str, COLOUR_DEFAULT);
 	} else {
@@ -317,7 +317,7 @@ void draw_UI_line_8(uint8_t* p_line_counter) {
 		strcat(line_8_str, COLOUR_DEFAULT);
 	}
 	strcat(line_8_str, "\t\ti sync: ");
-	if (inverter_state_safety.i_sync) {
+	if (inverter_safety.i_sync) {
 		strcat(line_8_str, "\x1B[92mYES"); /* Green YES*/
 		strcat(line_8_str, COLOUR_DEFAULT);
 	} else {
@@ -333,7 +333,7 @@ void draw_UI_line_9(uint8_t* p_line_counter) {
 
 	static char line_9_str[LINE_WIDTH];
 
-	sprintf(line_9_str,"PLL freq: %2.2f Hz\n\r",PLL_state_variables.freq_Hz);
+	sprintf(line_9_str,"PLL freq: %2.2f Hz\n\r",PLL.freq_Hz);
 	(*p_line_counter)++;
 
 	push_UART1((char*) line_9_str);

@@ -15,9 +15,10 @@
 /* Global variables                                                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
 
-PLL_state_variables_t PLL_state_variables = {.PI_ctrl_integ_term = 0,
-											 .w_est = NETWORK_FREQ,
-											 .theta_est = 0};
+PLL_state_variables_t PLL = {.PI_ctrl_integ_term = 0,
+							.w_est = NETWORK_FREQ,
+							.theta_est = 0};
+
 float sin_table[SIN_TABLE_SIZE];
 
 /*---------------------------------------------------------------------------------------------------------*/
@@ -39,68 +40,58 @@ void init_sin_table(float* sin_table, uint8_t table_size){
 
 void PLL_main(void){
 
-
-
-
-
 /*********************Input waveforms calculation begin**********************************/
-	float a_alpha = inverter_state_variables.v_AC_n;
-	float a_beta = delay_line(inverter_state_variables.v_AC_n);
+	float a_alpha = inverter.v_AC_n;
+	float a_beta = delay_line(inverter.v_AC_n);
 /*********************Input waveforms calculation end************************************/
 
 
 /*********************Estimated waveforms calculation begin******************************/
-	float b_alpha = cos_LUT(PLL_state_variables.theta_est, sin_table);
-	float b_beta = sin_LUT(PLL_state_variables.theta_est, sin_table);
+	float b_alpha = cos_LUT(PLL.theta_est, sin_table);
+	PLL.b_beta = sin_LUT(PLL.theta_est, sin_table);
 /*********************Estimated waveforms calculation end******************************/
 
 
 /*********************Error calcultion begin*********************************************/
 	float err;
-	err = (a_alpha*b_alpha) + (a_beta*b_beta);
+	err = (a_alpha*b_alpha) + (a_beta*PLL.b_beta);
 /*********************Error calculation end**********************************************/
-
 
 
 /****************************PI Controller begin***************************************/
 
-	PLL_state_variables.PI_ctrl_integ_term += err * KI * T_CALC; /* intégration de l'erreur avec le gain intégral */
+	PLL.PI_ctrl_integ_term += err * KI * T_CALC; /* intégration de l'erreur avec le gain intégral */
 
-	if (PLL_state_variables.PI_ctrl_integ_term > 2*M_PI*MAX_FREQ_DEVIATION){ /* Saturation de la fréquence pour empêcher le PLL de partir à la dérive si il y a perte de verouillage*/
+	if (PLL.PI_ctrl_integ_term > 2*M_PI*MAX_FREQ_DEVIATION){ /* Saturation de la fréquence pour empêcher le PLL de partir à la dérive si il y a perte de verouillage*/
 
-		PLL_state_variables.PI_ctrl_integ_term = 2*M_PI*MAX_FREQ_DEVIATION;
+		PLL.PI_ctrl_integ_term = 2*M_PI*MAX_FREQ_DEVIATION;
 
-	}else if (PLL_state_variables.PI_ctrl_integ_term < -2*M_PI*MAX_FREQ_DEVIATION){
+	}else if (PLL.PI_ctrl_integ_term < -2*M_PI*MAX_FREQ_DEVIATION){
 
-		PLL_state_variables.PI_ctrl_integ_term = -2*M_PI*MAX_FREQ_DEVIATION;
+		PLL.PI_ctrl_integ_term = -2*M_PI*MAX_FREQ_DEVIATION;
 
 	}
 
-	PLL_state_variables.w_est = err*KP + PLL_state_variables.PI_ctrl_integ_term + 2*M_PI*NETWORK_FREQ;	/* Output = err*Kp + err*Ki*(1/s) + Feedforward */
+	PLL.w_est = err*KP + PLL.PI_ctrl_integ_term + 2*M_PI*NETWORK_FREQ;	/* Output = err*Kp + err*Ki*(1/s) + Feedforward */
 
 /****************************PI Controller end*****************************************/
 
 
-
 /**************************Output integrator begin*************************************/
 
-	//PLL_state_variables.theta_est = output_integrator(PLL_state_variables.theta_est, PLL_state_variables.w_est, 2*M_PI, T_CALC); // Fonction output_integrator en assembleur
 
+	PLL.theta_est += PLL.w_est * T_CALC;	/* Integration of the instantaneous frequency value to get the angle*/
 
-	PLL_state_variables.theta_est += PLL_state_variables.w_est * T_CALC;	/* Integration of the instantaneous frequency value to get the angle*/
+	if (PLL.theta_est >= 2*M_PI){	/* Saturation pour garder la valeur de theta_est entre 0 et 2*pi*/
 
-	if (PLL_state_variables.theta_est >= 2*M_PI){	/* Saturation pour garder la valeur de theta_est entre 0 et 2*pi*/
-
-		PLL_state_variables.theta_est -= 2*M_PI;
+		PLL.theta_est -= 2*M_PI;
 	}
 
 /**************************Output integrator end***************************************/
 
-	//return a_beta; /* Return whatever state variable we are interested in monitoring */
+	/* To be put somewhere else */
+	PLL.freq_Hz = PLL.w_est*(1/(2*M_PI));
 
-	inverter_state_variables.i_SP = 33*b_beta;//Test
-
-	PLL_state_variables.freq_Hz = PLL_state_variables.w_est*(1/(2*M_PI));
 }
 
 

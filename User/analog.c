@@ -127,17 +127,19 @@ void process_ADC(void){
 void convert_to_float(void){
 
 	/* Vbus plus */
-	inverter_state_variables.V_DC_plus = ((float)ADC_raw_val[VBUS_PLUS_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*VBUS_GAIN));
+	inverter.V_DC_plus = ((float)ADC_raw_val[VBUS_PLUS_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*VBUS_GAIN));
 	/* Vbus minus */
-	inverter_state_variables.V_DC_minus = -((float)ADC_raw_val[VBUS_MINUS_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*VBUS_GAIN));
+	inverter.V_DC_minus = -((float)ADC_raw_val[VBUS_MINUS_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*VBUS_GAIN));
 	/* Vbus total */
-	inverter_state_variables.V_DC_total = inverter_state_variables.V_DC_plus + (-1*inverter_state_variables.V_DC_minus);
+	inverter.V_DC_total = inverter.V_DC_plus - inverter.V_DC_minus;
 	/* Vbus diff */
-	inverter_state_variables.V_DC_diff = inverter_state_variables.V_DC_plus - inverter_state_variables.V_DC_minus;
+	inverter.V_DC_diff = inverter.V_DC_plus + inverter.V_DC_minus;
 	/* V AC */
-	inverter_state_variables.v_AC = ((float)ADC_raw_val[V_AC_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*V_AC_GAIN))-V_AC_OFFSET;
+	inverter.v_AC = ((float)ADC_raw_val[V_AC_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*V_AC_GAIN))-V_AC_OFFSET;
 	/* V AC normalized*/
-	inverter_state_variables.v_AC_n = inverter_state_variables.v_AC*(1/(V_AC_NOMINAL_RMS_VALUE*M_SQRT2)); /* needs math.h */
+	inverter.v_AC_n = inverter.v_AC*(1/(V_AC_NOMINAL_RMS_VALUE*M_SQRT2)); /* needs math.h */
+	/* Current process value (actual amperage) */
+	inverter.i_PV = ((float)ADC_raw_val[I_PV_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*I_PV_GAIN))-I_PV_OFFSET;
 }
 
 
@@ -147,12 +149,12 @@ void convert_to_int_write_analog(void){
 	int32_t i_sp_val, d_ff_val;
 
 	/* Convert the current setpoint from float to int*/
-	i_sp_val = 	(int32_t)(inverter_state_variables.i_SP*I_SP_GAIN*(RES_12BIT/VREF_VOLTAGE));
+	i_sp_val = 	(int32_t)(inverter.i_SP*I_SP_GAIN*(RES_12BIT/VREF_VOLTAGE));
 	i_sp_val += I_SP_OFFSET;
 
 	/* Convert the duty cycle feedforward value from int to float */
-
-	d_ff_val = I_SP_OFFSET;/*To be implemented*/
+	d_ff_val = (int32_t)(inverter.d_feedforward*D_FF_GAIN*(RES_12BIT/VREF_VOLTAGE));
+	d_ff_val += D_FF_OFFSET;
 
 #ifdef PWM_DAC
 

@@ -38,7 +38,7 @@ typedef struct {
 	volatile float PI_ctrl_integ_term;
 	volatile float w_est;
 	volatile float theta_est;
-	volatile float some_state_var;
+	volatile float b_beta;
 	volatile float freq_Hz; /* Frequency value, low pass filtered and converted to hertz*/
 	volatile bool sync;
 
@@ -50,7 +50,7 @@ typedef struct {
 /* Global variables to be made available externally                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
 
-extern PLL_state_variables_t PLL_state_variables;
+extern PLL_state_variables_t PLL;
 
 extern float sin_table[];
 

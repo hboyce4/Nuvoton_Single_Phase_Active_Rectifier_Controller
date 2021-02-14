@@ -11,10 +11,11 @@
 /* Global variables                                                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
 
-inverter_state_variables_t inverter_state_variables;
-inverter_state_safety_t inverter_state_safety;
-inverter_setpoints_t inverter_setpoints;
-inverter_limits_t inverter_limits;
+inverter_state_variables_t inverter = {.I_D = 0};
+inverter_state_safety_t inverter_safety;
+inverter_state_setpoints_t inverter_setpoints = {.V_DC_total_setpoint = VBUS_TOTAL_DEFAULT,
+												 .V_DC_diff_setpoint = VBUS_DIFF_DEFAULT};
+//inverter_limits_t inverter_limits;
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Function definitions                                                                                       */
@@ -40,7 +41,7 @@ void init_inverter_control(void){
 
 	EPWM1->CLKPSC[1] = 0;/* CLKPSC[1] is EPWM_CLKPSC2_3 which is the prescaler for channels 2 & 3*/
 
-	EPWM1->PERIOD[2] = (uint16_t)RES_12BIT;
+	EPWM1->PERIOD[2] = (uint16_t)RES_12BIT; /* 192MHz/4096 = 46.87 kHz*/
 	EPWM1->PERIOD[3] = (uint16_t)RES_12BIT;
 
 	EPWM1->CMPDAT[2] = 2048;/* Some initial value*/
@@ -59,12 +60,9 @@ void init_inverter_control(void){
 
 	EPWM1->CNTEN |= EPWM_CNTEN_CNTEN2_Msk;
 	EPWM1->CNTEN |= EPWM_CNTEN_CNTEN3_Msk;
-
 #endif
+
 	delay_ms(10); /* Give the analog modulator some time to stabilize */
-
-
-
 
 
 	/* Start timer 1. Triggers the control loop interrupt */
@@ -73,5 +71,84 @@ void init_inverter_control(void){
     NVIC_EnableIRQ(TMR1_IRQn);
     NVIC_SetPriority(TMR1_IRQn, TMR1_INT_PRIORITY);
     TIMER_Start(TIMER1);
+
+}
+
+void inverter_control_main(void){
+
+
+
+	inverter_safety_fast();
+
+	/* Calculate the current (i) setpoint */
+	inverter_calc_I_D();
+	inverter_calc_I_balance();
+	//saturate();
+	inverter.i_SP = (inverter.I_D * PLL.b_beta) + inverter.I_balance ;
+
+	/* Calculate the duty cycle feedforward value */
+	float d_feedforward;
+	if(inverter.V_DC_total == 0){ /* If we were to run into a division by zero */
+		d_feedforward = 0.5; /* don't do the calculation and just pick 50% */
+	}else{
+		d_feedforward = (inverter.v_AC-inverter.V_DC_minus)/inverter.V_DC_total;
+
+		/* Saturate between 0 and 1 (0% and 100%)*/
+		if(d_feedforward < 0){
+			d_feedforward = 0;
+		}else if(d_feedforward > 1){
+			d_feedforward = 1;
+		}
+	}
+
+	inverter.d_feedforward = d_feedforward;
+
+
+}
+
+void inverter_safety_fast(void){
+
+}
+
+void inverter_calc_I_D(void){
+
+	static float V_DC_total_filtered;
+
+	V_DC_total_filtered = V_DC_total_filtered + (((inverter.V_DC_total-V_DC_total_filtered)*T_CALC)/VBUS_TOTAL_LPF_TAU);
+
+	float err_V_DC_total = V_DC_total_filtered - inverter_setpoints.V_DC_total_setpoint;
+
+	err_V_DC_total *= VBUS_TOTAL_KP;
+
+	/* Saturate */
+	if (err_V_DC_total > I_D_MAX){
+		err_V_DC_total = I_D_MAX;
+	}else if (err_V_DC_total < -I_D_MAX){
+		err_V_DC_total = -I_D_MAX;
+	}
+
+	inverter.I_D = err_V_DC_total;
+
+}
+
+void inverter_calc_I_balance(void){
+
+
+	static float V_DC_diff_filtered;
+
+		V_DC_diff_filtered = V_DC_diff_filtered + (((inverter.V_DC_diff-V_DC_diff_filtered)*T_CALC)/VBUS_DIFF_LPF_TAU);
+
+		float err_V_DC_diff = V_DC_diff_filtered - inverter_setpoints.V_DC_diff_setpoint;
+
+		err_V_DC_diff *= VBUS_DIFF_KP;
+
+		/* Saturate */
+		if (err_V_DC_diff > I_BALANCE_MAX){
+			err_V_DC_diff = I_BALANCE_MAX;
+		}else if (err_V_DC_diff < -I_BALANCE_MAX){
+			err_V_DC_diff = -I_BALANCE_MAX;
+		}
+
+		inverter.I_balance = err_V_DC_diff;
 
 }

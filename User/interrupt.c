@@ -74,6 +74,7 @@ void TMR1_IRQHandler(void){
 		process_ADC();
         convert_to_float();
 		PLL_main();
+		inverter_control_main();
 		convert_to_int_write_analog();
 #ifdef TIMING_DEBUG
 		PH->DOUT |= BIT1;	//Timing measurements
