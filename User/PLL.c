@@ -60,7 +60,7 @@ void PLL_main(void){
 
 /****************************PI Controller begin***************************************/
 
-	PLL.PI_ctrl_integ_term += err * KI * T_CALC; /* intégration de l'erreur avec le gain intégral */
+	PLL.PI_ctrl_integ_term += err * PLL_KI * T_CALC; /* intégration de l'erreur avec le gain intégral */
 
 	if (PLL.PI_ctrl_integ_term > 2*M_PI*MAX_FREQ_DEVIATION){ /* Saturation de la fréquence pour empêcher le PLL de partir à la dérive si il y a perte de verouillage*/
 
@@ -72,7 +72,7 @@ void PLL_main(void){
 
 	}
 
-	PLL.w_est = err*KP + PLL.PI_ctrl_integ_term + 2*M_PI*NETWORK_FREQ;	/* Output = err*Kp + err*Ki*(1/s) + Feedforward */
+	PLL.w_est = err*PLL_KP + PLL.PI_ctrl_integ_term + 2*M_PI*NETWORK_FREQ;	/* Output = err*Kp + err*Ki*(1/s) + Feedforward */
 
 /****************************PI Controller end*****************************************/
 
@@ -92,6 +92,7 @@ void PLL_main(void){
 	/* To be put somewhere else */
 	PLL.freq_Hz = PLL.w_est*(1/(2*M_PI));
 
+	PLL_check_sync();
 }
 
 
@@ -173,3 +174,28 @@ float cos_LUT(float angle, float* table){
 	}
 
 }
+
+void PLL_check_sync(void){
+
+	static uint16_t set_count, reset_count;
+
+	if((inverter.v_AC_n > PLL.b_beta-PLL_SYNC_TOL) && (inverter.v_AC_n < PLL.b_beta+PLL_SYNC_TOL)){ /* If the input voltage is within tolerance of the estimated voltage*/
+		reset_count = 0;
+		set_count++;
+	}else{/* Else it's out of tolerance*/
+		reset_count++;
+		set_count = 0;
+	}
+
+
+	if(reset_count >= PLL_SYNC_COUNT_FOR_RESET){
+		reset_count = PLL_SYNC_COUNT_FOR_RESET;
+		PLL.sync = false;
+	}else if(set_count >= PLL_SYNC_COUNT_FOR_SET){
+		set_count = PLL_SYNC_COUNT_FOR_SET;
+		PLL.sync = true;
+	}
+
+
+}
+

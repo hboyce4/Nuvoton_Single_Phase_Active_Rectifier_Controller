@@ -77,7 +77,7 @@ void init_inverter_control(void){
 void inverter_control_main(void){
 
 
-
+	inverter_check_i_sync();
 	inverter_safety_fast();
 
 	/* Calculate the current (i) setpoint */
@@ -150,5 +150,28 @@ void inverter_calc_I_balance(void){
 		}
 
 		inverter.I_balance = err_V_DC_diff;
+
+}
+
+void inverter_check_i_sync(void){
+
+	static uint16_t set_count, reset_count;
+
+	if((inverter.i_PV > inverter.i_SP-I_SYNC_TOL) && (inverter.i_PV < inverter.i_SP+I_SYNC_TOL)){ /* If the input voltage is within tolerance of the estimated voltage*/
+		reset_count = 0;
+		set_count++;
+	}else{/* Else it's out of tolerance*/
+		reset_count++;
+		set_count = 0;
+	}
+
+
+	if(reset_count >= I_SYNC_COUNT_FOR_RESET){
+		reset_count = I_SYNC_COUNT_FOR_RESET;
+		inverter_safety.i_sync = false;
+	}else if(set_count >= I_SYNC_COUNT_FOR_SET){
+		set_count = I_SYNC_COUNT_FOR_SET;
+		inverter_safety.i_sync = true;
+	}
 
 }

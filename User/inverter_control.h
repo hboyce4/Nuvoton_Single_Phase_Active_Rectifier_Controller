@@ -36,6 +36,10 @@
 #define I_D_MAX 33 /* [A] Maximum allowable peak AC current */
 #define I_BALANCE_MAX 3 /* [A] Maximum allowable balancing (DC) current */
 
+#define I_SYNC_TOL 				5 	/* [A] Tolerance within which the signal is considered in sync */
+#define I_SYNC_COUNT_FOR_SET	200	/* [counts] Number of times the signal must be found within tolerance to be considered in sync */
+#define I_SYNC_COUNT_FOR_RESET	5	/* [counts] Number of times the signal must be found OUT of tolerance to be considered out of sync */
+
 /*---------------------------------------------------------------------------------------------------------*/
 /* Type definitions           				                                                               */
 /*---------------------------------------------------------------------------------------------------------*/
@@ -52,7 +56,6 @@ typedef struct {
 	volatile bool OV_V_DC_diff;
 	volatile contactor_state_t DC_contactor_state;
 	volatile contactor_state_t AC_contactor_state;
-	volatile bool PLL_sync;
 	volatile bool i_sync;
 
 	/* Slow refresh*/
@@ -130,5 +133,6 @@ void inverter_control_main(void);
 void inverter_safety_fast(void);
 void inverter_calc_I_D(void);
 void inverter_calc_I_balance(void);
+void inverter_check_i_sync(void);
 
 #endif /* INVERTER_CONTROL_H_ */
