@@ -68,6 +68,9 @@ void TMR1_IRQHandler(void){
 
 
         /* Begin control loop iteration */
+
+        PA->DOUT |= BIT7;//Turn ON green LED
+
 #ifdef TIMING_DEBUG
         PH->DOUT &= ~(BIT1);//Timing measurements
 #endif
@@ -79,6 +82,8 @@ void TMR1_IRQHandler(void){
 #ifdef TIMING_DEBUG
 		PH->DOUT |= BIT1;	//Timing measurements
 #endif
+
+		PA->DOUT &= ~(BIT7);//Turn ON green LED
     }
 
 

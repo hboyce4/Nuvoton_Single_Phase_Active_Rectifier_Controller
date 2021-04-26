@@ -51,6 +51,8 @@ void SysTick_Handler(void)
 	}
 	UI_refresh_counter--;
 
+	PA6 ^= 1; // Toggle yellow LED
+
 }
 
 
@@ -222,8 +224,9 @@ int main()
 #ifdef TIMING_DEBUG
         PH->DOUT &= ~(BIT4);//Timing measurements
 #endif
-    		draw_UI(row_sel, col_sel);
-
+        	PA->DOUT |= BIT5;//Turn ON red LED
+        	draw_UI(row_sel, col_sel);
+        	PA->DOUT &= ~(BIT5);//Turn off red LED
 #ifdef TIMING_DEBUG
 		PH->DOUT |= BIT4;	//Timing measurements
 #endif

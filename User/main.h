@@ -14,7 +14,9 @@
 /* Macros           				                                                                       */
 /*---------------------------------------------------------------------------------------------------------*/
 #define PWM_DAC //uncomment for PWM DAC
-#define TIMING_DEBUG // Uncomment to enable pin toggling on port H for timing debug
+//#define TIMING_DEBUG // Uncomment to enable pin toggling on port H for timing debug
+
+// ************* Don't forget to update the __HXT macro with the correct External Crystal Clock Frequency *************************
 
 
 #define PLL_CLOCK           192000000

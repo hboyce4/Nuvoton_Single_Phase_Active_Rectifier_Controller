@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 #ifndef __HXT
-#define __HXT       (12000000UL)    /*!< External Crystal Clock Frequency     */
+#define __HXT       (20000000UL)    /*!< External Crystal Clock Frequency     */
 #endif
 
 #ifndef __LXT
