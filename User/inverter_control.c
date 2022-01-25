@@ -24,9 +24,9 @@ inverter_state_setpoints_t inverter_setpoints = {.V_DC_total_setpoint = VBUS_TOT
 void init_inverter_control(void){
 
     /*Using BPWM1, */
-    /* Begin to output the carrier waveform for the analog hardware PWModulator on PA.15 (pin 100 on the M487JIDAE) */
-	BPWM_ConfigOutputChannel(BPWM1, 5, PWM_CARRIER_FREQ, 50); /* Set prescaler to 1, CNT to 480. Use the defined carrier freq, with 50% duty cycle */
-	BPWM1->POEN |= BPWM_POEN_POEN5_Msk; /* Enable CH5 (set 1 at bit position 5)*/
+    /* Begin to output the carrier waveform for the analog hardware PWModulator on PA.6 (pin 16 on the M481LIDAE) */
+	BPWM_ConfigOutputChannel(BPWM1, 3, PWM_CARRIER_FREQ, 50); /* Set prescaler to 1, CNT to 480. Use the defined carrier freq, with 50% duty cycle */
+	BPWM1->POEN |= BPWM_POEN_POEN3_Msk; /* Enable CH5 (set 1 at bit position 5)*/
 	BPWM1->CNTEN = BPWM_CNTEN_CNTEN0_Msk;
 
 #ifdef PWM_DAC
@@ -41,11 +41,11 @@ void init_inverter_control(void){
 
 	EPWM1->CLKPSC[1] = 0;/* CLKPSC[1] is EPWM_CLKPSC2_3 which is the prescaler for channels 2 & 3*/
 
-	EPWM1->PERIOD[2] = (uint16_t)RES_12BIT; /* 192MHz/4096 = 46.87 kHz*/
-	EPWM1->PERIOD[3] = (uint16_t)RES_12BIT;
+	EPWM1->PERIOD[2] = (uint16_t)RES_11BIT; /* 192MHz/2048 = 93.75 kHz*/
+	EPWM1->PERIOD[3] = (uint16_t)RES_11BIT;
 
-	EPWM1->CMPDAT[2] = 2048;/* Some initial value*/
-	EPWM1->CMPDAT[3] = 2048;
+	EPWM1->CMPDAT[2] = (uint16_t)(RES_11BIT/2);/* Some initial value*/
+	EPWM1->CMPDAT[3] = (uint16_t)(RES_11BIT/2);
 
 	EPWM1->WGCTL0 = (EPWM1->WGCTL0 & ~(EPWM_WGCTL0_PRDPCTL2_Msk | EPWM_WGCTL0_ZPCTL2_Msk)) | ((uint32_t)EPWM_OUTPUT_HIGH << EPWM_WGCTL0_ZPCTL2_Pos);
 	EPWM1->WGCTL0 = (EPWM1->WGCTL0 & ~(EPWM_WGCTL0_PRDPCTL3_Msk | EPWM_WGCTL0_ZPCTL3_Msk)) | ((uint32_t)EPWM_OUTPUT_HIGH << EPWM_WGCTL0_ZPCTL3_Pos);

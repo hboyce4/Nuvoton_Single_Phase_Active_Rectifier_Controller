@@ -30,13 +30,14 @@
 #define EADC_TOTAL_CHANNELS 8
 #define VREF_VOLTAGE 3.239 /*[V] Voltage of the chip's analog voltage reference (Vref)*/
 #define RES_12BIT 4096.0
+#define RES_11BIT 2048.0
 
 
 /*ADC Channels*/
-#define VBUS_PLUS_CHANNEL 0
-#define VBUS_MINUS_CHANNEL 1
-#define V_AC_CHANNEL 2
-#define I_PV_CHANNEL 3
+#define VBUS_PLUS_CHANNEL 6
+#define VBUS_MINUS_CHANNEL 5
+#define V_AC_CHANNEL 4
+#define I_PV_CHANNEL 1
 
 /* Gains */
 #define VBUS_GAIN 0.1 /* [V/V] Gain of the analog front end for the bus voltages. The negative bus's front end has a gain of -VBUS_GAIN*/
@@ -51,10 +52,10 @@
 
 /* Output signals */
 #define I_SP_GAIN 0.033				/* [V/A] Gain of the current setpoint command */
-#define I_SP_OFFSET 2048			/* [LSB] Offset of the current setpoint command */
+#define I_SP_OFFSET (RES_11BIT/2)	/* [LSB] Offset of the current setpoint command */
 
 #define D_FF_GAIN 1					/*  Gain of the duty cycle feed forward value */
-#define D_FF_OFFSET 2048			/* [LSB] Offset of the duty cycle feed forward value */
+#define D_FF_OFFSET (RES_11BIT/2)	/* [LSB] Offset of the duty cycle feed forward value */
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Type definitions           				                                                                       */

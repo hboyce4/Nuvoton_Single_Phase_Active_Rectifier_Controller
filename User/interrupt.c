@@ -18,13 +18,13 @@ void PDMA_IRQHandler(void){
 
     if (status & 0x2){     /* If the interrupt is "Transfer Done" */
 
-        if (PDMA_GET_TD_STS(PDMA) & (1 << UART1_TX_DMA_CHANNEL)){ /* If the transfer that was completed is the UART1_TX_DMA_CHANNEL*/
-            PDMA_CLR_TD_FLAG(PDMA,1 << UART1_TX_DMA_CHANNEL);
+        if (PDMA_GET_TD_STS(PDMA) & (1 << UART2_TX_DMA_CHANNEL)){ /* If the transfer that was completed is the UART2_TX_DMA_CHANNEL*/
+            PDMA_CLR_TD_FLAG(PDMA,1 << UART2_TX_DMA_CHANNEL);
 
             UART_DMA_Xfer_t temp;
 
-            		if (!pop_UART1(&temp)){	// If popping a transfer "job" from the buffer succeeds
-            			start_UART1_DMA_Xfer(temp); // Start the transfer
+            		if (!pop_UART2(&temp)){	// If popping a transfer "job" from the buffer succeeds
+            			start_UART2_DMA_Xfer(temp); // Start the transfer
 
             		}/* else, popping from the buffer didn't not succeed, it means there's no transfer jobs left */
 
@@ -69,7 +69,7 @@ void TMR1_IRQHandler(void){
 
         /* Begin control loop iteration */
 
-        PA->DOUT |= BIT7;//Turn ON green LED
+        PA->DOUT &= ~(BIT12);//Turn ON green LED
 
 #ifdef TIMING_DEBUG
         PH->DOUT &= ~(BIT1);//Timing measurements
@@ -83,7 +83,7 @@ void TMR1_IRQHandler(void){
 		PH->DOUT |= BIT1;	//Timing measurements
 #endif
 
-		PA->DOUT &= ~(BIT7);//Turn ON green LED
+		PA->DOUT |= BIT12;//Turn OFF green LED
     }
 
 

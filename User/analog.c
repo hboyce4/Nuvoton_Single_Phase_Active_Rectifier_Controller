@@ -149,11 +149,11 @@ void convert_to_int_write_analog(void){
 	int32_t i_sp_val, d_ff_val;
 
 	/* Convert the current setpoint from float to int*/
-	i_sp_val = 	(int32_t)(inverter.i_SP*I_SP_GAIN*(RES_12BIT/VREF_VOLTAGE));
+	i_sp_val = 	(int32_t)(inverter.i_SP*I_SP_GAIN*(RES_11BIT/VREF_VOLTAGE));
 	i_sp_val += I_SP_OFFSET; /* signal centered around I_SP_OFFSET */
 
 	/* Convert the duty cycle feedforward value from int to float */
-	d_ff_val = (int32_t)((inverter.d_feedforward-0.5)*D_FF_GAIN*(RES_12BIT/VREF_VOLTAGE)); /* add -0.5 shift to make signal between -0.5 and 0.5 */
+	d_ff_val = (int32_t)((inverter.d_feedforward-0.5)*D_FF_GAIN*(RES_11BIT/VREF_VOLTAGE)); /* add -0.5 shift to make signal between -0.5 and 0.5 */
 	d_ff_val += D_FF_OFFSET; /* Centered around D_FF_OFFSET */
 
 #ifdef PWM_DAC

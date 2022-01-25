@@ -42,7 +42,7 @@ void SysTick_Handler(void)
 {
     g_SysTickIntCnt++;
 
-	update_buttons_LEDs_state();/* Copy button SW2 and SW3 states to LEDG and LEDY and flash LEDR */
+	//update_buttons_LEDs_state();/* Copy button SW2 and SW3 states to LEDG and LEDY and flash LEDR */
 
 	static uint16_t UI_refresh_counter = 0;
 	if(!UI_refresh_counter){
@@ -51,7 +51,7 @@ void SysTick_Handler(void)
 	}
 	UI_refresh_counter--;
 
-	PA6 ^= 1; // Toggle yellow LED
+	PA13 ^= 1; // Toggle amber LED
 
 }
 
@@ -85,7 +85,7 @@ void SYS_Init(void)
     //CLK_EnableModuleClock(TMR1_MODULE);
     CLK->APBCLK0 |= CLK_APBCLK0_TMR0CKEN_Msk; // UART0 Clock Enable
     CLK->APBCLK0 |= CLK_APBCLK0_UART0CKEN_Msk; // UART0 Clock Enable
-    CLK->APBCLK0 |= CLK_APBCLK0_UART1CKEN_Msk; // UART1 Clock Enable
+    CLK->APBCLK0 |= CLK_APBCLK0_UART2CKEN_Msk; // UART2 Clock Enable
     CLK->APBCLK0 |= CLK_APBCLK0_EADCCKEN_Msk; /* EADC0 Clock Enable*/
     CLK->APBCLK0 |= CLK_APBCLK0_TMR1CKEN_Msk; /* TMR1 Clock Enable*/
 
@@ -107,8 +107,8 @@ void SYS_Init(void)
     CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL1_TMR0SEL_Msk) | CLK_CLKSEL1_TMR0SEL_HXT;
     /* Select UART0 clock source is HXT (0x0 for HXT) */
     CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL1_UART0SEL_Msk) | CLK_CLKSEL1_UART0SEL_HXT;
-    /* Select UART1 clock source is HXT (0x0 for HXT) */
-    CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL1_UART1SEL_Msk) | CLK_CLKSEL1_UART1SEL_HXT;
+    /* Select UART2 clock source is HXT (0x0 for HXT) */
+    CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL3_UART2SEL_Msk) | CLK_CLKSEL3_UART2SEL_HXT;
     /* Select TMR1 clock source as HXT (0x0 for HXT) */
     CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL1_TMR1SEL_Msk) | CLK_CLKSEL1_TMR1SEL_HXT;
 #ifdef PWM_DAC // If PWM DAC is used
@@ -134,21 +134,21 @@ void SYS_Init(void)
     SYS->GPB_MFPH &= ~(SYS_GPB_MFPH_PB12MFP_Msk | SYS_GPB_MFPH_PB13MFP_Msk);
     SYS->GPB_MFPH |= (SYS_GPB_MFPH_PB12MFP_UART0_RXD | SYS_GPB_MFPH_PB13MFP_UART0_TXD);
 
-    /* Set PA multi-function pins for UART1 TXD and RXD*/
-     SYS->GPA_MFPL &= ~(SYS_GPA_MFPL_PA2MFP_Msk | SYS_GPA_MFPL_PA3MFP_Msk);
-     SYS->GPA_MFPL |= (0x8 << SYS_GPA_MFPL_PA2MFP_Pos) | (0x8 << SYS_GPA_MFPL_PA3MFP_Pos);
+    /* Set GPA multi-function pins for UART2 TXD and RXD on PC0(pin 32) and PC1(Pin 31) */
+     SYS->GPA_MFPL &= ~(SYS_GPC_MFPL_PC0MFP_Msk | SYS_GPC_MFPL_PC1MFP_Msk);
+     SYS->GPA_MFPL |= (SYS_GPC_MFPL_PC0MFP_UART2_RXD | SYS_GPC_MFPL_PC1MFP_UART2_TXD);//(0x8 << SYS_GPC_MFPL_PC0MFP_Pos) | (0x8 << SYS_GPC_MFPL_PC1MFP_Pos);
 
-     /* Set PA.15 as output from BPWM1_CH5 for hardware PWModulator carrier*/
-     SYS->GPA_MFPH &= ~(SYS_GPA_MFPH_PA15MFP_Msk);
-     SYS->GPA_MFPH |= SYS_GPA_MFPH_PA15MFP_BPWM1_CH5;
-     PA->SLEWCTL |= (GPIO_SLEWCTL_HIGH << 2*15); /*Set PA15 to "High" slew rate.*/
-     	/* For some reason "High" mode seems faster than "Fast" mode. Most likely it's just my probing setup (signal reflexions and such) */
+     /* Set PA.6 as output from BPWM1_CH3 for hardware PWModulator carrier*/
+     SYS->GPA_MFPH &= ~(SYS_GPA_MFPL_PA6MFP_Msk);
+     SYS->GPA_MFPH |= SYS_GPA_MFPL_PA6MFP_BPWM1_CH3;
+     PA->SLEWCTL |= (GPIO_SLEWCTL_HIGH << 2*6); /*Set PA15 to "High" slew rate.*/
+     	/* For some reason "High" mode seems faster than "Fast" mode. Most likely it's just my probing setup (signal reflections and such) */
 
 #ifdef PWM_DAC // If PWM DAC is used
      SYS->GPB_MFPH &= ~(SYS_GPB_MFPH_PB12MFP_Msk|SYS_GPB_MFPH_PB13MFP_Msk); /* Setup DAC pins as PWM outputs*/
      SYS->GPB_MFPH |= SYS_GPB_MFPH_PB12MFP_EPWM1_CH3|SYS_GPB_MFPH_PB13MFP_EPWM1_CH2;
      PB->SLEWCTL |= (GPIO_SLEWCTL_HIGH << 2*12)|(GPIO_SLEWCTL_HIGH << 2*13); /*Set PB12 & PB13 to "High" slew rate.*/
-     /* For some reason "High" mode seems faster than "Fast" mode. Most likely it's just my probing setup (signal reflexions and such) */
+     /* For some reason "High" mode seems faster than "Fast" mode. Most likely it's just my probing setup (signal reflections and such) */
 #endif
 
 
@@ -197,8 +197,9 @@ int main()
     /* Init UART to 115200-8n1 for print message */
     UART_Open(UART0, 115200);
 
-    UART_Open(UART1, 460800);
-    init_UART1_DMA(); /*Needs SysTick*/
+    /* Open UART 2, for external communication, on pins 31 & 32*/
+    UART_Open(UART2, 460800);
+    init_UART2_DMA(); /*Needs SysTick*/
 
     init_buttons_LEDs();
 
@@ -224,9 +225,10 @@ int main()
 #ifdef TIMING_DEBUG
         PH->DOUT &= ~(BIT4);//Timing measurements
 #endif
-        	PA->DOUT |= BIT5;//Turn ON red LED
+
+        	PA->DOUT &= ~(BIT14);//Turn ON red LED
         	draw_UI(row_sel, col_sel);
-        	PA->DOUT &= ~(BIT5);//Turn off red LED
+        	PA->DOUT |= BIT14;//Turn OFF red LED
 #ifdef TIMING_DEBUG
 		PH->DOUT |= BIT4;	//Timing measurements
 #endif

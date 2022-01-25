@@ -44,7 +44,7 @@ void draw_UI(int8_t row_sel, int8_t col_sel){/* 60-ish characters width*/
 	/* Last line */
 	static char last_line_str[LINE_WIDTH];
 	sprintf(last_line_str,"\x1B[%uA",p_line_counter);
-	push_UART1((char*)last_line_str);
+	push_UART2((char*)last_line_str);
 	/* End of last line */
 
 
@@ -57,10 +57,10 @@ void read_user_input(int8_t* p_row_sel, int8_t* p_col_sel){
 
   	char user_char;
   	static uint8_t state = 0;
-	uint32_t u32IntSts = UART1->INTSTS;
+	uint32_t u32IntSts = UART2->INTSTS;
 
 	if(u32IntSts & UART_INTSTS_RDAIF_Msk){/* If there is data to be read*/
-		user_char = ((char)UART1->DAT); // read out data
+		user_char = ((char)UART2->DAT); // read out data
 
 		if (state == 0){/* If no characters have been received*/
 			if(user_char == 0x1B){/* If the first character is escape*/
@@ -161,7 +161,7 @@ void draw_UI_line_0_1(uint8_t* p_line_counter) {
 			"\x1B[0J\n\r****ACTIVE RECTIFIER CONTROLLER V0.1****\n\r";
 	/*Escape sequence to clear from cursor to end of screen*/
 	*p_line_counter += 2;
-	push_UART1((char*) line_0_1_str);
+	push_UART2((char*) line_0_1_str);
 }
 
 void draw_UI_line_2(uint8_t* p_line_counter) {
@@ -194,7 +194,7 @@ void draw_UI_line_2(uint8_t* p_line_counter) {
 			COLOUR_DEFAULT, colour_V_DC_minus,
 			inverter.V_DC_minus);
 	(*p_line_counter)++;
-	push_UART1((char*) line_2_str);
+	push_UART2((char*) line_2_str);
 }
 
 void draw_UI_line_3(uint8_t* p_line_counter) {
@@ -211,7 +211,7 @@ void draw_UI_line_3(uint8_t* p_line_counter) {
 			colour_V_DC_diff, inverter.V_DC_diff,
 			COLOUR_DEFAULT, inverter.V_DC_total);
 	(*p_line_counter)++;
-	push_UART1((char*) line_3_str);
+	push_UART2((char*) line_3_str);
 }
 
 void draw_UI_line_4(uint8_t* p_line_counter) {
@@ -221,7 +221,7 @@ void draw_UI_line_4(uint8_t* p_line_counter) {
 			inverter.I_AC_RMS,
 			inverter.V_AC_RMS);
 	(*p_line_counter)++;
-	push_UART1((char*) line_4_str);
+	push_UART2((char*) line_4_str);
 }
 
 void draw_UI_line_5(uint8_t* p_line_counter) {
@@ -238,7 +238,7 @@ void draw_UI_line_5(uint8_t* p_line_counter) {
 	sprintf(line_5_str, "P AC RMS: %2.2f W\tPower flow: DC%sAC\n\r",
 			inverter.P_AC_RMS, power_flow_dir_str);
 	(*p_line_counter)++;
-	push_UART1((char*) line_5_str);
+	push_UART2((char*) line_5_str);
 }
 
 void draw_UI_line_6(uint8_t* p_line_counter) {
@@ -274,7 +274,7 @@ void draw_UI_line_6(uint8_t* p_line_counter) {
 			COLOUR_DEFAULT, inverter_temp_color_str,
 			inverter.T_inverter, COLOUR_DEFAULT);
 	(*p_line_counter)++;
-	push_UART1((char*) line_6_str);
+	push_UART2((char*) line_6_str);
 }
 
 void draw_UI_line_7(uint8_t* p_line_counter) {
@@ -302,7 +302,7 @@ void draw_UI_line_7(uint8_t* p_line_counter) {
 
 	strcat(line_7_str, "\n\r");
 	(*p_line_counter)++;
-	push_UART1((char*) line_7_str);
+	push_UART2((char*) line_7_str);
 }
 
 void draw_UI_line_8(uint8_t* p_line_counter) {
@@ -326,7 +326,7 @@ void draw_UI_line_8(uint8_t* p_line_counter) {
 	}
 	strcat(line_8_str, "\n\r");
 	(*p_line_counter)++;
-	push_UART1((char*) line_8_str);
+	push_UART2((char*) line_8_str);
 }
 
 void draw_UI_line_9(uint8_t* p_line_counter) {
@@ -336,7 +336,7 @@ void draw_UI_line_9(uint8_t* p_line_counter) {
 	sprintf(line_9_str,"PLL freq: %2.2f Hz\n\r",PLL.freq_Hz);
 	(*p_line_counter)++;
 
-	push_UART1((char*) line_9_str);
+	push_UART2((char*) line_9_str);
 }
 
 void draw_UI_line_separator(uint8_t* p_line_counter) {
@@ -344,7 +344,7 @@ void draw_UI_line_separator(uint8_t* p_line_counter) {
 	static char line_separator_str[LINE_WIDTH];
 	sprintf(line_separator_str,"****************************************\n\r");
 	(*p_line_counter)++;
-	push_UART1((char*) line_separator_str);
+	push_UART2((char*) line_separator_str);
 }
 
 void draw_UI_line_A(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel) {
@@ -379,7 +379,7 @@ void draw_UI_line_A(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel) {
 			colour_v_setpoint_str,inverter_setpoints.V_DC_total_setpoint,COLOUR_DEFAULT);
 	(*p_line_counter)++;
 
-	push_UART1((char*) line_A_str);
+	push_UART2((char*) line_A_str);
 
 }
 
@@ -408,7 +408,7 @@ void draw_UI_line_B(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
 			colour_V_diff_str,inverter_setpoints.V_DC_diff_setpoint,COLOUR_DEFAULT);
 	(*p_line_counter)++;
 
-	push_UART1((char*) line_B_str);
+	push_UART2((char*) line_B_str);
 
 }
 
