@@ -22,8 +22,8 @@
 /*---------------------------------------------------------------------------------------------------------*/
 #define HEARTBEAT_INTERVAL_MS 1000
 
-#define UART2_TX_DMA_CHANNEL 10 /* PDMA->REQSEL8_11 has to be modified by hand if the channel in this macro is changed. I know this is bad.*/
-#define UART_DMA_JOB_BUFF_SIZE 32 /* Must be a power of 2. Max = 256*/
+#define UART2_TX_DMA_CHANNEL 10 	/* PDMA->REQSEL8_11 has to be modified by hand if the channel is changed. I know this is bad.*/
+#define UART_DMA_JOB_BUFF_SIZE 32 	/* Must be a power of 2. Max = 256*/
 
 
 //#define EADC_DMA_CHANNEL 2
@@ -51,13 +51,11 @@ typedef struct
 /*---------------------------------------------------------------------------------------------------------*/
 
 void init_buttons_LEDs(void);
-//void update_buttons_LEDs_state(void);// Deprecated
 void delay_ms(uint32_t time); /*Generates a milliseconds delay. NOT ACCURATE. Use a hardware timer for accuracy*/
 void init_UART2_DMA(void); /* Needs SysTick!! */
 void start_UART2_DMA_Xfer(UART_DMA_Xfer_t);
 int8_t push_UART2(char*);
 int8_t pop_UART2(UART_DMA_Xfer_t*);
 
-//void start_PWModulator_carrier(void); /* Uses EPWM1 */
 
 #endif /* USER_SYS_H_ */

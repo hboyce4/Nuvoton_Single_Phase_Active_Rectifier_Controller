@@ -26,46 +26,11 @@ struct UART2_DMA_Job_Buffer_{
 void init_buttons_LEDs(void){
 
 
-#ifdef TIMING_DEBUG
-	GPIO_SetMode(PH, 0xFF, GPIO_MODE_OUTPUT); // 8 first bits of the port as timing debug outputs
-#else
-	/* Configure PH.0, PH.1 and PH.2 as Output mode for LED blink on ETM-M487 board*/
-	GPIO_SetMode(PH, BIT0|BIT1|BIT2, GPIO_MODE_OUTPUT); // LED outputs
 	/* Configure PA.12, PA.13 PA.14 and PA.15 as Output mode for LED blink on M481 boards */
 	GPIO_SetMode(PA, BIT12|BIT13|BIT14|BIT15, GPIO_MODE_OUTPUT); // LED outputs
-#endif
 
-
-/* No more buttons
-    GPIO_SetMode(PG, BIT15, GPIO_MODE_INPUT); // Configure pin as input for Button 1
-    GPIO_SetMode(PF, BIT11, GPIO_MODE_INPUT); // Configure pin as input for Button 2
-*/
 }
 
-//Deprecated
-//void update_buttons_LEDs_state() {
-//
-//	/* Copy button SW2 state to LEDG */
-//	uint32_t button_state = PG15;// Acquire PG15 (Button 1) state in new var at bit 0
-//	button_state <<= 1; // Move PG15 state to bit 1
-//	button_state |= PF11; /*Button 2*/
-//	button_state <<= 1; //  Move BTN states to bit 1 and bit 2
-//	//PH->DOUT &= ~(/*BIT1 |*/ BIT2);
-//	//PH->DOUT |= (button_state & BIT2);
-//
-//
-//	static uint16_t heartbeat_counter = 0;
-//
-//	if(!heartbeat_counter){
-//		heartbeat_counter = HEARTBEAT_INTERVAL_MS;
-//#ifdef TIMING_DEBUG
-//		PH0 ^= 1; // Access single pin (Toggle red LED)
-//#endif
-        //PH->DOUT ^= BIT0|BIT1|BIT2; // Access digital output register (toggle 3 LEDs)
-//	}
-//	heartbeat_counter--;
-
-//}
 
 void delay_ms(uint32_t delay){ /*Generates a milliseconds delay. NOT ACCURATE. Use a hardware timer for accuracy*/
 
@@ -167,17 +132,4 @@ int8_t pop_UART2(UART_DMA_Xfer_t* p_Xfer){
 
 }
 
-//void start_PWModulator_carrier(void){ /* This uses EPWM1 */
-//	/* Begin to output the carrier waveform for the analog hardware PWModulator on PB.14 (pin 133 on the M487JIDAE) */
-//
-//	PB->SLEWCTL |= (GPIO_SLEWCTL_HIGH << 2*14); /*Set PB14 to "High" slew rate.*/
-//	/* For some reason "High" mode seems faster than "Fast" mode. Most likely it's just my probing setup (signal reflexions and such) */
-//
-//	EPWM_ConfigOutputChannel(EPWM1, 1, PWM_CARRIER_FREQ, 50); /* Set prescaler to 1, CNT to 480 */
-//
-//	EPWM1->POEN |= 0b10; /* Enable CH1 (set 1 at bit position 1)*/
-//
-//	EPWM1->CNTEN |= 0b10; /* Start the counter (set 1 at bit position 1)*/
-//
-//}
 

@@ -57,10 +57,6 @@ void init_ADC(void){
     //g_u32COVNUMFlag = 0;
     EADC_START_CONV(EADC, BIT7);
 
-#ifdef DEBUG_TIMINGS
-
-
-#endif
     //__WFI();
 
     /* Disable the sample module 7 interrupt */
@@ -168,47 +164,3 @@ void convert_to_int_write_analog(void){
 
 }
 
-
-//void init_ADC_DMA(void){
-//	   /* Configure PDMA peripheral mode form EADC to memory */
-//
-//			PDMA->CHCTL = (0b1 << EADC_DMA_CHANNEL);			/* The channel we want to use is enabled in the CHCTL register */
-//
-//		    PDMA->REQSEL0_3 = (PDMA->REQSEL0_3 & ~PDMA_REQSEL0_3_REQSRC2_Msk)|(PDMA_EADC0_RX << PDMA_REQSEL0_3_REQSRC2_Pos); /* connect channel to EADC0_TX. Channel 2 is used */
-//
-//		    PDMA->DSCT[EADC_DMA_CHANNEL].CTL = PDMA_REQ_SINGLE|PDMA_SAR_FIX|PDMA_WIDTH_16;	/* 0b1 for TX type = single transfer*/
-//														/* 0b11 for no increment of source address (fixed address)*/
-//
-//		    PDMA->DSCT[EADC_DMA_CHANNEL].CTL = 	(PDMA->DSCT[EADC_DMA_CHANNEL].CTL & ~(PDMA_DSCT_CTL_TXCNT_Msk|PDMA_DSCT_CTL_OPMODE_Msk))|((((EADC_OVERSAMPLING_NUMBER+1)*EADC_TOTAL_CHANNELS)-1) << PDMA_DSCT_CTL_TXCNT_Pos)|PDMA_OP_BASIC; /* OR the string length in the register and set the operating mode from idle to basic*/
-//
-//		    PDMA->DSCT[EADC_DMA_CHANNEL].DA = ((uint32_t)&ADC_raw_val_buff); 	/* Destination address is the storage struct */
-//
-//		    PDMA->DSCT[EADC_DMA_CHANNEL].SA = ((uint32_t)&(EADC->CURDAT)); 		/* The constant source address is the EADC CURDAT register */
-//
-//		    EADC->INTEN |= (UART_INTEN_TXPDMAEN_Msk /*| UART_INTEN_RDAIEN_Msk*/); 		/* Bit TXPDMAEN is set to one enable PDMA requests. RDAIEN is set to generate interrupt on character receive*/
-//		    /* The fist time the DMA is used, the UARTn->INTEN write must absolutely be done at the end */
-//
-//		    //delay_ms(10); /* Make sure the init string is transferred before anything else happens*/
-//
-//		    EADC_ENABLE_SAMPLE_MODULE_PDMA();
-//
-//		    PDMA_EnableInt(PDMA,EADC_DMA_CHANNEL, PDMA_INT_TRANS_DONE);
-//		    NVIC_EnableIRQ(PDMA_IRQn);
-//
-//		    NVIC_SetPriority(PDMA_IRQn, DMA_INTERRUPT_PRIORITY);
-//
-//
-//}
-
-//void start_ADC_acq(void){
-//
-//	/*Reload DMA*/
-//	PDMA->DSCT[EADC_DMA_CHANNEL].CTL = 	(PDMA->DSCT[EADC_DMA_CHANNEL].CTL & ~(PDMA_DSCT_CTL_TXCNT_Msk|PDMA_DSCT_CTL_OPMODE_Msk))|
-//			((((EADC_OVERSAMPLING_NUMBER+1)*EADC_TOTAL_CHANNELS)-1) << PDMA_DSCT_CTL_TXCNT_Pos)|PDMA_OP_BASIC; /* OR the string length in the register and set the operating mode from idle to basic*/
-//
-//	/*Enable ADINT0 by sample module 7 for self triggering in a loop*/
-//	EADC_ENABLE_SAMPLE_MODULE_INT(EADC, 0, BIT7);//Enable sample module 7 interrupt.
-//
-//	/*Trigger sample module 7 to */
-//
-//}

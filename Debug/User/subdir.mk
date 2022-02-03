@@ -7,6 +7,7 @@ C_SRCS += \
 ../User/PLL.c \
 ../User/UI.c \
 ../User/analog.c \
+../User/init.c \
 ../User/interrupt.c \
 ../User/inverter_control.c \
 ../User/main.c \
@@ -16,6 +17,7 @@ OBJS += \
 ./User/PLL.o \
 ./User/UI.o \
 ./User/analog.o \
+./User/init.o \
 ./User/interrupt.o \
 ./User/inverter_control.o \
 ./User/main.o \
@@ -25,6 +27,7 @@ C_DEPS += \
 ./User/PLL.d \
 ./User/UI.d \
 ./User/analog.d \
+./User/init.d \
 ./User/interrupt.d \
 ./User/inverter_control.d \
 ./User/main.d \
