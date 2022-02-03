@@ -83,7 +83,7 @@ void SYS_Init(void)
     //CLK_EnableModuleClock(TMR0_MODULE);
     //CLK_EnableModuleClock(EPWM0_MODULE);
     //CLK_EnableModuleClock(TMR1_MODULE);
-    CLK->APBCLK0 |= CLK_APBCLK0_TMR0CKEN_Msk; // UART0 Clock Enable
+    CLK->APBCLK0 |= CLK_APBCLK0_TMR0CKEN_Msk; // TMR0 Clock Enable
     CLK->APBCLK0 |= CLK_APBCLK0_UART0CKEN_Msk; // UART0 Clock Enable
     CLK->APBCLK0 |= CLK_APBCLK0_UART2CKEN_Msk; // UART2 Clock Enable
     CLK->APBCLK0 |= CLK_APBCLK0_EADCCKEN_Msk; /* EADC0 Clock Enable*/
@@ -107,8 +107,6 @@ void SYS_Init(void)
     CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL1_TMR0SEL_Msk) | CLK_CLKSEL1_TMR0SEL_HXT;
     /* Select UART0 clock source is HXT (0x0 for HXT) */
     CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL1_UART0SEL_Msk) | CLK_CLKSEL1_UART0SEL_HXT;
-    /* Select UART2 clock source is HXT (0x0 for HXT) */
-    CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL3_UART2SEL_Msk) | CLK_CLKSEL3_UART2SEL_HXT;
     /* Select TMR1 clock source as HXT (0x0 for HXT) */
     CLK->CLKSEL1 = (CLK->CLKSEL1 & ~CLK_CLKSEL1_TMR1SEL_Msk) | CLK_CLKSEL1_TMR1SEL_HXT;
 #ifdef PWM_DAC // If PWM DAC is used
@@ -118,6 +116,8 @@ void SYS_Init(void)
     CLK->CLKSEL2 = (CLK->CLKSEL2 & ~CLK_CLKSEL2_BPWM1SEL_Msk) | CLK_CLKSEL2_BPWM1SEL_PLL;
     //CLK_SetModuleClock(TMR1_MODULE, CLK_CLKSEL1_TMR1SEL_PCLK0, 0);
 
+    /* Select UART2 clock source is HXT (0x0 for HXT) */
+    CLK->CLKSEL3 = (CLK->CLKSEL3 & ~CLK_CLKSEL3_UART2SEL_Msk) | CLK_CLKSEL3_UART2SEL_HXT;
 
     /* EADC clock has only one source: PCLK1, so no need to select it.*/
     /* Set divider for EADC */
@@ -130,17 +130,17 @@ void SYS_Init(void)
     SystemCoreClockUpdate();
 
 
-    /* Set GPB multi-function pins for UART0 RXD and TXD */
-    SYS->GPB_MFPH &= ~(SYS_GPB_MFPH_PB12MFP_Msk | SYS_GPB_MFPH_PB13MFP_Msk);
-    SYS->GPB_MFPH |= (SYS_GPB_MFPH_PB12MFP_UART0_RXD | SYS_GPB_MFPH_PB13MFP_UART0_TXD);
+    /* Set GPA multi-function pins for UART0 RXD and TXD */
+    SYS->GPA_MFPL &= ~(SYS_GPA_MFPL_PA0MFP_Msk | SYS_GPA_MFPL_PA1MFP_Msk);
+    SYS->GPA_MFPL |= (SYS_GPA_MFPL_PA0MFP_UART0_RXD | SYS_GPA_MFPL_PA1MFP_UART0_TXD);
 
-    /* Set GPA multi-function pins for UART2 TXD and RXD on PC0(pin 32) and PC1(Pin 31) */
-     SYS->GPA_MFPL &= ~(SYS_GPC_MFPL_PC0MFP_Msk | SYS_GPC_MFPL_PC1MFP_Msk);
-     SYS->GPA_MFPL |= (SYS_GPC_MFPL_PC0MFP_UART2_RXD | SYS_GPC_MFPL_PC1MFP_UART2_TXD);//(0x8 << SYS_GPC_MFPL_PC0MFP_Pos) | (0x8 << SYS_GPC_MFPL_PC1MFP_Pos);
+    /* Set GPC multi-function pins for UART2 TXD and RXD on PC0(pin 32) and PC1(Pin 31) */
+     SYS->GPC_MFPL &= ~(SYS_GPC_MFPL_PC0MFP_Msk | SYS_GPC_MFPL_PC1MFP_Msk);
+     SYS->GPC_MFPL |= (SYS_GPC_MFPL_PC0MFP_UART2_RXD | SYS_GPC_MFPL_PC1MFP_UART2_TXD);//(0x8 << SYS_GPC_MFPL_PC0MFP_Pos) | (0x8 << SYS_GPC_MFPL_PC1MFP_Pos);
 
      /* Set PA.6 as output from BPWM1_CH3 for hardware PWModulator carrier*/
-     SYS->GPA_MFPH &= ~(SYS_GPA_MFPL_PA6MFP_Msk);
-     SYS->GPA_MFPH |= SYS_GPA_MFPL_PA6MFP_BPWM1_CH3;
+     SYS->GPA_MFPL &= ~(SYS_GPA_MFPL_PA6MFP_Msk);
+     SYS->GPA_MFPL |= SYS_GPA_MFPL_PA6MFP_BPWM1_CH3;
      PA->SLEWCTL |= (GPIO_SLEWCTL_HIGH << 2*6); /*Set PA15 to "High" slew rate.*/
      	/* For some reason "High" mode seems faster than "Fast" mode. Most likely it's just my probing setup (signal reflections and such) */
 
@@ -201,6 +201,8 @@ int main()
     UART_Open(UART2, 460800);
     init_UART2_DMA(); /*Needs SysTick*/
 
+    printf("Initializing...\n");
+
     init_buttons_LEDs();
 
     init_ADC();
@@ -211,9 +213,9 @@ int main()
 
     init_inverter_control();
 
-    /* Connect UART to PC, and open a terminal tool to receive following message */
-    printf("Hello World\n");
-    printf("\033[2J");
+    /* Connect UART0 on PA0 and PA1 to PC, and open a terminal tool to receive following message */
+    //printf("Hello World\n");
+    //printf("\033[2J");
 
 
     while(1){
@@ -226,15 +228,16 @@ int main()
         PH->DOUT &= ~(BIT4);//Timing measurements
 #endif
 
-        	PA->DOUT &= ~(BIT14);//Turn ON red LED
+        	PA->DOUT &= ~(BIT15);//Turn ON red LED
         	draw_UI(row_sel, col_sel);
-        	PA->DOUT |= BIT14;//Turn OFF red LED
+        	PA->DOUT |= BIT15;//Turn OFF red LED
 #ifdef TIMING_DEBUG
 		PH->DOUT |= BIT4;	//Timing measurements
 #endif
+
     	}
     	read_user_input(&row_sel,&col_sel);/* Since the chip has a 16 byte hardware FIFO, and we are only expecting
-    	 human input, we don't need interrupts nor DMA. Just run this routine every few milliseconds.*/
+    	human input, we don't need interrupts nor DMA. Just run this routine every few milliseconds.*/
     	/* UI end */
 
 
