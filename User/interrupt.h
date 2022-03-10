@@ -9,8 +9,8 @@
 #define INTERRUPT_H_
 
 #include "NuMicro.h"
-#include "user_sys.h"
 #include "analog.h"
+#include "UART_over_DMA.h"
 
 void PDMA_IRQHandler(void);
 void TMR1_IRQHandler(void);

@@ -68,8 +68,9 @@ User/main.o: ../User/main.c ../User/main.h \
  ../Library/StdDriver/inc/rtc.h ../Library/StdDriver/inc/usci_uart.h \
  ../Library/StdDriver/inc/sdh.h ../Library/StdDriver/inc/usbd.h \
  ../Library/StdDriver/inc/hsusbd.h ../Library/StdDriver/inc/otg.h \
- ../Library/StdDriver/inc/hsotg.h ../User/init.h ../User/user_sys.h \
- ../User/inverter_control.h ../User/analog.h ../User/PLL.h ../User/UI.h
+ ../Library/StdDriver/inc/hsotg.h ../User/init.h ../User/constants.h \
+ ../User/inverter_control.h ../User/analog.h ../User/PLL.h \
+ ../User/UART_over_DMA.h ../User/UI.h
 
 ../User/main.h:
 
@@ -255,12 +256,14 @@ User/main.o: ../User/main.c ../User/main.h \
 
 ../User/init.h:
 
-../User/user_sys.h:
+../User/constants.h:
 
 ../User/inverter_control.h:
 
 ../User/analog.h:
 
 ../User/PLL.h:
+
+../User/UART_over_DMA.h:
 
 ../User/UI.h:

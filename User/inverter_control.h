@@ -15,30 +15,33 @@
 #include "stdbool.h"
 #include "NuMicro.h"
 #include "main.h"
-#include "user_sys.h"
+#include "constants.h"
 #include "analog.h"
+#include "UART_over_DMA.h"
 
 /*---------------------------------------------------------------------------------------------------------*/
-/* Macros           				                                                                       */
+/* Local Macros           				                                                                       */
 /*---------------------------------------------------------------------------------------------------------*/
 
-#define PWM_CARRIER_FREQ 400000
 
-#define VBUS_TOTAL_DEFAULT 48 /* [V] Default total bus voltage setpoint*/
+// VBUS_TOTAL Filter
 #define VBUS_TOTAL_LPF_TAU 0.007958 /* [1/s] 20 Hz (1/(2*pi*20)) */
 #define VBUS_TOTAL_KP 5 /* Proportional gain of the V_DC_total controller */
 
-
-#define VBUS_DIFF_DEFAULT 0 /* [V] Default voltage difference setpoint between the two half-busses*/
+// VBUS_DIFF Filter
 #define VBUS_DIFF_LPF_TAU 0.026526 /* [1/s] 6 Hz (1/(2*pi*6)) */
 #define VBUS_DIFF_KP 1 /* Proportional gain of the V_DC_diff controller */
 
+// Maximum currents
 #define I_D_MAX 33 /* [A] Maximum allowable peak AC current */
 #define I_BALANCE_MAX 3 /* [A] Maximum allowable balancing (DC) current */
 
+
+// Tolerances for synchronization
 #define I_SYNC_TOL 				5 	/* [A] Tolerance within which the signal is considered in sync */
 #define I_SYNC_COUNT_FOR_SET	200	/* [counts] Number of times the signal must be found within tolerance to be considered in sync */
 #define I_SYNC_COUNT_FOR_RESET	5	/* [counts] Number of times the signal must be found OUT of tolerance to be considered out of sync */
+
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Type definitions           				                                                               */
@@ -128,7 +131,7 @@ extern inverter_state_setpoints_t inverter_setpoints;
 /* Functions declaration                                                                            	   */
 /*---------------------------------------------------------------------------------------------------------*/
 
-void init_inverter_control(void);
+
 void inverter_control_main(void);
 void inverter_safety_fast(void);
 void inverter_calc_I_D(void);

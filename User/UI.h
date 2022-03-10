@@ -15,13 +15,13 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "user_sys.h"
 #include "PLL.h"
 #include "inverter_control.h"
+#include "UART_over_DMA.h"
 
 
 /*---------------------------------------------------------------------------------------------------------*/
-/* Macros           				                                                                      */
+/* Local Macros           				                                                                      */
 /*---------------------------------------------------------------------------------------------------------*/
 
 #define UI_FRAME_INTERVAL_MS	200	/* interval between UI refreshes */
@@ -63,6 +63,8 @@ void draw_UI_line_6(uint8_t*);
 void draw_UI_line_7(uint8_t*);
 void draw_UI_line_8(uint8_t*);
 void draw_UI_line_9(uint8_t*);
+void draw_UI_line_10(uint8_t*);
+void draw_UI_line_11(uint8_t*);
 
 void draw_UI_line_separator(uint8_t*);
 

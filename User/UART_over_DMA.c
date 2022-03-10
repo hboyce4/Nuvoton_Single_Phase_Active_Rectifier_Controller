@@ -1,11 +1,11 @@
 /*
- * user_sys.c
+ * UART_over_DMA.c
  *
  *  Created on: Jan 5, 2021
  *      Author: Hugo Boyce
  */
 
-#include "user_sys.h"
+#include "UART_over_DMA.h"
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
@@ -23,23 +23,10 @@ struct UART2_DMA_Job_Buffer_{
 /* Function definitions                                                                                       */
 /*---------------------------------------------------------------------------------------------------------*/
 
-void init_buttons_LEDs(void){
 
 
-	/* Configure PA.12, PA.13 PA.14 and PA.15 as Output mode for LED blink on M481 boards */
-	GPIO_SetMode(PA, BIT12|BIT13|BIT14|BIT15, GPIO_MODE_OUTPUT); // LED outputs
-
-}
 
 
-void delay_ms(uint32_t delay){ /*Generates a milliseconds delay. NOT ACCURATE. Use a hardware timer for accuracy*/
-
-	uint64_t end_time = g_SysTickIntCnt + ((uint64_t)delay);
-
-	while(g_SysTickIntCnt <= end_time){ /* As long as the end time is not reached*/
-		/* Do nothing*/
-	}
-}
 
 void init_UART2_DMA(void){
 

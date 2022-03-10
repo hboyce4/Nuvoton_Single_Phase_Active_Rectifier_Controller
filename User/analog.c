@@ -21,78 +21,6 @@ volatile uint8_t ADC_acq_count;
 /*---------------------------------------------------------------------------------------------------------*/
 
 
-void init_ADC(void){
-
-
-    /* Set input mode as single-end and enable the A/D converter */
-    EADC_Open(EADC, EADC_CTL_DIFFEN_SINGLE_END);
-
-    /* Configure the sample 4 module for analog input channel 0 and enable ADINT0 trigger source */
-    EADC_ConfigSampleModule(EADC, 0, EADC_ADINT0_TRIGGER, 0);
-    /* Configure the sample 5 module for analog input channel 1 and enable ADINT0 trigger source */
-    EADC_ConfigSampleModule(EADC, 1, EADC_ADINT0_TRIGGER, 1);
-    /* Configure the sample 6 module for analog input channel 2 and enable ADINT0 trigger source */
-    EADC_ConfigSampleModule(EADC, 2, EADC_ADINT0_TRIGGER, 2);
-    /* Configure the sample 7 module for analog input channel 3 and enable ADINT0 trigger source */
-    EADC_ConfigSampleModule(EADC, 3, EADC_ADINT0_TRIGGER, 3);
-    /* Configure the sample 4 module for analog input channel 0 and enable ADINT0 trigger source */
-    EADC_ConfigSampleModule(EADC, 4, EADC_ADINT0_TRIGGER, 4);
-    /* Configure the sample 5 module for analog input channel 1 and enable ADINT0 trigger source */
-    EADC_ConfigSampleModule(EADC, 5, EADC_ADINT0_TRIGGER, 5);
-    /* Configure the sample 6 module for analog input channel 2 and enable ADINT0 trigger source */
-    EADC_ConfigSampleModule(EADC, 6, EADC_ADINT0_TRIGGER, 6);
-    /* Configure the sample 7 module for analog input channel 3 and enable ADINT0 trigger source */
-    EADC_ConfigSampleModule(EADC, 7, EADC_ADINT0_TRIGGER, 7);
-
-    /* Clear the A/D ADINT0 interrupt flag for safety */
-    EADC_CLR_INT_FLAG(EADC, EADC_STATUS2_ADIF0_Msk);
-
-    /* Enable the sample module 7 interrupt */
-    EADC_ENABLE_INT(EADC, BIT0);//Enable sample module  A/D ADINT0 interrupt.
-    EADC_ENABLE_SAMPLE_MODULE_INT(EADC, 0, BIT7);//Enable sample module 7 interrupt.
-    NVIC_SetPriority(EADC00_IRQn, ADC_INT_PRIORITY);
-
-    /* Reset the ADC indicator and trigger sample module 7 to start A/D conversion */
-    //g_u32AdcIntFlag = 0;
-    //g_u32COVNUMFlag = 0;
-    EADC_START_CONV(EADC, BIT7);
-
-    //__WFI();
-
-    /* Disable the sample module 7 interrupt */
-    //EADC_DISABLE_SAMPLE_MODULE_INT(EADC, 0, BIT7);
-}
-
-void init_DAC(void){
-
-	/* Set the software trigger DAC and enable D/A converter */
-	//DAC_Open(DAC0, 0, DAC_SOFTWARE_TRIGGER);
-	DAC_Open(DAC1, 0, DAC_SOFTWARE_TRIGGER);
-
-	//DAC0->CTL |= BIT8; /* Set Bit 8 of the control register to disable the output buffer*/
-	//DAC1->CTL |= BIT8; /* Set Bit 8 of the control register to disable the output buffer*/
-
-	/* Enable DAC to work in group mode, once group mode enabled, DAC1 is configured by DAC0 registers */
-	//DAC_ENABLE_GROUP_MODE(DAC0);
-
-    /* The DAC conversion settling time is 1us */
-    //DAC_SetDelayTime(DAC0, 1);
-    DAC_SetDelayTime(DAC1, 6);
-
-    /* Set DAC 12-bit holding data */
-    DAC_WRITE_DATA(DAC1, 0, 0x400);
-
-    /* Clear the DAC conversion complete finish flag for safe */
-    DAC_CLR_INT_FLAG(DAC1, 0);
-
-    /* Enable the DAC interrupt */
-    DAC_ENABLE_INT(DAC1, 0);
-    NVIC_EnableIRQ(DAC_IRQn);
-
-    /* Start A/D conversion */
-    DAC_START_CONV(DAC1);
-}
-
 void run_ADC_cal(void){
 
 	EADC->CALCTL |= EADC_CALCTL_CALSTART_Msk|EADC_CALCTL_CALSEL_Msk;/* Set CALSTART to start calibration. Set CALSEL so it doesn't try to load user calibration word*/
@@ -120,12 +48,13 @@ void process_ADC(void){
 }
 
 
+
 void convert_to_float(void){
 
 	/* Vbus plus */
-	inverter.V_DC_plus = ((float)ADC_raw_val[VBUS_PLUS_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*VBUS_GAIN));
+	inverter.V_DC_plus = ((float)ADC_raw_val[VBUS_PLUS_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*VBUS_PLUS_GAIN))-VBUS_PLUS_OFFSET;
 	/* Vbus minus */
-	inverter.V_DC_minus = -((float)ADC_raw_val[VBUS_MINUS_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*VBUS_GAIN));
+	inverter.V_DC_minus = -(((float)ADC_raw_val[VBUS_MINUS_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*VBUS_MINUS_GAIN)))-VBUS_MINUS_OFFSET;
 	/* Vbus total */
 	inverter.V_DC_total = inverter.V_DC_plus - inverter.V_DC_minus;
 	/* Vbus diff */

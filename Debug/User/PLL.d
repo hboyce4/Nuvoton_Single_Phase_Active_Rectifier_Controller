@@ -68,8 +68,8 @@ User/PLL.o: ../User/PLL.c ../User/PLL.h ../User/inverter_control.h \
  ../Library/StdDriver/inc/rtc.h ../Library/StdDriver/inc/usci_uart.h \
  ../Library/StdDriver/inc/sdh.h ../Library/StdDriver/inc/usbd.h \
  ../Library/StdDriver/inc/hsusbd.h ../Library/StdDriver/inc/otg.h \
- ../Library/StdDriver/inc/hsotg.h ../User/main.h ../User/user_sys.h \
- ../User/analog.h
+ ../Library/StdDriver/inc/hsotg.h ../User/main.h ../User/constants.h \
+ ../User/analog.h ../User/UART_over_DMA.h
 
 ../User/PLL.h:
 
@@ -257,6 +257,8 @@ User/PLL.o: ../User/PLL.c ../User/PLL.h ../User/inverter_control.h \
 
 ../User/main.h:
 
-../User/user_sys.h:
+../User/constants.h:
 
 ../User/analog.h:
+
+../User/UART_over_DMA.h:

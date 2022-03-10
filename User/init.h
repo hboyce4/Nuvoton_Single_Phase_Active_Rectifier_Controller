@@ -14,6 +14,7 @@
 
 #include "NuMicro.h"
 #include "main.h"
+#include "constants.h"
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Macros           				                                                                      */
@@ -32,6 +33,11 @@
 /* Functions declaration                                                                              		*/
 /*---------------------------------------------------------------------------------------------------------*/
 
-void Sys_Init(void);
+void SYS_Init(void);
+void init_buttons_LEDs(void);
+void init_ADC(void);
+void init_DAC(void);
+void init_inverter_control(void);
+
 
 #endif /* INIT_H_ */

@@ -17,6 +17,7 @@
 
 // XTAL:
 // !!! Don't forget to update the __HXT macro with the correct External Crystal Clock Frequency !!!
+#define __HXT       (12000000UL)    /*!< External Crystal Clock Frequency     */
 
 #define PLL_CLOCK           192000000
 
@@ -44,7 +45,7 @@ extern volatile uint64_t g_SysTickIntCnt;
 /*---------------------------------------------------------------------------------------------------------*/
 /* Functions declaration                                                                            	   */
 /*---------------------------------------------------------------------------------------------------------*/
-
+void delay_ms(uint32_t time); /*Generates a milliseconds delay. NOT ACCURATE. Use a hardware timer for accuracy*/
 
 
 

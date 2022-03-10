@@ -33,6 +33,8 @@ void draw_UI(int8_t row_sel, int8_t col_sel){/* 60-ish characters width*/
 	draw_UI_line_7(&p_line_counter);
 	draw_UI_line_8(&p_line_counter);
 	draw_UI_line_9(&p_line_counter);
+	draw_UI_line_10(&p_line_counter);
+	draw_UI_line_11(&p_line_counter);
 
 	draw_UI_line_separator(&p_line_counter);
 	/* Menu input*/
@@ -338,6 +340,27 @@ void draw_UI_line_9(uint8_t* p_line_counter) {
 
 	push_UART2((char*) line_9_str);
 }
+
+void draw_UI_line_10(uint8_t* p_line_counter) {
+
+	static char line_10_str[LINE_WIDTH];
+
+	sprintf(line_10_str,"Inst. v AC: %2.2f V\n\r",inverter.v_AC);
+	(*p_line_counter)++;
+
+	push_UART2((char*) line_10_str);
+}
+
+void draw_UI_line_11(uint8_t* p_line_counter) {
+
+	static char line_11_str[LINE_WIDTH];
+
+	sprintf(line_11_str,"Inst. i AC (PV): %2.2f V\n\r",inverter.i_PV);
+	(*p_line_counter)++;
+
+	push_UART2((char*) line_11_str);
+}
+
 
 void draw_UI_line_separator(uint8_t* p_line_counter) {
 

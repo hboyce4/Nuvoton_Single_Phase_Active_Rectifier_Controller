@@ -17,11 +17,11 @@
 #include "NuMicro.h"
 
 #include "init.h"
-#include "user_sys.h"
 #include "inverter_control.h"
 #include "PLL.h"
 #include "UI.h"
 #include "analog.h"
+#include "UART_over_DMA.h"
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
@@ -107,6 +107,15 @@ int main()
     }
 
 
+}
+
+void delay_ms(uint32_t delay){ /*Generates a milliseconds delay. NOT ACCURATE. Use a hardware timer for accuracy*/
+
+	uint64_t end_time = g_SysTickIntCnt + ((uint64_t)delay);
+
+	while(g_SysTickIntCnt <= end_time){ /* As long as the end time is not reached*/
+		/* Do nothing*/
+	}
 }
 
 /*** (C) COPYRIGHT 2021 Hugo Boyce ***/

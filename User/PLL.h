@@ -29,6 +29,7 @@
 #define PLL_KI				2500						// Gain intégral du compensateur PI
 #define	PLL_KP				50							// Gain proportionnel du compensateur PI
 
+// Tolerance for synchronisation
 #define PLL_SYNC_TOL 				0.25 /* [units] Tolerance within which the signal is considered in sync */
 #define PLL_SYNC_COUNT_FOR_SET		600	/* [counts] Number of times the signal must be found within tolerance to be considered in sync */
 #define PLL_SYNC_COUNT_FOR_RESET	10	/* [counts] Number of times the signal must be found OUT of tolerance to be considered out of sync */
