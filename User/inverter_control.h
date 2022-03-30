@@ -46,7 +46,9 @@
 /*---------------------------------------------------------------------------------------------------------*/
 /* Type definitions           				                                                               */
 /*---------------------------------------------------------------------------------------------------------*/
-typedef enum {OPEN = 0, CLOSED = 1, PRECHARGE = 2} contactor_state_t;
+//typedef enum {OPEN = 0, CLOSED = 1, PRECHARGE = 2} contactor_state_t;
+
+typedef enum {OFF = 0, PRECHARGE = 1, WAIT_FOR_CLOSE = 2, DWELL = 3, RELAY_ON = 4} operating_state_t;
 
 typedef struct {
 
@@ -57,9 +59,10 @@ typedef struct {
 	volatile bool UV_V_DC_plus;
 	volatile bool UV_V_DC_minus;
 	volatile bool OV_V_DC_diff;
-	volatile contactor_state_t DC_contactor_state;
-	volatile contactor_state_t AC_contactor_state;
+	//volatile contactor_state_t DC_contactor_state;
+	//volatile contactor_state_t AC_contactor_state;
 	volatile bool i_sync;
+	volatile operating_state_t operating_state;
 
 	/* Slow refresh*/
 	volatile bool HT_Transformer;

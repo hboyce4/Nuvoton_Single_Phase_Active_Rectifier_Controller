@@ -13,7 +13,8 @@
 
 inverter_state_variables_t inverter = {.I_D = 0};
 inverter_state_safety_t inverter_safety;
-inverter_state_setpoints_t inverter_setpoints = {.V_DC_total_setpoint = VBUS_TOTAL_DEFAULT,
+inverter_state_setpoints_t inverter_setpoints = {.inverter_active = 0,
+												 .V_DC_total_setpoint = VBUS_TOTAL_DEFAULT,
 												 .V_DC_diff_setpoint = VBUS_DIFF_DEFAULT};
 //inverter_limits_t inverter_limits;
 
@@ -56,6 +57,54 @@ void inverter_control_main(void){
 }
 
 void inverter_safety_fast(void){
+
+
+	if(!PLL.sync){ // If no PLL sync
+		inverter_safety.operating_state = OFF; // switch to the OFF state immediately
+	}
+
+	switch (inverter_safety.operating_state){
+
+	case OFF:
+
+		/*****Set all relays off here*******/
+
+		if(PLL.sync && inverter_setpoints.inverter_active){ // If we have PLL sync and the inverter is set to ON
+			inverter_safety.operating_state = PRECHARGE; // Go into precharge mode
+		}
+		break;
+
+
+	case PRECHARGE:
+
+
+		/**** Turn on AC precharge relay here****/
+
+		if(/* Bus voltages hig enough, phase angle is good*/){
+			inverter_safety.operating_state = WAIT_FOR_CLOSE; // go to the WAIT_FOR_CLOSE state
+		}
+
+		break;
+
+
+	case WAIT_FOR_CLOSE:
+
+		/**** Turn on both AC relays here****/
+
+		;
+		break;
+
+	case DWELL:
+		;
+		break;
+
+	case RELAY_ON:
+		;
+		break;
+
+	}
+
+
 
 }
 
