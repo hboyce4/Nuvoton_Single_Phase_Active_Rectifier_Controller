@@ -21,8 +21,7 @@
 /*---------------------------------------------------------------------------------------------------------*/
 
 #define NETWORK_FREQ		60							// [Hz] Fréquence nominale du réseau électrique
-//#define F_CALC				14400						// [HZ] Fréquence de traitement du signal. doit être un multiple entier de 4 * NETWORK_FREQ pour que DELAY_ARRAY_SIZE soit un entier.
-//#define T_CALC				(1.0/F_CALC)				// [s] Période de calcul du traitement de signal. Inverse de F_CALC
+
 #define DELAY_ARRAY_SIZE 	(F_CALC/(4*NETWORK_FREQ))	// Taille du tableau pour créer un délai de signal équivalent à pi/4 [rad] à la fréquence de NETWORK_FREQ
 #define SIN_TABLE_SIZE		200							// Taille de la LUT de la fct. sinus (max. 254)
 #define MAX_FREQ_DEVIATION	6							// [Hz] Déviation maximale à partir de la fréquence nominale permise pour le verouillage

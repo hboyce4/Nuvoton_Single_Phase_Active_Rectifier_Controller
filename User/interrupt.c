@@ -53,25 +53,24 @@ void PDMA_IRQHandler(void){
 
 }
 
-void TMR1_IRQHandler(void){
+void TMR1_IRQHandler(void){ /*High frequency interrupt (F_CALC). Keep light!!! */
 
     if(TIMER_GetIntFlag(TIMER1) == 1)
     {
         /* Clear Timer1 time-out interrupt flag, or else interrupt is executed forever */
         TIMER_ClearIntFlag(TIMER1);
 
-
         /* Begin control loop iteration */
 
-        PA->DOUT &= ~(BIT12);//Turn ON green LED
+        PA->DOUT &= ~(BIT12);//Turn ON green LED for timing measurements
 
-		process_ADC();
-        convert_to_float();
-		PLL_main();
-		inverter_control_main();
-		convert_to_int_write_analog();
+		process_ADC(); // Service ADC routine
+        convert_to_float(); // Service analog input values (convert ints from ADC to float for maths
+		PLL_main(); // Service the PLL. Needs up-to-date analog input values.
+		inverter_control_main(); // Service the inverter. Needs up-to-date PLL and analog input values.
+		convert_to_int_write_analog(); // Convert the calculated output values to int and output them
 
-		PA->DOUT |= BIT12;//Turn OFF green LED
+		PA->DOUT |= BIT12;//Turn OFF green LED for timing measurements
     }
 
 

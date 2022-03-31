@@ -38,7 +38,7 @@ void init_sin_table(float* sin_table, uint8_t table_size){
 
 }
 
-void PLL_main(void){
+void PLL_main(void){ // Service the PLL. Needs up-to-date analog input values.
 
 /*********************Input waveforms calculation begin**********************************/
 	float a_alpha = inverter.v_AC_n;

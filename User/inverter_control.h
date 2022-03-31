@@ -42,26 +42,44 @@
 #define I_SYNC_COUNT_FOR_SET	200	/* [counts] Number of times the signal must be found within tolerance to be considered in sync */
 #define I_SYNC_COUNT_FOR_RESET	5	/* [counts] Number of times the signal must be found OUT of tolerance to be considered out of sync */
 
+// Operational limits
+#define OV_LIMIT 30 /* [V] Voltage limit for overvoltage on either VBUS */
+#define UV_LIMIT 15 /* [V] Undervoltage limit 1 on either VBUS. Below this, inverter must stop */
+#define UV2_LIMIT 8 /* [V] Undervoltage limit 2 on either VBUS. Below this, precharge is necessary */
+#define DIFF_LIMIT 3 /* [V] Maximum voltage imbalance between VBUSes */
+
+// Limits for startup on AC
+// The AC relay takes 10ms to close. Therefore it should be turned on a bit more than 10ms before the next zero-crossing
+// We define a window of phase angle where it is appropriate to close the AC relay
+// The ideal trigger point is defined as ((1/60Hz)-10ms / (1/60Hz))*2*pi =  2.51327 rad
+#define THETA_MIN_RELAY_CLOSE 2.1363 //[rad] Is equal to ((1/60Hz) - 11ms / (1/60Hz)) * 2 * pi
+#define THETA_MAX_RELAY_CLOSE 2.5133 //[rad] Is equal to ((1/60Hz) - 10ms / (1/60Hz)) * 2 * pi
+#define SLIGHTLY_LESS_THAN_2_PI 6 // Slightly less than 2*pi=6.28. Determines when the end of a cycle has been reached, and the approximate theta of a zero crossing
+#define THETA_MIN_GARANTEED_CLOSE 0.5 // [rad] theta in the cycle following the activation of the relay where we're sure the relay has finished closing
+#define PRECHARGE_TIMEOUT 60000 // [T_CALC] Number of time steps after which the PRECHARGE step times out. steps = seconds*F_CALC
+#define CHARGE_TIMEOUT 400 // [T_CALC] Number of time steps after which the CHARGE step times out. steps = seconds*F_CALC
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Type definitions           				                                                               */
 /*---------------------------------------------------------------------------------------------------------*/
 //typedef enum {OPEN = 0, CLOSED = 1, PRECHARGE = 2} contactor_state_t;
 
-typedef enum {OFF = 0, PRECHARGE = 1, WAIT_FOR_CLOSE = 2, DWELL = 3, RELAY_ON = 4} operating_state_t;
+typedef enum {OFF = 0, PRECHARGE = 1, WAIT_FOR_CLOSE = 2, DWELL = 3, CHARGE = 4, AC_ON = 5} operating_state_t;
 
-typedef struct {
+typedef struct { /* Safety and operational statuses and conditions */
 
 	/* Fast refresh */
+	volatile bool i_sync;
 	volatile bool OV_v_AC;
 	volatile bool OV_V_DC_plus;
 	volatile bool OV_V_DC_minus;
 	volatile bool UV_V_DC_plus;
 	volatile bool UV_V_DC_minus;
+	volatile bool UV2_V_DC_plus;
+	volatile bool UV2_V_DC_minus;
 	volatile bool OV_V_DC_diff;
 	//volatile contactor_state_t DC_contactor_state;
 	//volatile contactor_state_t AC_contactor_state;
-	volatile bool i_sync;
 	volatile operating_state_t operating_state;
 
 	/* Slow refresh*/
@@ -72,7 +90,7 @@ typedef struct {
 
 } inverter_state_safety_t;
 
-typedef struct inverter_state_variables{
+typedef struct inverter_state_variables{ /* Process values or state variables */
 
 	/* "Constant" (slow varying) values for control */
 	volatile float V_DC_plus;
@@ -99,9 +117,9 @@ typedef struct inverter_state_variables{
 
 } inverter_state_variables_t;
 
-float some_float_state_variable;
+float some_float_state_variable; // caca
 
-typedef struct {
+typedef struct { /* Uset selectable setpoints and modes */
 
 	//volatile float I_Q;
 	volatile bool inverter_active;
@@ -111,23 +129,30 @@ typedef struct {
 
 } inverter_state_setpoints_t;
 
-/*
-typedef struct {
 
-	//volatile float I_Q;
-	volatile float some_limit;
+typedef struct { /* Memorizes fault conditions, limits exceeded, etc */
 
-} inverter_limits_t;
-*/
+	volatile bool i_sync_fault;
+	volatile bool OV_v_AC_fault;
+	volatile bool OV_V_DC_plus_fault;
+	volatile bool OV_V_DC_minus_fault;
+	volatile bool UV_V_DC_plus_fault;
+	volatile bool UV_V_DC_minus_fault;
+	volatile bool UV2_V_DC_plus_fault;
+	volatile bool UV2_V_DC_minus_fault;
+	volatile bool OV_V_DC_diff_fault;
+
+} inverter_errors_t;
+
 
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* External global variables                                                                               */
 /*---------------------------------------------------------------------------------------------------------*/
-extern inverter_state_variables_t inverter;
-extern inverter_state_safety_t inverter_safety;
-extern inverter_state_setpoints_t inverter_setpoints;
-//extern inverter_limits_t inverter_limits;
+extern inverter_state_variables_t inverter; /* Process values or state variables */
+extern inverter_state_safety_t inverter_safety; /* Safety and operational statuses */
+extern inverter_state_setpoints_t inverter_setpoints; /* Uset selectable setpoints and modes */
+extern inverter_errors_t inverter_faults; /* Memorizes fault conditions, broken limits, etc */
 
 
 /*---------------------------------------------------------------------------------------------------------*/
@@ -136,9 +161,13 @@ extern inverter_state_setpoints_t inverter_setpoints;
 
 
 void inverter_control_main(void);
-void inverter_safety_fast(void);
+
 void inverter_calc_I_D(void);
 void inverter_calc_I_balance(void);
+void inverter_check_safety_operational_status(void);
 void inverter_check_i_sync(void);
+void inverter_check_limits(void);
+void inverter_calc_state(void);
+
 
 #endif /* INVERTER_CONTROL_H_ */

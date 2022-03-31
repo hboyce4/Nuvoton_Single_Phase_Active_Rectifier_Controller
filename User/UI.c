@@ -315,7 +315,7 @@ void draw_UI_line_8(uint8_t* p_line_counter) {
 		strcat(line_8_str, "\x1B[92mYES"); /* Green YES*/
 		strcat(line_8_str, COLOUR_DEFAULT);
 	} else {
-		strcat(line_8_str, "\x1B[91mNO"); /* Red NO*/
+		strcat(line_8_str, "\x1B[93mNO"); /* Yellow NO*/
 		strcat(line_8_str, COLOUR_DEFAULT);
 	}
 	strcat(line_8_str, "\t\ti sync: ");
