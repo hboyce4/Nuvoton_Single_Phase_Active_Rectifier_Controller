@@ -139,11 +139,16 @@ void SYS_Init(void)
 }
 
 
-void init_buttons_LEDs(void){
+void init_general_IO(void){
 
-
+	// LEDs
 	/* Configure PA.12, PA.13 PA.14 and PA.15 as Output mode for LED blink on M481 boards */
 	GPIO_SetMode(PA, BIT12|BIT13|BIT14|BIT15, GPIO_MODE_OUTPUT); // LED outputs
+
+	// Relay and precharge optos
+	GPIO_SetMode(PC, BIT2|BIT3|BIT4|BIT5, GPIO_MODE_OUTPUT); // Optocouplers outputs
+	// Since they're active-low, we initialize them high
+	PC->DOUT |= (BIT2|BIT3|BIT4|BIT5); //set opto outputs high/inactive
 
 }
 

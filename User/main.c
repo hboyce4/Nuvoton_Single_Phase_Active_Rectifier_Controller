@@ -73,7 +73,7 @@ int main()
     printf("UART0 Debug Port.\n");/* Connect UART0 on PA0 and PA1 to PC, and open a terminal tool to access debug info*/
     printf("Initializing...\n");
 
-    init_buttons_LEDs();
+    init_general_IO();
 
     init_ADC();
 #ifndef PWM_DAC

@@ -281,25 +281,35 @@ void draw_UI_line_6(uint8_t* p_line_counter) {
 
 void draw_UI_line_7(uint8_t* p_line_counter) {
 
+	contactor_state_t AC_contactor_state;
+	contactor_state_t DC_contactor_state;
+	get_contactor_states(&AC_contactor_state, &DC_contactor_state);
+
 	static char line_7_str[LINE_WIDTH];
 	sprintf(line_7_str, "AC Contactor:");
-	if (inverter_safety.AC_contactor_state == CLOSED) {
+	if (AC_contactor_state == CONTACTOR_CLOSED) {
 		strcat(line_7_str, " Closed");
-	} else if (inverter_safety.AC_contactor_state == PRECHARGE) {
+	} else if (AC_contactor_state == CONTACTOR_PRECHARGE) {
 		strcat(line_7_str, "\x1B[93mPrecharge"); /*Yellow Precharge*/
 		strcat(line_7_str, COLOUR_DEFAULT);
-	} else if (inverter_safety.AC_contactor_state == OPEN) {
+	} else if (AC_contactor_state == CONTACTOR_OPEN) {
 		strcat(line_7_str, " Open");
+	} else if (AC_contactor_state == CONTACTOR_DWELL) {
+			strcat(line_7_str, "\x1B[93mDwell"); /*Yellow Dwell*/
+			strcat(line_7_str, COLOUR_DEFAULT);
 	}
 
 	strcat(line_7_str, "\tDC Contactor:");
-	if (inverter_safety.DC_contactor_state == CLOSED) {
+	if (DC_contactor_state == CONTACTOR_CLOSED) {
 		strcat(line_7_str, " Closed");
-	} else if (inverter_safety.DC_contactor_state == PRECHARGE) {
+	} else if (DC_contactor_state == CONTACTOR_PRECHARGE) {
 		strcat(line_7_str, "\x1B[93mPrecharge"); /*Yellow Precharge*/
 		strcat(line_7_str, COLOUR_DEFAULT);
-	} else if (inverter_safety.DC_contactor_state == OPEN) {
+	} else if (DC_contactor_state == CONTACTOR_OPEN) {
 		strcat(line_7_str, " Open");
+	} else if (DC_contactor_state == CONTACTOR_DWELL) {
+			strcat(line_7_str, "\x1B[93mDwell"); /*Yellow Dwell*/
+			strcat(line_7_str, COLOUR_DEFAULT);
 	}
 
 	strcat(line_7_str, "\n\r");
@@ -434,4 +444,15 @@ void draw_UI_line_B(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
 	push_UART2((char*) line_B_str);
 
 }
+
+void get_contactor_states(contactor_state_t* AC_contactor_state, contactor_state_t*DC_contactor_state){
+
+	*AC_contactor_state = ((PC->PIN)&(BIT2|BIT4))>>2; // Pins for AC contactor are at PC2 and PC4. PC2 is precharge, and PC4 is the relay. Signals are active low.
+
+	*DC_contactor_state = ((PC->PIN)&(BIT3|BIT5))>>3; // Pins for DC contactor are at PC3 and PC5. PC3 is precharge, and PC5 is the relay. Signals are active low.
+
+	// This gives states corresponding to those defined in the contactor_state_t enum.
+
+}
+
 

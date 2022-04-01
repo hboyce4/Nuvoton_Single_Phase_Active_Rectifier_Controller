@@ -34,7 +34,7 @@
 /*---------------------------------------------------------------------------------------------------------*/
 
 void SYS_Init(void);
-void init_buttons_LEDs(void);
+void init_general_IO(void);
 void init_ADC(void);
 void init_DAC(void);
 void init_inverter_control(void);

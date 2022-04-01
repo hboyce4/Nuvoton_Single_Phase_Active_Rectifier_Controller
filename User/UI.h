@@ -40,7 +40,7 @@
 /*---------------------------------------------------------------------------------------------------------*/
 /* Type definitions           				                                                               */
 /*---------------------------------------------------------------------------------------------------------*/
-
+typedef enum {CONTACTOR_DWELL = 0, CONTACTOR_CLOSED = 1, CONTACTOR_PRECHARGE = 4, CONTACTOR_OPEN = 5} contactor_state_t;
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables to be made available externally                                                        */
@@ -74,5 +74,7 @@ void draw_UI_line_B(uint8_t* , int8_t, int8_t);
 void read_user_input(int8_t*, int8_t*);
 void increment_UI_value(int8_t, int8_t);
 void decrement_UI_value(int8_t, int8_t);
+
+void get_contactor_states(contactor_state_t*, contactor_state_t*);
 
 #endif /* UI_H_ */
