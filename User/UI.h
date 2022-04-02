@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "PLL.h"
+#include "analog.h"
 #include "inverter_control.h"
 #include "UART_over_DMA.h"
 
@@ -76,5 +77,9 @@ void increment_UI_value(int8_t, int8_t);
 void decrement_UI_value(int8_t, int8_t);
 
 void get_contactor_states(contactor_state_t*, contactor_state_t*);
+
+void UI_serialize_code(uint32_t*, bool);
+uint32_t UI_get_faults_code(void);
+void draw_UI_debug(uint8_t*);
 
 #endif /* UI_H_ */

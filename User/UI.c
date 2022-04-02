@@ -33,13 +33,17 @@ void draw_UI(int8_t row_sel, int8_t col_sel){/* 60-ish characters width*/
 	draw_UI_line_7(&p_line_counter);
 	draw_UI_line_8(&p_line_counter);
 	draw_UI_line_9(&p_line_counter);
-	draw_UI_line_10(&p_line_counter);
-	draw_UI_line_11(&p_line_counter);
+	//draw_UI_line_10(&p_line_counter);
+	//draw_UI_line_11(&p_line_counter);
 
 	draw_UI_line_separator(&p_line_counter);
 	/* Menu input*/
 	draw_UI_line_A(&p_line_counter,row_sel, col_sel);
 	draw_UI_line_B(&p_line_counter,row_sel, col_sel);
+
+	draw_UI_line_separator(&p_line_counter);
+
+	draw_UI_debug(&p_line_counter);
 
 	draw_UI_line_separator(&p_line_counter);
 
@@ -174,7 +178,7 @@ void draw_UI_line_2(uint8_t* p_line_counter) {
 	if (inverter_safety.OV_V_DC_plus) {
 		/* if overvoltage */
 		strcpy(colour_V_DC_plus, "\x1B[91m"); /* Red*/
-	} else if (inverter_safety.UV_V_DC_plus) {
+	} else if (inverter_safety.UV2_V_DC_plus) {
 		/* if undervoltage */
 		strcpy(colour_V_DC_plus, "\x1B[96m"); /* Cyan*/
 	} else {
@@ -184,17 +188,17 @@ void draw_UI_line_2(uint8_t* p_line_counter) {
 	if (inverter_safety.OV_V_DC_minus) {
 		/* if overvoltage */
 		strcpy(colour_V_DC_minus, "\x1B[91m"); /* Red*/
-	} else if (inverter_safety.UV_V_DC_minus) {
+	} else if (inverter_safety.UV2_V_DC_minus) {
 		/* if undervoltage */
 		strcpy(colour_V_DC_minus, "\x1B[96m"); /* Cyan*/
 	} else {
 		strcpy(colour_V_DC_minus, COLOUR_DEFAULT); /* default*/
 	}
 
-	sprintf(line_2_str, "V bus +: %s%2.2f V%s \tV bus -: %s%2.2f V\n\r",
-			colour_V_DC_plus, inverter.V_DC_plus,
+	sprintf(line_2_str, "V bus +: %s%2.2f V%s \tV bus -: %s%2.2f V%s\n\r",
+			colour_V_DC_plus, analog_in.V_DC_plus,
 			COLOUR_DEFAULT, colour_V_DC_minus,
-			inverter.V_DC_minus);
+			analog_in.V_DC_minus,COLOUR_DEFAULT);
 	(*p_line_counter)++;
 	push_UART2((char*) line_2_str);
 }
@@ -210,8 +214,8 @@ void draw_UI_line_3(uint8_t* p_line_counter) {
 		strcpy(colour_V_DC_diff, COLOUR_DEFAULT); /* default*/
 	}
 	sprintf(line_3_str, "V bus diff: %s%2.2f V%s\tV bus total: %2.2f V\n\r",
-			colour_V_DC_diff, inverter.V_DC_diff,
-			COLOUR_DEFAULT, inverter.V_DC_total);
+			colour_V_DC_diff, analog_in.V_DC_diff,
+			COLOUR_DEFAULT, analog_in.V_DC_total);
 	(*p_line_counter)++;
 	push_UART2((char*) line_3_str);
 }
@@ -272,9 +276,9 @@ void draw_UI_line_6(uint8_t* p_line_counter) {
 
 	sprintf(line_6_str,
 			"Xformer temp: %s%2.1fC%s\tInverter temp: %s%2.1fC%s \n\r",
-			xformer_temp_color_str, inverter.T_transformer,
+			xformer_temp_color_str, analog_in.T_transformer,
 			COLOUR_DEFAULT, inverter_temp_color_str,
-			inverter.T_inverter, COLOUR_DEFAULT);
+			analog_in.T_inverter, COLOUR_DEFAULT);
 	(*p_line_counter)++;
 	push_UART2((char*) line_6_str);
 }
@@ -321,7 +325,7 @@ void draw_UI_line_8(uint8_t* p_line_counter) {
 
 	static char line_8_str[LINE_WIDTH];
 	sprintf(line_8_str, "PLL sync: ");
-	if (PLL.sync) {
+	if (inverter_safety.PLL_sync) {
 		strcat(line_8_str, "\x1B[92mYES"); /* Green YES*/
 		strcat(line_8_str, COLOUR_DEFAULT);
 	} else {
@@ -355,7 +359,7 @@ void draw_UI_line_10(uint8_t* p_line_counter) {
 
 	static char line_10_str[LINE_WIDTH];
 
-	sprintf(line_10_str,"Inst. v AC: %2.2f V\n\r",inverter.v_AC);
+	sprintf(line_10_str,"Inst. v AC: %2.2f V\n\r",analog_in.v_AC);
 	(*p_line_counter)++;
 
 	push_UART2((char*) line_10_str);
@@ -365,7 +369,7 @@ void draw_UI_line_11(uint8_t* p_line_counter) {
 
 	static char line_11_str[LINE_WIDTH];
 
-	sprintf(line_11_str,"Inst. i AC (PV): %2.2f V\n\r",inverter.i_PV);
+	sprintf(line_11_str,"Inst. i AC (PV): %2.2f V\n\r",analog_in.i_PV);
 	(*p_line_counter)++;
 
 	push_UART2((char*) line_11_str);
@@ -455,4 +459,44 @@ void get_contactor_states(contactor_state_t* AC_contactor_state, contactor_state
 
 }
 
+void UI_serialize_code(uint32_t* faults_code, bool flag){
+
+	if(flag){// If the flag is true
+		*faults_code |= 1;// Add a 1
+	}
+	*faults_code <<= 1;// Shift to make room for the next flag
+}
+
+uint32_t UI_get_faults_code(void){
+
+	uint32_t faults_code = 0;
+
+	UI_serialize_code(&faults_code, inverter_faults.PLL_sync_fault);
+	UI_serialize_code(&faults_code, inverter_faults.i_sync_fault);
+	UI_serialize_code(&faults_code, inverter_faults.i_sync_fault);
+	UI_serialize_code(&faults_code, inverter_faults.OV_v_AC_fault);
+	UI_serialize_code(&faults_code, inverter_faults.OV_V_DC_plus_fault);
+	UI_serialize_code(&faults_code, inverter_faults.OV_V_DC_minus_fault);
+	UI_serialize_code(&faults_code, inverter_faults.UV_V_DC_plus_fault);
+	UI_serialize_code(&faults_code, inverter_faults.UV_V_DC_minus_fault);
+	UI_serialize_code(&faults_code, inverter_faults.UV2_V_DC_plus_fault);
+	UI_serialize_code(&faults_code, inverter_faults.UV2_V_DC_minus_fault);
+	UI_serialize_code(&faults_code, inverter_faults.OV_V_DC_diff_fault);
+	UI_serialize_code(&faults_code, inverter_faults.precharge_timeout_fault);
+	UI_serialize_code(&faults_code, inverter_faults.charge_timeout_fault);
+
+	return faults_code;
+}
+
+void draw_UI_debug(uint8_t* p_line_counter){
+
+	static char debug_str[LINE_WIDTH];
+
+		sprintf(debug_str,"Error code:%x\tOper. State:%d\n\r",UI_get_faults_code(),inverter_safety.operating_state);
+
+		(*p_line_counter)++;
+
+		push_UART2((char*) debug_str);
+
+}
 

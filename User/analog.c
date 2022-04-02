@@ -11,7 +11,7 @@
 /* Global variables                                                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
 
-
+volatile analog_inputs_t analog_in; /* directly measured values */
 volatile int32_t ADC_raw_val[EADC_TOTAL_CHANNELS];
 volatile uint16_t ADC_acq_buff[EADC_TOTAL_CHANNELS];
 volatile uint8_t ADC_acq_count;
@@ -52,19 +52,19 @@ void process_ADC(void){
 void convert_to_float(void){
 
 	/* Vbus plus */
-	inverter.V_DC_plus = ((float)ADC_raw_val[VBUS_PLUS_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*VBUS_PLUS_GAIN))-VBUS_PLUS_OFFSET;
+	analog_in.V_DC_plus = ((float)ADC_raw_val[VBUS_PLUS_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*VBUS_PLUS_GAIN))-VBUS_PLUS_OFFSET;
 	/* Vbus minus */
-	inverter.V_DC_minus = -(((float)ADC_raw_val[VBUS_MINUS_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*VBUS_MINUS_GAIN)))-VBUS_MINUS_OFFSET;
+	analog_in.V_DC_minus = -(((float)ADC_raw_val[VBUS_MINUS_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*VBUS_MINUS_GAIN)))-VBUS_MINUS_OFFSET;
 	/* Vbus total */
-	inverter.V_DC_total = inverter.V_DC_plus - inverter.V_DC_minus;
+	analog_in.V_DC_total = analog_in.V_DC_plus - analog_in.V_DC_minus;
 	/* Vbus diff */
-	inverter.V_DC_diff = inverter.V_DC_plus + inverter.V_DC_minus;
+	analog_in.V_DC_diff = analog_in.V_DC_plus + analog_in.V_DC_minus;
 	/* V AC */
-	inverter.v_AC = ((float)ADC_raw_val[V_AC_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*V_AC_GAIN))-V_AC_OFFSET;
-	/* V AC normalized*/
-	inverter.v_AC_n = inverter.v_AC*(1/(V_AC_NOMINAL_RMS_VALUE*M_SQRT2)); /* needs math.h */
+	analog_in.v_AC = ((float)ADC_raw_val[V_AC_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*V_AC_GAIN))-V_AC_OFFSET;
+	/* V AC normalized to 1 */
+	analog_in.v_AC_n = analog_in.v_AC*(1/(V_AC_NOMINAL_RMS_VALUE*M_SQRT2)); /* needs math.h */
 	/* Current process value (actual amperage) */
-	inverter.i_PV = ((float)ADC_raw_val[I_PV_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*I_PV_GAIN))-I_PV_OFFSET;
+	analog_in.i_PV = ((float)ADC_raw_val[I_PV_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*I_PV_GAIN))-I_PV_OFFSET;
 }
 
 

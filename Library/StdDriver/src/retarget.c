@@ -77,7 +77,7 @@ static void stackDump(uint32_t stack[])
 void Hard_Fault_Handler(uint32_t stack[])
 {
     printf("In Hard Fault Handler\n");
-
+    // TODO: Implement hard fault handler
     stackDump(stack);
     /* Replace while(1) with chip reset if WDT is not enabled for end product */
     while(1);

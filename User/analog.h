@@ -75,12 +75,26 @@
 /*---------------------------------------------------------------------------------------------------------*/
 /* Type definitions           				                                                                       */
 /*---------------------------------------------------------------------------------------------------------*/
+typedef struct analog_inputs{ /* Process values or state variables */
 
+
+	volatile float V_DC_plus;
+	volatile float V_DC_minus;
+	volatile float V_DC_total;
+	volatile float V_DC_diff;
+	volatile float v_AC;
+	volatile float v_AC_n; /* v_AC normalized to a peak amplitude of one */
+	volatile float i_PV;
+
+	volatile float T_transformer;
+	volatile float T_inverter;
+
+} analog_inputs_t;
 
 /*---------------------------------------------------------------------------------------------------------*/
-/* Global variables to be made available externally                                                        */
+/* External global variables                                                                               */
 /*---------------------------------------------------------------------------------------------------------*/
-
+extern volatile analog_inputs_t analog_in; /* directly measured values */
 extern volatile uint16_t ADC_acq_buff[EADC_TOTAL_CHANNELS];
 extern volatile uint8_t ADC_acq_count;
 

@@ -22,7 +22,55 @@ inverter_faults_t inverter_faults;
 /* Function definitions                                                                                       */
 /*---------------------------------------------------------------------------------------------------------*/
 
+void inverter_check_PLL_sync(void){
 
+	static uint16_t set_count, reset_count;
+
+	if((analog_in.v_AC_n > PLL.b_beta-PLL_SYNC_TOL) && (analog_in.v_AC_n < PLL.b_beta+PLL_SYNC_TOL)){ /* If the input voltage is within tolerance of the estimated voltage*/
+		reset_count = 0;
+		set_count++;
+	}else{/* Else it's out of tolerance*/
+		reset_count++;
+		set_count = 0;
+	}
+
+
+	if(reset_count >= PLL_SYNC_COUNT_FOR_RESET){
+		reset_count = PLL_SYNC_COUNT_FOR_RESET; // So reset_count doesn't overflow
+		inverter_safety.PLL_sync = false;
+		inverter_faults.PLL_sync_fault = true; // memorize the loss of sync
+
+	}else if(set_count >= PLL_SYNC_COUNT_FOR_SET){
+		set_count = PLL_SYNC_COUNT_FOR_SET; // So set_count doesn't overflow
+		inverter_safety.PLL_sync = true;
+	}
+
+
+}
+
+void inverter_check_i_sync(void){
+
+	static uint16_t set_count, reset_count;
+
+	if((analog_in.i_PV > inverter.i_SP-I_SYNC_TOL) && (analog_in.i_PV < inverter.i_SP+I_SYNC_TOL)){ /* If the input voltage is within tolerance of the estimated voltage*/
+		reset_count = 0;
+		set_count++;
+	}else{/* Else it's out of tolerance*/
+		reset_count++;
+		set_count = 0;
+	}
+
+
+	if(reset_count >= I_SYNC_COUNT_FOR_RESET){
+		reset_count = I_SYNC_COUNT_FOR_RESET;
+		inverter_safety.i_sync = false;
+		inverter_faults.i_sync_fault = true; /* loss of current sync is a fault*/
+	}else if(set_count >= I_SYNC_COUNT_FOR_SET){
+		set_count = I_SYNC_COUNT_FOR_SET;
+		inverter_safety.i_sync = true;
+	}
+
+}
 
 void inverter_control_main(void){ // Service the inverter. Needs up-to-date PLL and analog input values.
 
@@ -37,10 +85,10 @@ void inverter_control_main(void){ // Service the inverter. Needs up-to-date PLL 
 
 	/* Calculate the duty cycle feedforward value */
 	float d_feedforward;
-	if(inverter.V_DC_total == 0){ /* If we were to run into a division by zero */
+	if(analog_in.V_DC_total == 0){ /* If we were to run into a division by zero */
 		d_feedforward = 0.5; /* don't do the calculation and just pick 50% */
 	}else{
-		d_feedforward = (inverter.v_AC-inverter.V_DC_minus)/inverter.V_DC_total;
+		d_feedforward = (analog_in.v_AC-analog_in.V_DC_minus)/analog_in.V_DC_total;
 
 		/* Saturate between 0 and 1 (0% and 100%)*/
 		if(d_feedforward < 0){
@@ -52,7 +100,6 @@ void inverter_control_main(void){ // Service the inverter. Needs up-to-date PLL 
 
 	inverter.d_feedforward = d_feedforward;
 
-
 }
 
 
@@ -60,7 +107,7 @@ void inverter_calc_I_D(void){
 
 	static float V_DC_total_filtered;
 
-	V_DC_total_filtered = V_DC_total_filtered + (((inverter.V_DC_total-V_DC_total_filtered)*T_CALC)/VBUS_TOTAL_LPF_TAU);
+	V_DC_total_filtered = V_DC_total_filtered + (((analog_in.V_DC_total-V_DC_total_filtered)*T_CALC)/VBUS_TOTAL_LPF_TAU);
 
 	float err_V_DC_total = V_DC_total_filtered - inverter_setpoints.V_DC_total_setpoint;
 
@@ -82,7 +129,7 @@ void inverter_calc_I_balance(void){
 
 	static float V_DC_diff_filtered;
 
-		V_DC_diff_filtered = V_DC_diff_filtered + (((inverter.V_DC_diff-V_DC_diff_filtered)*T_CALC)/VBUS_DIFF_LPF_TAU);
+		V_DC_diff_filtered = V_DC_diff_filtered + (((analog_in.V_DC_diff-V_DC_diff_filtered)*T_CALC)/VBUS_DIFF_LPF_TAU);
 
 		float err_V_DC_diff = V_DC_diff_filtered - inverter_setpoints.V_DC_diff_setpoint;
 
@@ -101,44 +148,20 @@ void inverter_calc_I_balance(void){
 
 void inverter_check_safety_operational_status(void){
 
+	inverter_check_PLL_sync();
 	inverter_check_i_sync();
 	inverter_check_limits();
 
 	inverter_calc_state();
 
-
-
-
-
 }
 
-void inverter_check_i_sync(void){
 
-	static uint16_t set_count, reset_count;
-
-	if((inverter.i_PV > inverter.i_SP-I_SYNC_TOL) && (inverter.i_PV < inverter.i_SP+I_SYNC_TOL)){ /* If the input voltage is within tolerance of the estimated voltage*/
-		reset_count = 0;
-		set_count++;
-	}else{/* Else it's out of tolerance*/
-		reset_count++;
-		set_count = 0;
-	}
-
-
-	if(reset_count >= I_SYNC_COUNT_FOR_RESET){
-		reset_count = I_SYNC_COUNT_FOR_RESET;
-		inverter_safety.i_sync = false;
-	}else if(set_count >= I_SYNC_COUNT_FOR_SET){
-		set_count = I_SYNC_COUNT_FOR_SET;
-		inverter_safety.i_sync = true;
-	}
-
-}
 
 void inverter_check_limits(void){
 
 	/************* VBUS+ Overvoltage **************************************************************************************/
-	if(inverter.V_DC_plus > OV_LIMIT){ /* If VBUS+ is over the overvoltage limit*/
+	if(analog_in.V_DC_plus > OV_LIMIT){ /* If VBUS+ is over the overvoltage limit*/
 		inverter_safety.OV_V_DC_plus = TRUE; /* There is currently an overvoltage condition */
 		inverter_faults.OV_V_DC_plus_fault = TRUE; /* Memorize the fault */
 	}else{
@@ -147,7 +170,7 @@ void inverter_check_limits(void){
 	/************* VBUS+ Overvoltage end **********************************************************************************/
 
 	/************* VBUS- Overvoltage **************************************************************************************/
-	if(inverter.V_DC_minus < -OV_LIMIT){ /* If VBUS- exceeds the overvoltage limit*/
+	if(analog_in.V_DC_minus < -OV_LIMIT){ /* If VBUS- exceeds the overvoltage limit*/
 		inverter_safety.OV_V_DC_minus = TRUE; /* There is currently an overvoltage condition */
 		inverter_faults.OV_V_DC_minus_fault = TRUE; /* Memorize the fault */
 	}else{
@@ -156,40 +179,46 @@ void inverter_check_limits(void){
 	/************* VBUS- Overvoltage end ***********************************************************************************/
 
 	/************* VBUS+ Undervoltage **************************************************************************************/
-	if(inverter.V_DC_plus < UV_LIMIT){ /* If VBUS+ is under the undervoltage limit*/
+	if(analog_in.V_DC_plus < UV_LIMIT){ /* If VBUS+ is under the undervoltage limit*/
 		inverter_safety.UV_V_DC_plus = TRUE; /* There is currently an undervoltage condition */
 		inverter_faults.UV_V_DC_plus_fault = TRUE; /* Memorize the fault */
-
-		if(inverter.V_DC_plus < UV2_LIMIT){ /* If VBUS+ is under the second undervoltage limit*/
-			inverter_safety.UV2_V_DC_plus = TRUE; /* There is currently an undervoltage 2 condition */
-			inverter_faults.UV2_V_DC_plus_fault = TRUE; /* Memorize the fault */
-		}else{
-			inverter_safety.UV2_V_DC_plus = FALSE; /* There is not currently an undervoltage 2 condition */
-		}
-
 	}else{
 		inverter_safety.UV_V_DC_plus = FALSE; /* There is not currently an overvoltage condition */
 	}
 	/************* VBUS+ Undervoltage end **********************************************************************************/
 
+	/************* VBUS+ Undervoltage 2 **************************************************************************************/
+	if(analog_in.V_DC_plus < UV2_LIMIT){ /* If VBUS+ is under the second undervoltage limit*/
+		inverter_safety.UV2_V_DC_plus = TRUE; /* There is currently an undervoltage 2 condition */
+		inverter_faults.UV2_V_DC_plus_fault = TRUE; /* Memorize the fault */
+	}else{
+		inverter_safety.UV2_V_DC_plus = FALSE; /* There is not currently an undervoltage 2 condition */
+	}
+	/************* VBUS+ Undervoltage 2 end **********************************************************************************/
+
 	/************* VBUS- Undervoltage **************************************************************************************/
-	if(inverter.V_DC_minus > -UV_LIMIT){ /* If VBUS- exceeds the undervoltage limit*/
+	if(analog_in.V_DC_minus > -UV_LIMIT){ /* If VBUS- exceeds the undervoltage limit*/
 		inverter_safety.UV_V_DC_minus = TRUE; /* There is currently an undervoltage condition */
 		inverter_faults.UV_V_DC_minus_fault = TRUE; /* Memorize the fault */
 
-		if(inverter.V_DC_minus > -UV2_LIMIT){ /* If VBUS- exceeds the second undervoltage limit*/
-			inverter_safety.UV2_V_DC_minus = TRUE; /* There is currently an undervoltage 2 condition */
-			inverter_faults.UV2_V_DC_minus_fault = TRUE; /* Memorize the fault */
-		}else{
-			inverter_safety.UV2_V_DC_minus = FALSE; /* There is not currently an undervoltage condition */
-		}
+
 	}else{
 		inverter_safety.UV_V_DC_minus = FALSE; /* There is not currently an undervoltage condition */
 	}
 	/************* VBUS- Undervoltage end ***********************************************************************************/
 
+	/************* VBUS- Undervoltage 2 **************************************************************************************/
+	if(analog_in.V_DC_minus > -UV2_LIMIT){ /* If VBUS- exceeds the second undervoltage limit*/
+		inverter_safety.UV2_V_DC_minus = TRUE; /* There is currently an undervoltage 2 condition */
+		inverter_faults.UV2_V_DC_minus_fault = TRUE; /* Memorize the fault */
+	}else{
+		inverter_safety.UV2_V_DC_minus = FALSE; /* There is not currently an undervoltage condition */
+	}
+	/************* VBUS- Undervoltage 2 end ***********************************************************************************/
+
+
 	/************* VBUS imbalance **************************************************************************************/
-	if(abs(inverter.V_DC_diff) > DIFF_LIMIT){ /* If VBUS+ is over the overvoltage limit*/
+	if(fabs(analog_in.V_DC_diff) > DIFF_LIMIT){ /* If VBUS+ is over the overvoltage limit*/
 		inverter_safety.OV_V_DC_diff = TRUE; /* There is currently an overvoltage condition */
 		inverter_faults.OV_V_DC_diff_fault = TRUE; /* Memorize the fault */
 	}else{
@@ -208,7 +237,7 @@ void inverter_calc_state(void){
 	static uint32_t charge_timer = 0;
 
 
-	if((!PLL.sync)||(!inverter_setpoints.inverter_active)){ // If no PLL sync or inverter set to off by user
+	if((!inverter_safety.PLL_sync)||(!inverter_setpoints.inverter_active)){ // If no PLL sync or inverter set to off by user
 		inverter_safety.operating_state = OPER_OFF; // switch to the OFF state immediately
 	}
 
@@ -219,8 +248,9 @@ void inverter_calc_state(void){
 		//Set all relays off here (signals are active low)
 		PC2 = TRUE; // Precharge opto
 		PC4 = TRUE; // Relay
+		PA14 = TRUE;// Turn OFF red LED
 
-		if(PLL.sync && inverter_setpoints.inverter_active){ // If we have PLL sync and the inverter is set to ON
+		if(inverter_safety.PLL_sync && inverter_setpoints.inverter_active){ // If we have PLL sync and the inverter is set to ON
 
 
 
@@ -238,7 +268,8 @@ void inverter_calc_state(void){
 
 		// Turn on only precharge opto here (signals are active low)
 		PC2 = FALSE; // Precharge opto
-		PC4 = TRUE; // Relay
+		PC4 = TRUE; // Relay OFF
+		PA14 = TRUE;// Turn OFF red LED
 
 
 		/* Timeout here*/
@@ -248,6 +279,8 @@ void inverter_calc_state(void){
 			// PRECHARGE state exit code would go here
 
 			inverter_safety.operating_state = OPER_OFF; // switch to the OFF state immediately
+			inverter_setpoints.inverter_active = FALSE; // To avoid cycling
+			inverter_faults.precharge_timeout_fault = TRUE; // To save the fault event
 
 			// OFF state entry code would go here
 		}
@@ -271,7 +304,8 @@ void inverter_calc_state(void){
 
 		//**** Turn on precharge opto AND AC relay here (signals are active low)
 		PC2 = FALSE; // Precharge opto
-		//PC4 = FALSE; // Relay
+		PC4 = FALSE; // Relay ON
+		PA14 = FALSE;// Turn on red LED
 
 
 		if(PLL.theta_est > SLIGHTLY_LESS_THAN_2_PI){ /* If the end of the cycle and the zero crossing is near*/
@@ -284,7 +318,8 @@ void inverter_calc_state(void){
 
 		//**** Turn on precharge opto AND AC relay here (signals are active low)
 		PC2 = FALSE; // Precharge opto
-		//PC4 = FALSE; // Relay
+		PC4 = FALSE; // Relay ON
+		PA14 = FALSE;// Turn on red LED
 
 		if((PLL.theta_est < SLIGHTLY_LESS_THAN_2_PI)&&(PLL.theta_est > THETA_MIN_GARANTEED_CLOSE)){/*If we are some time after the 0-crossing, we are sure the relay has closed and we can turn off the precharge*/
 			inverter_safety.operating_state = OPER_CHARGE; // go to the CHARGE state;
@@ -300,7 +335,8 @@ void inverter_calc_state(void){
 
 		//**** Turn on only relay here (signals are active low)
 		PC2 = TRUE; // Precharge opto
-		//PC4 = FALSE; // Relay
+		PC4 = FALSE; // Relay ON
+		PA14 = FALSE;// Turn on red LED
 
 		/* Timeout here*/
 		if(charge_timer){ /* If time left on the timer*/
@@ -310,7 +346,8 @@ void inverter_calc_state(void){
 			// CHARGE state exit code would go here
 
 			inverter_safety.operating_state = OPER_OFF; // switch to the OFF state immediately
-
+			inverter_setpoints.inverter_active = FALSE; // To avoid cycling
+			inverter_faults.charge_timeout_fault = TRUE; // To save the fault event
 			// OFF state entry code would go here
 		}
 
@@ -328,7 +365,8 @@ void inverter_calc_state(void){
 
 		//**** Turn on only relay here (signals are active low)
 		PC2 = TRUE; // Precharge opto
-		//PC4 = FALSE; // Relay
+		PC4 = FALSE; // Relay ON
+		PA14 = FALSE;// Turn on red LED
 
 		// No exit condition other than user OFF or PLL desync;
 		break;

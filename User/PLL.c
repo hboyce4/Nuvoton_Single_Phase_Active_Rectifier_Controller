@@ -41,8 +41,8 @@ void init_sin_table(float* sin_table, uint8_t table_size){
 void PLL_main(void){ // Service the PLL. Needs up-to-date analog input values.
 
 /*********************Input waveforms calculation begin**********************************/
-	float a_alpha = inverter.v_AC_n;
-	float a_beta = delay_line(inverter.v_AC_n);
+	float a_alpha = analog_in.v_AC_n;
+	float a_beta = delay_line(analog_in.v_AC_n);
 /*********************Input waveforms calculation end************************************/
 
 
@@ -81,6 +81,7 @@ void PLL_main(void){ // Service the PLL. Needs up-to-date analog input values.
 
 
 	PLL.theta_est += PLL.w_est * T_CALC;	/* Integration of the instantaneous frequency value to get the angle*/
+	// TODO: Implement Tustin/Bilinear/Trapezoidal integration method instead of rectangular/Euler method. It's more accurate.
 
 	if (PLL.theta_est >= 2*M_PI){	/* Saturation pour garder la valeur de theta_est entre 0 et 2*pi*/
 
@@ -92,7 +93,6 @@ void PLL_main(void){ // Service the PLL. Needs up-to-date analog input values.
 	/* To be put somewhere else */
 	PLL.freq_Hz = PLL.w_est*(1/(2*M_PI));
 
-	PLL_check_sync();
 }
 
 
@@ -175,27 +175,4 @@ float cos_LUT(float angle, float* table){
 
 }
 
-void PLL_check_sync(void){
-
-	static uint16_t set_count, reset_count;
-
-	if((inverter.v_AC_n > PLL.b_beta-PLL_SYNC_TOL) && (inverter.v_AC_n < PLL.b_beta+PLL_SYNC_TOL)){ /* If the input voltage is within tolerance of the estimated voltage*/
-		reset_count = 0;
-		set_count++;
-	}else{/* Else it's out of tolerance*/
-		reset_count++;
-		set_count = 0;
-	}
-
-
-	if(reset_count >= PLL_SYNC_COUNT_FOR_RESET){
-		reset_count = PLL_SYNC_COUNT_FOR_RESET;
-		PLL.sync = false;
-	}else if(set_count >= PLL_SYNC_COUNT_FOR_SET){
-		set_count = PLL_SYNC_COUNT_FOR_SET;
-		PLL.sync = true;
-	}
-
-
-}
 
