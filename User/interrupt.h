@@ -11,6 +11,16 @@
 #include "NuMicro.h"
 #include "analog.h"
 #include "UART_over_DMA.h"
+#include "UI.h"
+
+
+/*---------------------------------------------------------------------------------------------------------*/
+/* Global variables to be made available externally                                                        */
+/*---------------------------------------------------------------------------------------------------------*/
+extern volatile uint64_t g_SysTickIntCnt;
+extern volatile bool UI_new_frame_tick;
+
+
 
 void PDMA_IRQHandler(void);
 void TMR1_IRQHandler(void);

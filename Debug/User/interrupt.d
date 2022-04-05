@@ -70,7 +70,7 @@ User/interrupt.o: ../User/interrupt.c ../User/interrupt.h \
  ../Library/StdDriver/inc/hsusbd.h ../Library/StdDriver/inc/otg.h \
  ../Library/StdDriver/inc/hsotg.h ../User/analog.h ../User/main.h \
  ../User/constants.h ../User/PLL.h ../User/inverter_control.h \
- ../User/UART_over_DMA.h
+ ../User/UART_over_DMA.h ../User/UI.h
 
 ../User/interrupt.h:
 
@@ -265,3 +265,5 @@ User/interrupt.o: ../User/interrupt.c ../User/interrupt.h \
 ../User/inverter_control.h:
 
 ../User/UART_over_DMA.h:
+
+../User/UI.h:

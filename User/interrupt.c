@@ -7,6 +7,78 @@
 
 #include "interrupt.h"
 
+/*---------------------------------------------------------------------------------------------------------*/
+/* Global variables                                                                                        */
+/*---------------------------------------------------------------------------------------------------------*/
+volatile uint64_t g_SysTickIntCnt = 0;
+
+volatile bool UI_new_frame_tick = false;
+
+/*---------------------------------------------------------------------------------------------------------*/
+/* Function definitions                                                                                    */
+/*---------------------------------------------------------------------------------------------------------*/
+void EADC00_IRQHandler(void){ /* Very high frequency interrupt. Keep very light!!! */
+
+    EADC_CLR_INT_FLAG(EADC, EADC_STATUS2_ADIF0_Msk);      /* Clear the A/D ADINT0 interrupt flag */
+
+	uint8_t channel;
+	for(channel = 0; channel < EADC_TOTAL_CHANNELS;channel++){/* Acquire latest data from ADC, filtering out status bits*/
+
+		ADC_acq_buff[channel] += (uint16_t)(EADC->DAT[channel]);/* Only keep the lowest 16 bits of the register*/
+
+	}
+
+	ADC_acq_count--;/* Decrease the number of acquisitions left to make*/
+
+    if(!ADC_acq_count){/* If zero acquisitions left to do */
+    	NVIC_DisableIRQ(EADC00_IRQn); /* Stop the interrupt */
+
+    }
+
+}
+
+void TMR1_IRQHandler(void){ /*High frequency interrupt (F_CALC). Keep light!!! */
+
+    if(TIMER_GetIntFlag(TIMER1) == 1)
+    {
+        /* Clear Timer1 time-out interrupt flag, or else interrupt is executed forever */
+        TIMER_ClearIntFlag(TIMER1);
+
+        //PA->DOUT &= ~(BIT12);//Turn ON green LED for timing measurements
+        PA12 = 0;
+
+        /* Begin control loop iteration */
+		process_ADC(); // Service ADC routine
+        convert_to_float(); // Service analog input values (convert ints from ADC to float for maths
+		PLL_main(); // Service the PLL. Needs up-to-date analog input values.
+		inverter_control_main(); // Service the inverter. Needs up-to-date PLL and analog input values.
+		convert_to_int_write_analog(); // Convert the calculated output values to int and output them
+
+		//PA->DOUT |= BIT12;//Turn OFF green LED for timing measurements
+		PA12 = 1;
+    }
+
+
+}
+
+void SysTick_Handler(void)	// Every millisecond (Medium frequency).
+{
+    g_SysTickIntCnt++;
+
+    PA13 = 0; // Turn on amber LED
+
+    inverter_medium_freq_task();
+
+	static uint16_t UI_refresh_counter = 0;
+	if(!UI_refresh_counter){
+		UI_refresh_counter = UI_FRAME_INTERVAL_MS;
+		UI_new_frame_tick = true;
+	}
+	UI_refresh_counter--;
+
+	PA13 = 1; // Turn off amber LED
+
+}
 
 void PDMA_IRQHandler(void){
 
@@ -50,49 +122,6 @@ void PDMA_IRQHandler(void){
         printf("unknown PDMA int.!!\n");
     }
 
-
-}
-
-void TMR1_IRQHandler(void){ /*High frequency interrupt (F_CALC). Keep light!!! */
-
-    if(TIMER_GetIntFlag(TIMER1) == 1)
-    {
-        /* Clear Timer1 time-out interrupt flag, or else interrupt is executed forever */
-        TIMER_ClearIntFlag(TIMER1);
-
-        /* Begin control loop iteration */
-
-        PA->DOUT &= ~(BIT12);//Turn ON green LED for timing measurements
-
-		process_ADC(); // Service ADC routine
-        convert_to_float(); // Service analog input values (convert ints from ADC to float for maths
-		PLL_main(); // Service the PLL. Needs up-to-date analog input values.
-		inverter_control_main(); // Service the inverter. Needs up-to-date PLL and analog input values.
-		convert_to_int_write_analog(); // Convert the calculated output values to int and output them
-
-		PA->DOUT |= BIT12;//Turn OFF green LED for timing measurements
-    }
-
-
-}
-
-void EADC00_IRQHandler(void){ /* Very high frequency interrupt. Keep very light!!! */
-
-    EADC_CLR_INT_FLAG(EADC, EADC_STATUS2_ADIF0_Msk);      /* Clear the A/D ADINT0 interrupt flag */
-
-	uint8_t channel;
-	for(channel = 0; channel < EADC_TOTAL_CHANNELS;channel++){/* Acquire latest data from ADC, filtering out status bits*/
-
-		ADC_acq_buff[channel] += (uint16_t)(EADC->DAT[channel]);/* Only keep the lowest 16 bits of the register*/
-
-	}
-
-	ADC_acq_count--;/* Decrease the number of acquisitions left to make*/
-
-    if(!ADC_acq_count){/* If zero acquisitions left to do */
-    	NVIC_DisableIRQ(EADC00_IRQn); /* Stop the interrupt */
-
-    }
 
 }
 

@@ -21,10 +21,7 @@
 
 #define PLL_CLOCK           192000000
 
-#define F_CALC				12000			// [Hz] Control loop frequency. Must be an integer multiple of
-											//4 * NETWORK_FREQ so that DELAY_ARRAY_SIZE is an integer.
 
-#define T_CALC				(1.0/F_CALC)	// [s] Control loop trigger period. Inverse of F_CALC.
 
 /* Interrupt priorities */
 #define ADC_INT_PRIORITY 0	/* Needed for the control loop, so it has to have the highest priority*/
@@ -39,7 +36,6 @@
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables to be made available externally                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
-extern volatile uint64_t g_SysTickIntCnt;
 
 
 /*---------------------------------------------------------------------------------------------------------*/
@@ -47,6 +43,8 @@ extern volatile uint64_t g_SysTickIntCnt;
 /*---------------------------------------------------------------------------------------------------------*/
 void delay_ms(uint32_t time); /*Generates a milliseconds delay. NOT ACCURATE. Use a hardware timer for accuracy*/
 
+//void PDMA_IRQHandler(void);
+//void UART_PDMATest(void);
 
 
 #endif /* MAIN_H_ */

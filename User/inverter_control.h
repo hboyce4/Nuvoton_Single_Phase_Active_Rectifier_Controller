@@ -101,7 +101,9 @@ typedef struct inverter_state_variables{ /* Process values or state variables */
 	//volatile float V_DC_plus;
 	//volatile float V_DC_minus;
 	//volatile float V_DC_total;
+	volatile float V_DC_total_filtered;
 	//volatile float V_DC_diff;
+	volatile float V_DC_diff_filtered;
 	volatile float I_D;
 	//volatile float I_Q;
 	volatile float I_balance;
@@ -175,6 +177,8 @@ void inverter_check_i_sync(void);
 void inverter_check_safety_operational_status(void);
 void inverter_check_limits(void);
 void inverter_calc_state(void);
+
+void inverter_medium_freq_task(void);
 
 void inverter_calc_I_D(void);
 void inverter_calc_I_balance(void);

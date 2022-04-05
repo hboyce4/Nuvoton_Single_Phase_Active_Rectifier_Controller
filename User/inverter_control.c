@@ -22,6 +22,47 @@ inverter_faults_t inverter_faults;
 /* Function definitions                                                                                       */
 /*---------------------------------------------------------------------------------------------------------*/
 
+
+
+void inverter_control_main(void){ // Service the inverter. Needs up-to-date PLL and analog input values.
+	/* High frequency -> Use T_CALC */
+
+	inverter_check_safety_operational_status();
+
+	//saturate();
+	inverter.i_SP = (inverter.I_D * PLL.b_beta) + inverter.I_balance ; /* The current setpoint is the sum of the "direct" (iD) current and the balancing current*/
+	// inverter.I_D is a continuous ("DC") value, PLL.b_beta is a sine wave.  inverter.I_balance is a proportionately small "DC" value.
+
+	/* Calculate the duty cycle feedforward value */
+	float d_feedforward;
+	if(analog_in.V_DC_total == 0){ /* If we were to run into a division by zero */
+		d_feedforward = 0.5; /* don't do the calculation and just pick 50% */
+	}else{
+		d_feedforward = (analog_in.v_AC-analog_in.V_DC_minus)/analog_in.V_DC_total;
+
+		/* Saturate between 0 and 1 (0% and 100%)*/
+		if(d_feedforward < 0){
+			d_feedforward = 0;
+		}else if(d_feedforward > 1){
+			d_feedforward = 1;
+		}
+	}
+
+	inverter.d_feedforward = d_feedforward;
+
+}
+
+
+void inverter_check_safety_operational_status(void){
+
+	inverter_check_PLL_sync();
+	inverter_check_i_sync();
+	inverter_check_limits();
+
+	inverter_calc_state();
+
+}
+
 void inverter_check_PLL_sync(void){
 
 	static uint16_t set_count, reset_count;
@@ -71,92 +112,6 @@ void inverter_check_i_sync(void){
 	}
 
 }
-
-void inverter_control_main(void){ // Service the inverter. Needs up-to-date PLL and analog input values.
-
-	inverter_check_safety_operational_status();
-
-	/* Calculate the current (i) setpoint */
-	inverter_calc_I_D();
-	inverter_calc_I_balance();
-	//saturate();
-	inverter.i_SP = (inverter.I_D * PLL.b_beta) + inverter.I_balance ; /* The current setpoint is the sum of the "direct" (iD) current and the balancing current*/
-	// inverter.I_D is a continuous ("DC") value, PLL.b_beta is a sine wave.  inverter.I_balance is a proportionately small "DC" value.
-
-	/* Calculate the duty cycle feedforward value */
-	float d_feedforward;
-	if(analog_in.V_DC_total == 0){ /* If we were to run into a division by zero */
-		d_feedforward = 0.5; /* don't do the calculation and just pick 50% */
-	}else{
-		d_feedforward = (analog_in.v_AC-analog_in.V_DC_minus)/analog_in.V_DC_total;
-
-		/* Saturate between 0 and 1 (0% and 100%)*/
-		if(d_feedforward < 0){
-			d_feedforward = 0;
-		}else if(d_feedforward > 1){
-			d_feedforward = 1;
-		}
-	}
-
-	inverter.d_feedforward = d_feedforward;
-
-}
-
-
-void inverter_calc_I_D(void){
-
-	static float V_DC_total_filtered;
-
-	V_DC_total_filtered = V_DC_total_filtered + (((analog_in.V_DC_total-V_DC_total_filtered)*T_CALC)/VBUS_TOTAL_LPF_TAU);
-
-	float err_V_DC_total = V_DC_total_filtered - inverter_setpoints.V_DC_total_setpoint;
-
-	err_V_DC_total *= VBUS_TOTAL_KP;
-
-	/* Saturate */
-	if (err_V_DC_total > I_D_MAX){
-		err_V_DC_total = I_D_MAX;
-	}else if (err_V_DC_total < -I_D_MAX){
-		err_V_DC_total = -I_D_MAX;
-	}
-
-	inverter.I_D = err_V_DC_total;
-
-}
-
-void inverter_calc_I_balance(void){
-
-
-	static float V_DC_diff_filtered;
-
-		V_DC_diff_filtered = V_DC_diff_filtered + (((analog_in.V_DC_diff-V_DC_diff_filtered)*T_CALC)/VBUS_DIFF_LPF_TAU);
-
-		float err_V_DC_diff = V_DC_diff_filtered - inverter_setpoints.V_DC_diff_setpoint;
-
-		err_V_DC_diff *= VBUS_DIFF_KP;
-
-		/* Saturate */
-		if (err_V_DC_diff > I_BALANCE_MAX){
-			err_V_DC_diff = I_BALANCE_MAX;
-		}else if (err_V_DC_diff < -I_BALANCE_MAX){
-			err_V_DC_diff = -I_BALANCE_MAX;
-		}
-
-		inverter.I_balance = err_V_DC_diff;
-
-}
-
-void inverter_check_safety_operational_status(void){
-
-	inverter_check_PLL_sync();
-	inverter_check_i_sync();
-	inverter_check_limits();
-
-	inverter_calc_state();
-
-}
-
-
 
 void inverter_check_limits(void){
 
@@ -377,5 +332,63 @@ void inverter_calc_state(void){
 	}
 /**************End of state machine for startup and operational conditions**************************************************/
 
+}
+
+void inverter_medium_freq_task(void){
+	/* Medium frequency -> Use T_SYSTICK */
+
+	/* Calculate the current (i) setpoint */
+	inverter_calc_I_D();
+	inverter_calc_I_balance();
+
 
 }
+
+void inverter_calc_I_D(void){
+
+	//static float V_DC_total_filtered;
+
+	inverter.V_DC_total_filtered = inverter.V_DC_total_filtered + (((analog_in.V_DC_total-inverter.V_DC_total_filtered)*T_SYSTICK)/VBUS_TOTAL_LPF_TAU); // Low pass filter
+
+	float err_V_DC_total = inverter.V_DC_total_filtered - inverter_setpoints.V_DC_total_setpoint; // Calculate the error
+
+	err_V_DC_total *= VBUS_TOTAL_KP; /* Multiply by the gain to determine how big of a correction to apply */
+
+	/* Saturate */
+	if (err_V_DC_total > I_D_MAX){
+		err_V_DC_total = I_D_MAX;
+	}else if (err_V_DC_total < -I_D_MAX){
+		err_V_DC_total = -I_D_MAX;
+	}
+
+	inverter.I_D = err_V_DC_total; /* Return the value of the "direct" current */
+
+}
+
+void inverter_calc_I_balance(void){
+
+
+	//static float V_DC_diff_filtered;
+
+	inverter.V_DC_diff_filtered = inverter.V_DC_diff_filtered + (((analog_in.V_DC_diff-inverter.V_DC_diff_filtered)*T_SYSTICK)/VBUS_DIFF_LPF_TAU); // Low pass filter
+
+	float err_V_DC_diff = inverter.V_DC_diff_filtered - inverter_setpoints.V_DC_diff_setpoint; // Calculate the error
+
+	err_V_DC_diff *= VBUS_DIFF_KP; /* Multiply by the gain to determine how big of a correction to apply */
+
+	/* Saturate */
+	if (err_V_DC_diff > I_BALANCE_MAX){
+		err_V_DC_diff = I_BALANCE_MAX;
+	}else if (err_V_DC_diff < -I_BALANCE_MAX){
+		err_V_DC_diff = -I_BALANCE_MAX;
+	}
+
+	inverter.I_balance = err_V_DC_diff; /* Return the value of the "direct" current */
+
+}
+
+
+
+
+
+

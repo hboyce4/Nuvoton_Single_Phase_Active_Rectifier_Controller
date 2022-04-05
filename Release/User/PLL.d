@@ -1,4 +1,4 @@
-User/PLL.o: ../User/PLL.c ../User/PLL.h ../User/inverter_control.h \
+User/PLL.o: ../User/PLL.c ../User/PLL.h ../User/main.h ../User/analog.h \
  ../Library/Device/Nuvoton/M480/Include/NuMicro.h \
  ../Library/Device/Nuvoton/M480/Include/M480.h \
  ../Library/CMSIS/Include/core_cm4.h \
@@ -68,12 +68,14 @@ User/PLL.o: ../User/PLL.c ../User/PLL.h ../User/inverter_control.h \
  ../Library/StdDriver/inc/rtc.h ../Library/StdDriver/inc/usci_uart.h \
  ../Library/StdDriver/inc/sdh.h ../Library/StdDriver/inc/usbd.h \
  ../Library/StdDriver/inc/hsusbd.h ../Library/StdDriver/inc/otg.h \
- ../Library/StdDriver/inc/hsotg.h ../User/main.h ../User/user_sys.h \
- ../User/analog.h
+ ../Library/StdDriver/inc/hsotg.h ../User/constants.h \
+ ../User/inverter_control.h ../User/UART_over_DMA.h
 
 ../User/PLL.h:
 
-../User/inverter_control.h:
+../User/main.h:
+
+../User/analog.h:
 
 ../Library/Device/Nuvoton/M480/Include/NuMicro.h:
 
@@ -255,8 +257,8 @@ User/PLL.o: ../User/PLL.c ../User/PLL.h ../User/inverter_control.h \
 
 ../Library/StdDriver/inc/hsotg.h:
 
-../User/main.h:
+../User/constants.h:
 
-../User/user_sys.h:
+../User/inverter_control.h:
 
-../User/analog.h:
+../User/UART_over_DMA.h:

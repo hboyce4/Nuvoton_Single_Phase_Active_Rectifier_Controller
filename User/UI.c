@@ -214,8 +214,8 @@ void draw_UI_line_3(uint8_t* p_line_counter) {
 		strcpy(colour_V_DC_diff, COLOUR_DEFAULT); /* default*/
 	}
 	sprintf(line_3_str, "V bus diff: %s%2.2f V%s\tV bus total: %2.2f V\n\r",
-			colour_V_DC_diff, analog_in.V_DC_diff,
-			COLOUR_DEFAULT, analog_in.V_DC_total);
+			colour_V_DC_diff, inverter.V_DC_diff_filtered,
+			COLOUR_DEFAULT, inverter.V_DC_total_filtered);
 	(*p_line_counter)++;
 	push_UART2((char*) line_3_str);
 }

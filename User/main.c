@@ -7,6 +7,10 @@
 *****************************************************************************/
 #include "main.h"
 
+// This firmware is very interrupt-driven. Therefore most of the "meat" is in interrupt.c
+
+
+
 /*---------------------------------------------------------------------------------------------------------*/
 /* Includes           				                                                                       */
 /*---------------------------------------------------------------------------------------------------------*/
@@ -17,6 +21,7 @@
 #include "NuMicro.h"
 
 #include "init.h"
+#include "interrupt.h"
 #include "inverter_control.h"
 #include "PLL.h"
 #include "UI.h"
@@ -26,34 +31,11 @@
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
-volatile uint64_t g_SysTickIntCnt = 0;
-
-volatile bool UI_new_frame_tick = false;
 
 
 /*---------------------------------------------------------------------------------------------------------*/
-/* Define functions prototype                                                                              */
+/* Functions definitions                                                                      	   */
 /*---------------------------------------------------------------------------------------------------------*/
-//void PDMA_IRQHandler(void);
-//void UART_PDMATest(void);
-
-
-
-void SysTick_Handler(void)	// Every millisecond
-{
-    g_SysTickIntCnt++;
-
-	static uint16_t UI_refresh_counter = 0;
-	if(!UI_refresh_counter){
-		UI_refresh_counter = UI_FRAME_INTERVAL_MS;
-		UI_new_frame_tick = true;
-	}
-	UI_refresh_counter--;
-
-	PA13 ^= 1; // Toggle amber LED
-
-}
-
 
 int main()
 {
@@ -63,7 +45,7 @@ int main()
     SysTick_Config(SystemCoreClock / 1000);
     NVIC_SetPriority(SysTick_IRQn, SYSTICK_INT_PRIORITY);
 
-    /* Init UART to 115200-8n1 for print message */
+    /* Init UART to 115200-8n1 to print message */
     UART_Open(UART0, 115200);
 
     /* Open UART 2, for external communication, on pins 31 & 32*/
@@ -102,13 +84,11 @@ int main()
     	human input, we don't need interrupts nor DMA. Just run this routine every few milliseconds.*/
 
     	/*********************** UI end *********************************/
-
-
     }
-
 
 }
 
+/* I don't know where to put this*/
 void delay_ms(uint32_t delay){ /*Generates a milliseconds delay. NOT ACCURATE. Use a hardware timer for accuracy*/
 
 	uint64_t end_time = g_SysTickIntCnt + ((uint64_t)delay);
