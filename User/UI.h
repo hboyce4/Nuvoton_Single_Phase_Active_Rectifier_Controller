@@ -19,7 +19,7 @@
 #include "analog.h"
 #include "inverter_control.h"
 #include "UART_over_DMA.h"
-
+#include "interrupt.h"
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Local Macros           				                                                                      */
@@ -29,7 +29,7 @@
 #define LINE_WIDTH 128
 #define ESCAPE_SEQUENCE_LENGTH 16
 
-#define UI_MENU_NB_ROWS 2
+#define UI_MENU_NB_ROWS 3
 #define UI_MENU_NB_COLUMNS 2
 
 #define COLOUR_DEFAULT "\x1B[97m\x1B[40m" /* white text, black background \x1B[40m */
@@ -71,6 +71,7 @@ void draw_UI_line_separator(uint8_t*);
 
 void draw_UI_line_A(uint8_t* , int8_t, int8_t);
 void draw_UI_line_B(uint8_t* , int8_t, int8_t);
+void draw_UI_line_C(uint8_t* , int8_t, int8_t);
 
 void read_user_input(int8_t*, int8_t*);
 void increment_UI_value(int8_t, int8_t);
@@ -78,7 +79,7 @@ void decrement_UI_value(int8_t, int8_t);
 
 void get_contactor_states(contactor_state_t*, contactor_state_t*);
 
-void UI_serialize_code(uint32_t*, bool);
+void UI_serialize_code(uint32_t*, uint8_t, bool);
 uint32_t UI_get_faults_code(void);
 void draw_UI_debug(uint8_t*);
 

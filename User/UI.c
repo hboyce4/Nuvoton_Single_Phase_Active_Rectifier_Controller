@@ -40,6 +40,7 @@ void draw_UI(int8_t row_sel, int8_t col_sel){/* 60-ish characters width*/
 	/* Menu input*/
 	draw_UI_line_A(&p_line_counter,row_sel, col_sel);
 	draw_UI_line_B(&p_line_counter,row_sel, col_sel);
+	draw_UI_line_C(&p_line_counter,row_sel, col_sel);
 
 	draw_UI_line_separator(&p_line_counter);
 
@@ -130,15 +131,24 @@ void increment_UI_value(int8_t row_sel, int8_t col_sel){
 
 	if(row_sel == 0){
 		if(col_sel == 0){
-			inverter_setpoints.inverter_active = !inverter_setpoints.inverter_active;
+			if(!inverter_setpoints.inverter_active){ // if the inverter is off and we'll be turning it on in the next line
+				inverter_reset_charge_errors(); // Reset the charge errors
+			}
+			inverter_setpoints.inverter_active = true;
 		}else if (col_sel == 1){
 			inverter_setpoints.V_DC_total_setpoint += FLOAT_INCREMENT;
 		}
 	} else if(row_sel == 1){
 		if(col_sel == 0){
-			inverter_setpoints.some_setpoint += FLOAT_INCREMENT;
+			inverter_setpoints.precharge_threshold += FLOAT_INCREMENT;
 		}else if (col_sel == 1){
 			inverter_setpoints.V_DC_diff_setpoint += FLOAT_INCREMENT;
+		}
+	} else if(row_sel == 2){
+		if(col_sel == 0){
+			PA2 = true;
+		}else if (col_sel == 1){
+			PA5 = true;
 		}
 	}
 }
@@ -147,15 +157,21 @@ void decrement_UI_value(int8_t row_sel, int8_t col_sel){
 
 	if(row_sel == 0){
 		if(col_sel == 0){
-			inverter_setpoints.inverter_active = !inverter_setpoints.inverter_active;
+			inverter_setpoints.inverter_active = false;
 		}else if (col_sel == 1){
 			inverter_setpoints.V_DC_total_setpoint -= FLOAT_INCREMENT;
 		}
 	} else if(row_sel == 1){
 		if(col_sel == 0){
-			inverter_setpoints.some_setpoint -= FLOAT_INCREMENT;
+			inverter_setpoints.precharge_threshold -= FLOAT_INCREMENT;
 		}else if (col_sel == 1){
 			inverter_setpoints.V_DC_diff_setpoint -= FLOAT_INCREMENT;
+		}
+	} else if(row_sel == 2){
+		if(col_sel == 0){
+			PA2 = false;
+		}else if (col_sel == 1){
+			PA5 = false;
 		}
 	}
 }
@@ -423,9 +439,8 @@ void draw_UI_line_A(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel) {
 void draw_UI_line_B(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
 
 	static char line_B_str[LINE_WIDTH];
-	char colour_V_diff_str[ESCAPE_SEQUENCE_LENGTH];
-	//char on_off_str[ESCAPE_SEQUENCE_LENGTH];
 	char colour_other_str[ESCAPE_SEQUENCE_LENGTH];
+	char colour_V_diff_str[ESCAPE_SEQUENCE_LENGTH];
 
 	/* Column 0 */
 	if(row_sel == 1 && col_sel == 0){
@@ -441,11 +456,39 @@ void draw_UI_line_B(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
 		strcpy(colour_V_diff_str, COLOUR_NOT_SELECTED);
 	}
 
-	sprintf(line_B_str,"Other: %s%2.2f%s\t\tV DC diff set: %s%2.2f V%s\n\r",colour_other_str,inverter_setpoints.some_setpoint,COLOUR_DEFAULT,
+	sprintf(line_B_str,"UV2: %s%2.2f%s\t\tV DC diff set: %s%2.2f V%s\n\r",colour_other_str,inverter_setpoints.precharge_threshold,COLOUR_DEFAULT,
 			colour_V_diff_str,inverter_setpoints.V_DC_diff_setpoint,COLOUR_DEFAULT);
 	(*p_line_counter)++;
 
 	push_UART2((char*) line_B_str);
+
+}
+
+void draw_UI_line_C(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
+
+	static char line_C_str[LINE_WIDTH];
+	char colour_left_value_str[ESCAPE_SEQUENCE_LENGTH];
+	char colour_right_value_str[ESCAPE_SEQUENCE_LENGTH];
+
+	/* Column 0 */
+	if(row_sel == 2 && col_sel == 0){
+		strcpy(colour_left_value_str, COLOUR_SELECTED);
+	}else{
+		strcpy(colour_left_value_str, COLOUR_NOT_SELECTED);
+	}
+
+	/* Column 1 */
+	if(row_sel == 2 && col_sel == 1){
+		strcpy(colour_right_value_str, COLOUR_SELECTED);
+	}else{
+		strcpy(colour_right_value_str, COLOUR_NOT_SELECTED);
+	}
+
+	sprintf(line_C_str,"Latch Set Pin: %s%d%s\tComp Reset Pin: %s%d%s\n\r",colour_left_value_str,PA2,COLOUR_DEFAULT,
+			colour_right_value_str,PA5,COLOUR_DEFAULT);
+	(*p_line_counter)++;
+
+	push_UART2((char*) line_C_str);
 
 }
 
@@ -459,31 +502,33 @@ void get_contactor_states(contactor_state_t* AC_contactor_state, contactor_state
 
 }
 
-void UI_serialize_code(uint32_t* faults_code, bool flag){
+void UI_serialize_code(uint32_t* faults_code, uint8_t bit_number, bool flag){
 
 	if(flag){// If the flag is true
-		*faults_code |= 1;// Add a 1
+		*faults_code |= (1<<bit_number);// Add a 1
 	}
-	*faults_code <<= 1;// Shift to make room for the next flag
+
+
 }
 
 uint32_t UI_get_faults_code(void){
 
 	uint32_t faults_code = 0;
 
-	UI_serialize_code(&faults_code, inverter_faults.PLL_sync_fault);
-	UI_serialize_code(&faults_code, inverter_faults.i_sync_fault);
-	UI_serialize_code(&faults_code, inverter_faults.i_sync_fault);
-	UI_serialize_code(&faults_code, inverter_faults.OV_v_AC_fault);
-	UI_serialize_code(&faults_code, inverter_faults.OV_V_DC_plus_fault);
-	UI_serialize_code(&faults_code, inverter_faults.OV_V_DC_minus_fault);
-	UI_serialize_code(&faults_code, inverter_faults.UV_V_DC_plus_fault);
-	UI_serialize_code(&faults_code, inverter_faults.UV_V_DC_minus_fault);
-	UI_serialize_code(&faults_code, inverter_faults.UV2_V_DC_plus_fault);
-	UI_serialize_code(&faults_code, inverter_faults.UV2_V_DC_minus_fault);
-	UI_serialize_code(&faults_code, inverter_faults.OV_V_DC_diff_fault);
-	UI_serialize_code(&faults_code, inverter_faults.precharge_timeout_fault);
-	UI_serialize_code(&faults_code, inverter_faults.charge_timeout_fault);
+	/* Bit 00*/UI_serialize_code(&faults_code, 0, inverter_faults.PLL_sync_fault);
+	/* Bit 01*/UI_serialize_code(&faults_code, 1, inverter_faults.i_sync_fault);
+	/* Bit 02*/UI_serialize_code(&faults_code, 2, inverter_faults.OV_v_AC_fault);
+	/* Bit 03*/UI_serialize_code(&faults_code, 3, inverter_faults.OV_V_DC_plus_fault);
+	/* Bit 04*/UI_serialize_code(&faults_code, 4, inverter_faults.OV_V_DC_minus_fault);
+	/* Bit 05*/UI_serialize_code(&faults_code, 5, inverter_faults.UV_V_DC_plus_fault);
+	/* Bit 06*/UI_serialize_code(&faults_code, 6, inverter_faults.UV_V_DC_minus_fault);
+	/* Bit 07*/UI_serialize_code(&faults_code, 7, inverter_faults.UV2_V_DC_plus_fault);
+	/* Bit 08*/UI_serialize_code(&faults_code, 8, inverter_faults.UV2_V_DC_minus_fault);
+	/* Bit 09*/UI_serialize_code(&faults_code, 9, inverter_faults.OV_V_DC_diff_fault);
+	/* Bit 10*/UI_serialize_code(&faults_code, 10, inverter_faults.precharge_timeout_fault);
+	/* Bit 11*/UI_serialize_code(&faults_code, 11, inverter_faults.charge_timeout_fault);
+	/* Bit 12*/UI_serialize_code(&faults_code, 12, g_Interrupt_real_time_fault);
+
 
 	return faults_code;
 }

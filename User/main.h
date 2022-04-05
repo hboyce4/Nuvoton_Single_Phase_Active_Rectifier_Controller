@@ -17,7 +17,7 @@
 
 // XTAL:
 // !!! Don't forget to update the __HXT macro with the correct External Crystal Clock Frequency !!!
-#define __HXT       (12000000UL)    /*!< External Crystal Clock Frequency     */
+//#define __HXT       (12000000UL)    /*!< External Crystal Clock Frequency     */
 
 #define PLL_CLOCK           192000000
 

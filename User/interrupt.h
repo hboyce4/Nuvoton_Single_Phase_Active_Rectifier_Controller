@@ -18,7 +18,9 @@
 /* Global variables to be made available externally                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
 extern volatile uint64_t g_SysTickIntCnt;
-extern volatile bool UI_new_frame_tick;
+extern volatile bool g_UI_new_frame_tick;
+
+extern volatile bool g_Interrupt_real_time_fault;
 
 
 

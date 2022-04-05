@@ -14,6 +14,7 @@
 inverter_state_variables_t inverter = {.I_D = 0};
 inverter_state_safety_t inverter_safety;
 inverter_state_setpoints_t inverter_setpoints = {.inverter_active = 0,
+												 .precharge_threshold = UV2_LIMIT,
 												 .V_DC_total_setpoint = VBUS_TOTAL_DEFAULT,
 												 .V_DC_diff_setpoint = VBUS_DIFF_DEFAULT};
 inverter_faults_t inverter_faults;
@@ -26,39 +27,32 @@ inverter_faults_t inverter_faults;
 
 void inverter_control_main(void){ // Service the inverter. Needs up-to-date PLL and analog input values.
 	/* High frequency -> Use T_CALC */
+	PA4 = false;inverter_safety.d_ok = false;
 
 	inverter_check_safety_operational_status();
+
+	if(inverter_safety.d_ok){
+		PA4 = true; /* rising edge to enable the inverter*/
+	}
+
+	PA15 = !PA3;/* Make the blue LED display the status of the current latch*/
 
 	//saturate();
 	inverter.i_SP = (inverter.I_D * PLL.b_beta) + inverter.I_balance ; /* The current setpoint is the sum of the "direct" (iD) current and the balancing current*/
 	// inverter.I_D is a continuous ("DC") value, PLL.b_beta is a sine wave.  inverter.I_balance is a proportionately small "DC" value.
-
-	/* Calculate the duty cycle feedforward value */
-	float d_feedforward;
-	if(analog_in.V_DC_total == 0){ /* If we were to run into a division by zero */
-		d_feedforward = 0.5; /* don't do the calculation and just pick 50% */
-	}else{
-		d_feedforward = (analog_in.v_AC-analog_in.V_DC_minus)/analog_in.V_DC_total;
-
-		/* Saturate between 0 and 1 (0% and 100%)*/
-		if(d_feedforward < 0){
-			d_feedforward = 0;
-		}else if(d_feedforward > 1){
-			d_feedforward = 1;
-		}
-	}
-
-	inverter.d_feedforward = d_feedforward;
 
 }
 
 
 void inverter_check_safety_operational_status(void){
 
+	//Update all variables and flags
 	inverter_check_PLL_sync();
 	inverter_check_i_sync();
-	inverter_check_limits();
+	inverter_check_voltage_limits();
+	inverter_calc_duty_cycle();
 
+	/* Calculate the operating state*/
 	inverter_calc_state();
 
 }
@@ -113,7 +107,7 @@ void inverter_check_i_sync(void){
 
 }
 
-void inverter_check_limits(void){
+void inverter_check_voltage_limits(void){
 
 	/************* VBUS+ Overvoltage **************************************************************************************/
 	if(analog_in.V_DC_plus > OV_LIMIT){ /* If VBUS+ is over the overvoltage limit*/
@@ -143,7 +137,7 @@ void inverter_check_limits(void){
 	/************* VBUS+ Undervoltage end **********************************************************************************/
 
 	/************* VBUS+ Undervoltage 2 **************************************************************************************/
-	if(analog_in.V_DC_plus < UV2_LIMIT){ /* If VBUS+ is under the second undervoltage limit*/
+	if(analog_in.V_DC_plus < /*UV2_LIMIT*/inverter_setpoints.precharge_threshold){ /* If VBUS+ is under the second undervoltage limit*/
 		inverter_safety.UV2_V_DC_plus = TRUE; /* There is currently an undervoltage 2 condition */
 		inverter_faults.UV2_V_DC_plus_fault = TRUE; /* Memorize the fault */
 	}else{
@@ -163,7 +157,7 @@ void inverter_check_limits(void){
 	/************* VBUS- Undervoltage end ***********************************************************************************/
 
 	/************* VBUS- Undervoltage 2 **************************************************************************************/
-	if(analog_in.V_DC_minus > -UV2_LIMIT){ /* If VBUS- exceeds the second undervoltage limit*/
+	if(analog_in.V_DC_minus > /*-UV2_LIMIT*/-inverter_setpoints.precharge_threshold){ /* If VBUS- exceeds the second undervoltage limit*/
 		inverter_safety.UV2_V_DC_minus = TRUE; /* There is currently an undervoltage 2 condition */
 		inverter_faults.UV2_V_DC_minus_fault = TRUE; /* Memorize the fault */
 	}else{
@@ -180,8 +174,38 @@ void inverter_check_limits(void){
 		inverter_safety.OV_V_DC_diff = FALSE; /* There is not currently an overvoltage condition */
 	}
 	/************* VBUS Imbalance end **********************************************************************************/
-	;
 
+}
+
+void inverter_calc_duty_cycle(void){
+
+	/* Calculate the duty cycle feedforward value */
+
+	float d; /* Theoretical duty cycle*/
+
+	if(analog_in.V_DC_total != 0){ /* If we're not dividing by zero*/
+
+		d = (analog_in.v_AC-analog_in.V_DC_minus)/analog_in.V_DC_total; // Calc the duty cycle
+
+		/* Saturate between 0 and 1 (0% and 100%) and make the value available for the analog output*/
+		if(d < 0){
+			inverter.d_feedforward = 0;
+		}else if(d > 1){
+			inverter.d_feedforward = 1;
+		} else {
+			inverter.d_feedforward = d;
+		}
+
+		if((d > D_MARGIN)&&(d < 1-D_MARGIN)){ /*If the duty cycle is within the inverter's capabilities*/
+			inverter_safety.d_ok = true;
+		}else{
+			inverter_safety.d_ok = false;
+		}
+
+	}else{
+		inverter.d_feedforward = 0.5; /* don't do the calculation and just pick 50% */
+		inverter_safety.d_ok = false;
+	}
 }
 
 void inverter_calc_state(void){
@@ -313,6 +337,11 @@ void inverter_calc_state(void){
 			// CHARGE state exit code here
 			precharge_timer = 0;
 			// CHARGE state exit code end
+
+			// OPER_AC_ON state entry code here
+			inverter_faults.reset = true;
+			// OPER_AC_ON state entry code end
+
 		};
 		break;
 
@@ -337,9 +366,15 @@ void inverter_calc_state(void){
 void inverter_medium_freq_task(void){
 	/* Medium frequency -> Use T_SYSTICK */
 
+	if(inverter_faults.reset){
+		inverter_reset_main_errors();
+	}
+
 	/* Calculate the current (i) setpoint */
 	inverter_calc_I_D();
 	inverter_calc_I_balance();
+
+
 
 
 }
@@ -387,8 +422,29 @@ void inverter_calc_I_balance(void){
 
 }
 
+void inverter_reset_main_errors(void){
 
+	inverter_faults.reset = false;
+	inverter_faults.PLL_sync_fault = false;
+	inverter_faults.i_sync_fault = false;
+	inverter_faults.OV_v_AC_fault = false;
+	inverter_faults.OV_V_DC_plus_fault = false;
+	inverter_faults.OV_V_DC_minus_fault = false;
+	inverter_faults.UV_V_DC_plus_fault = false;
+	inverter_faults.UV_V_DC_minus_fault = false;
+	inverter_faults.UV2_V_DC_plus_fault = false;
+	inverter_faults.UV2_V_DC_minus_fault = false;
+	inverter_faults.OV_V_DC_diff_fault = false;
+	//inverter_faults.precharge_timeout_fault; No need to reset these errors here since if they're triggered, the OPER_AC_ON state isn't reached
+	//inverter_faults.charge_timeout_fault;
 
+}
+
+void inverter_reset_charge_errors(void){
+
+	inverter_faults.precharge_timeout_fault = false;
+	inverter_faults.charge_timeout_fault = false;
+}
 
 
 

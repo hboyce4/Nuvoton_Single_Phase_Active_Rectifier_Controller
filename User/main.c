@@ -9,8 +9,6 @@
 
 // This firmware is very interrupt-driven. Therefore most of the "meat" is in interrupt.c
 
-
-
 /*---------------------------------------------------------------------------------------------------------*/
 /* Includes           				                                                                       */
 /*---------------------------------------------------------------------------------------------------------*/
@@ -20,6 +18,7 @@
 #include <stdint.h>
 #include "NuMicro.h"
 
+#include "sys.h"
 #include "init.h"
 #include "interrupt.h"
 #include "inverter_control.h"
@@ -72,12 +71,12 @@ int main()
     	/********************** UI begin ********************************/
 
     	int8_t row_sel, col_sel;
-    	if(UI_new_frame_tick){
-    		UI_new_frame_tick = false;
+    	if(g_UI_new_frame_tick){
+    		g_UI_new_frame_tick = false;
 
-        	PA->DOUT &= ~(BIT15);//Turn ON red LED
+        	//PA->DOUT &= ~(BIT15);//Turn ON blue LED
         	draw_UI(row_sel, col_sel);
-        	PA->DOUT |= BIT15;//Turn OFF red LED
+        	//PA->DOUT |= BIT15;//Turn OFF blue LED
 
     	}
     	read_user_input(&row_sel,&col_sel);/* Since the chip has a 16 byte hardware FIFO, and we are only expecting
@@ -89,13 +88,6 @@ int main()
 }
 
 /* I don't know where to put this*/
-void delay_ms(uint32_t delay){ /*Generates a milliseconds delay. NOT ACCURATE. Use a hardware timer for accuracy*/
 
-	uint64_t end_time = g_SysTickIntCnt + ((uint64_t)delay);
-
-	while(g_SysTickIntCnt <= end_time){ /* As long as the end time is not reached*/
-		/* Do nothing*/
-	}
-}
 
 /*** (C) COPYRIGHT 2021 Hugo Boyce ***/

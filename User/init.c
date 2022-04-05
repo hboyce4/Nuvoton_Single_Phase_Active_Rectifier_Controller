@@ -146,9 +146,16 @@ void init_general_IO(void){
 	GPIO_SetMode(PA, BIT12|BIT13|BIT14|BIT15, GPIO_MODE_OUTPUT); // LED outputs
 
 	// Relay and precharge optos
-	GPIO_SetMode(PC, BIT2|BIT3|BIT4|BIT5, GPIO_MODE_OUTPUT); // Optocouplers outputs
 	// Since they're active-low, we initialize them high
 	PC->DOUT |= (BIT2|BIT3|BIT4|BIT5); //set opto outputs high/inactive
+	GPIO_SetMode(PC, BIT2|BIT3|BIT4|BIT5, GPIO_MODE_OUTPUT); // Set optocoupler pins to outputs
+
+	// Inverter control pins
+	PA5 = true; // Compensator reset pin is active high. It should be in the reset state when the inverter is not running to prevent windup.
+	PA4 = false; // Enable pulse is idle in low state. Rising-edge trigerred
+	PA2 = false; // Current_ok_latch is set by setting the pin high
+	GPIO_SetMode(PA, BIT2|BIT4|BIT5, GPIO_MODE_OUTPUT);
+	GPIO_SetMode(PA, BIT3, GPIO_MODE_INPUT); // input for Current_ok_latch state
 
 }
 

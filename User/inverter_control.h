@@ -37,7 +37,7 @@
 
 // Operational limits
 #define OV_LIMIT 30.5 /* [V] Voltage limit for overvoltage on either VBUS */
-#define UV_LIMIT 14.9 /* [V] Undervoltage limit 1 on either VBUS. Below this, inverter must stop */
+#define UV_LIMIT 14.8 /* [V] Undervoltage limit 1 on either VBUS. Below this, inverter must stop */
 #define UV2_LIMIT 9.5 /* [V] Undervoltage limit 2 on either VBUS. Below this, precharge is necessary */
 #define DIFF_LIMIT 3 /* [V] Maximum voltage imbalance between VBUSes */
 
@@ -54,15 +54,23 @@
 
 // VBUS_TOTAL Filter
 #define VBUS_TOTAL_LPF_TAU 0.007958 /* [1/s] 20 Hz (1/(2*pi*20)) */
-#define VBUS_TOTAL_KP 5 /* Proportional gain of the V_DC_total controller */
-
 // VBUS_DIFF Filter
 #define VBUS_DIFF_LPF_TAU 0.026526 /* [1/s] 6 Hz (1/(2*pi*6)) */
-#define VBUS_DIFF_KP 1 /* Proportional gain of the V_DC_diff controller */
+
+
+//#define VBUS_DIFF_KP 1 /* Proportional gain of the V_DC_diff controller */
+#define VBUS_DIFF_KP 0.33 /* Proportional gain of the V_DC_diff controller */
+//#define VBUS_TOTAL_KP 5 /* Proportional gain of the V_DC_total controller */
+#define VBUS_TOTAL_KP (5/3) /* Proportional gain of the V_DC_total controller */
+
 
 // Maximum currents
-#define I_D_MAX 33 /* [A] Maximum allowable peak AC current */
-#define I_BALANCE_MAX 3 /* [A] Maximum allowable balancing (DC) current */
+//#define I_D_MAX 33 /* [A] Maximum allowable peak AC current */
+#define I_D_MAX 11 /* [A] Maximum allowable peak AC current */
+//#define I_BALANCE_MAX 3 /* [A] Maximum allowable balancing (DC) current */
+#define I_BALANCE_MAX 1 /* [A] Maximum allowable balancing (DC) current */
+
+#define D_MARGIN 0.15 /* Duty cycle margin. If the theoretical duty cycle is smaller than D_MARGIN, or greater than 1-D_MARGIN, don't run the inverter*/
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Type definitions           				                                                               */
@@ -75,6 +83,7 @@ typedef struct { /* Safety and operational statuses and conditions */
 	/* Fast refresh */
 	volatile bool PLL_sync;
 	volatile bool i_sync;
+	volatile bool d_ok;
 	volatile bool OV_v_AC;
 	volatile bool OV_V_DC_plus;
 	volatile bool OV_V_DC_minus;
@@ -120,6 +129,7 @@ typedef struct inverter_state_variables{ /* Process values or state variables */
 	//volatile float v_AC_n; /* v_AC normalized to a peak amplitude of one */
 	volatile float i_SP;
 	//volatile float i_PV;
+	volatile float d;
 	volatile float d_feedforward;
 
 } inverter_state_variables_t;
@@ -129,15 +139,18 @@ typedef struct { /* Uset selectable setpoints and modes */
 
 	//volatile float I_Q;
 	volatile bool inverter_active;
-	volatile float some_setpoint;
+	//volatile bool latch_set;
+	//volatile float some_setpoint;
 	volatile float V_DC_total_setpoint;
 	volatile float V_DC_diff_setpoint;
+	volatile float precharge_threshold;
 
 } inverter_state_setpoints_t;
 
 
 typedef struct { /* Memorizes fault conditions, limits exceeded, etc */
 
+	volatile bool reset;
 	volatile bool PLL_sync_fault;
 	volatile bool i_sync_fault;
 	volatile bool OV_v_AC_fault;
@@ -175,12 +188,18 @@ void inverter_check_PLL_sync(void);
 void inverter_check_i_sync(void);
 
 void inverter_check_safety_operational_status(void);
-void inverter_check_limits(void);
+void inverter_check_voltage_limits(void);
+
+void inverter_calc_duty_cycle(void);
+
 void inverter_calc_state(void);
 
 void inverter_medium_freq_task(void);
 
 void inverter_calc_I_D(void);
 void inverter_calc_I_balance(void);
+
+void inverter_reset_main_errors(void);
+void inverter_reset_charge_errors(void);
 
 #endif /* INVERTER_CONTROL_H_ */

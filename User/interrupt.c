@@ -12,7 +12,9 @@
 /*---------------------------------------------------------------------------------------------------------*/
 volatile uint64_t g_SysTickIntCnt = 0;
 
-volatile bool UI_new_frame_tick = false;
+volatile bool g_UI_new_frame_tick = false;
+
+volatile bool g_Interrupt_real_time_fault = false;
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Function definitions                                                                                    */
@@ -54,6 +56,10 @@ void TMR1_IRQHandler(void){ /*High frequency interrupt (F_CALC). Keep light!!! *
 		inverter_control_main(); // Service the inverter. Needs up-to-date PLL and analog input values.
 		convert_to_int_write_analog(); // Convert the calculated output values to int and output them
 
+		if(TIMER_GetIntFlag(TIMER1) == 1){/* If timer interrupt retrigerred before it's finished, we have a real time fault (cannot finish task on time)*/
+			g_Interrupt_real_time_fault = true;
+		}
+
 		//PA->DOUT |= BIT12;//Turn OFF green LED for timing measurements
 		PA12 = 1;
     }
@@ -72,9 +78,11 @@ void SysTick_Handler(void)	// Every millisecond (Medium frequency).
 	static uint16_t UI_refresh_counter = 0;
 	if(!UI_refresh_counter){
 		UI_refresh_counter = UI_FRAME_INTERVAL_MS;
-		UI_new_frame_tick = true;
+		g_UI_new_frame_tick = true;
 	}
 	UI_refresh_counter--;
+
+	// TODO: Raise fault if retrigger before end of task
 
 	PA13 = 1; // Turn off amber LED
 
