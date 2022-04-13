@@ -75,6 +75,8 @@ void SysTick_Handler(void)	// Every millisecond (Medium frequency).
 
     inverter_medium_freq_task();
 
+    ADC_calc_averages();
+
 	static uint16_t UI_refresh_counter = 0;
 	if(!UI_refresh_counter){
 		UI_refresh_counter = UI_FRAME_INTERVAL_MS;

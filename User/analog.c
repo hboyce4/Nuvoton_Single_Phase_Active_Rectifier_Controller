@@ -12,9 +12,15 @@
 /*---------------------------------------------------------------------------------------------------------*/
 
 volatile analog_inputs_t analog_in; /* directly measured values */
-volatile int32_t ADC_raw_val[EADC_TOTAL_CHANNELS];
+volatile uint32_t ADC_raw_val[EADC_TOTAL_CHANNELS];
 volatile uint16_t ADC_acq_buff[EADC_TOTAL_CHANNELS];
 volatile uint8_t ADC_acq_count;
+
+volatile analog_averages_t analog_avgs;
+
+volatile analog_offsets_t analog_offsets = {.v_AC = V_AC_OFFSET,
+											.i_PV = I_PV_OFFSET};
+
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Function definitions                                                                                       */
@@ -60,11 +66,11 @@ void convert_to_float(void){
 	/* Vbus diff */
 	analog_in.V_DC_diff = analog_in.V_DC_plus + analog_in.V_DC_minus;
 	/* V AC */
-	analog_in.v_AC = ((float)ADC_raw_val[V_AC_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*V_AC_GAIN))-V_AC_OFFSET;
+	analog_in.v_AC = ((float)ADC_raw_val[V_AC_CHANNEL] - (float)analog_offsets.v_AC)*(VREF_VOLTAGE/(RES_12BIT*V_AC_GAIN));
 	/* V AC normalized to 1 */
 	analog_in.v_AC_n = analog_in.v_AC*(1/(V_AC_NOMINAL_RMS_VALUE*M_SQRT2)); /* needs math.h */
 	/* Current process value (actual amperage) */
-	analog_in.i_PV = ((float)ADC_raw_val[I_PV_CHANNEL])*(VREF_VOLTAGE/(RES_12BIT*I_PV_GAIN))-I_PV_OFFSET;
+	analog_in.i_PV = ((float)ADC_raw_val[I_PV_CHANNEL] - (float)analog_offsets.i_PV)*(VREF_VOLTAGE/(RES_12BIT*I_PV_GAIN));
 }
 
 
@@ -89,7 +95,41 @@ void convert_to_int_write_analog(void){
 	 DAC_WRITE_DATA(DAC1, 0, i_sp_val);
 	 DAC_START_CONV(DAC1);
 #endif
+}
 
+void ADC_calc_averages(void){
+
+	static uint32_t v_AC_accumulator = 0;
+	static uint32_t i_PV_accumulator = 0;
+	static uint32_t v_Mid_accumulator = 0;
+	static uint32_t i = NB_SAMPLES_LONG_TERM_AVG;
+
+
+	if(i){ /* If countdown isn't finished (not zero)*/
+
+		v_AC_accumulator += (uint32_t)ADC_raw_val[V_AC_CHANNEL];
+		i_PV_accumulator += (uint32_t)ADC_raw_val[I_PV_CHANNEL];
+		v_Mid_accumulator += (uint32_t)ADC_raw_val[V_MID_CHANNEL];
+		i--;
+
+	}else{ /* Else countdown is finished*/
+
+		i = NB_SAMPLES_LONG_TERM_AVG; // reset i
+		analog_avgs.v_AC = v_AC_accumulator / NB_SAMPLES_LONG_TERM_AVG; // export the content of the accumulator div. by the number of samples to get avg.
+		v_AC_accumulator = 0; // reset the accumulator
+		analog_avgs.i_PV = i_PV_accumulator / NB_SAMPLES_LONG_TERM_AVG;
+		i_PV_accumulator = 0;
+		analog_avgs.v_Mid = v_Mid_accumulator / NB_SAMPLES_LONG_TERM_AVG;
+		v_Mid_accumulator = 0;
+
+	}
+
+}
+
+void ADC_autozero(void){ /* Zero ou the ADCs */
+
+	analog_offsets.v_AC = analog_avgs.v_AC;
+	analog_offsets.i_PV = analog_avgs.i_PV;
 
 }
 

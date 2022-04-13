@@ -46,7 +46,7 @@ typedef enum {CONTACTOR_DWELL = 0, CONTACTOR_CLOSED = 1, CONTACTOR_PRECHARGE = 4
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables to be made available externally                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
-
+extern volatile bool g_New_startup_from_user;
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Functions declaration                                                                              */
@@ -66,6 +66,7 @@ void draw_UI_line_8(uint8_t*);
 void draw_UI_line_9(uint8_t*);
 void draw_UI_line_10(uint8_t*);
 void draw_UI_line_11(uint8_t*);
+void draw_UI_line_12(uint8_t*);
 
 void draw_UI_line_separator(uint8_t*);
 

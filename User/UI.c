@@ -10,6 +10,7 @@
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
+volatile bool g_New_startup_from_user = 0;
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Function definitions                                                                                    */
@@ -33,8 +34,9 @@ void draw_UI(int8_t row_sel, int8_t col_sel){/* 60-ish characters width*/
 	draw_UI_line_7(&p_line_counter);
 	draw_UI_line_8(&p_line_counter);
 	draw_UI_line_9(&p_line_counter);
-	//draw_UI_line_10(&p_line_counter);
-	//draw_UI_line_11(&p_line_counter);
+	draw_UI_line_10(&p_line_counter);
+	draw_UI_line_11(&p_line_counter);
+	draw_UI_line_12(&p_line_counter);
 
 	draw_UI_line_separator(&p_line_counter);
 	/* Menu input*/
@@ -133,6 +135,7 @@ void increment_UI_value(int8_t row_sel, int8_t col_sel){
 		if(col_sel == 0){
 			if(!inverter_setpoints.inverter_active){ // if the inverter is off and we'll be turning it on in the next line
 				inverter_reset_charge_errors(); // Reset the charge errors
+				g_New_startup_from_user = true;
 			}
 			inverter_setpoints.inverter_active = true;
 		}else if (col_sel == 1){
@@ -375,7 +378,7 @@ void draw_UI_line_10(uint8_t* p_line_counter) {
 
 	static char line_10_str[LINE_WIDTH];
 
-	sprintf(line_10_str,"Inst. v AC: %2.2f V\n\r",analog_in.v_AC);
+	sprintf(line_10_str,"v AC avg: %d\tv AC offs: %d\n\r",analog_avgs.v_AC, analog_offsets.v_AC);
 	(*p_line_counter)++;
 
 	push_UART2((char*) line_10_str);
@@ -385,10 +388,20 @@ void draw_UI_line_11(uint8_t* p_line_counter) {
 
 	static char line_11_str[LINE_WIDTH];
 
-	sprintf(line_11_str,"Inst. i AC (PV): %2.2f V\n\r",analog_in.i_PV);
+	sprintf(line_11_str,"i PV avg: %d\ti PV offs: %d\n\r",analog_avgs.i_PV, analog_offsets.i_PV);
 	(*p_line_counter)++;
 
 	push_UART2((char*) line_11_str);
+}
+
+void draw_UI_line_12(uint8_t* p_line_counter) {
+
+	static char line_12_str[LINE_WIDTH];
+
+	sprintf(line_12_str,"Avg. v Mid: %d\n\r",analog_avgs.v_Mid);
+	(*p_line_counter)++;
+
+	push_UART2((char*) line_12_str);
 }
 
 
