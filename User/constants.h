@@ -24,8 +24,12 @@
 #define T_SYSTICK (1.0/1000) // [s] 1 millisecond systick
 
 
-#define RES_12BIT 4096.0
-#define RES_11BIT 2048.0
+#define ADC_RES_BITS 12
+#define ADC_RES_COUNT 4096.0 // 2^ADC_RES_BITS
+
+#define DAC_RES_BITS 11
+#define DAC_RES_COUNT 2048.0 // 2^DAC_RES_BITS
+
 
 
 // Nominal voltages

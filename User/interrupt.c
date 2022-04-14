@@ -50,8 +50,8 @@ void TMR1_IRQHandler(void){ /*High frequency interrupt (F_CALC). Keep light!!! *
         PA12 = 0;
 
         /* Begin control loop iteration */
-		process_ADC(); // Service ADC routine
-        convert_to_float(); // Service analog input values (convert ints from ADC to float for maths
+		ADC_service_oversampling(); // Service ADC routine
+        ADC_convert_to_float(); // Service analog input values (convert ints from ADC to float for maths
 		PLL_main(); // Service the PLL. Needs up-to-date analog input values.
 		inverter_control_main(); // Service the inverter. Needs up-to-date PLL and analog input values.
 		convert_to_int_write_analog(); // Convert the calculated output values to int and output them

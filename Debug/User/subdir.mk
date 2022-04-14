@@ -11,7 +11,8 @@ C_SRCS += \
 ../User/init.c \
 ../User/interrupt.c \
 ../User/inverter_control.c \
-../User/main.c 
+../User/main.c \
+../User/sys.c 
 
 OBJS += \
 ./User/PLL.o \
@@ -21,7 +22,8 @@ OBJS += \
 ./User/init.o \
 ./User/interrupt.o \
 ./User/inverter_control.o \
-./User/main.o 
+./User/main.o \
+./User/sys.o 
 
 C_DEPS += \
 ./User/PLL.d \
@@ -31,7 +33,8 @@ C_DEPS += \
 ./User/init.d \
 ./User/interrupt.d \
 ./User/inverter_control.d \
-./User/main.d 
+./User/main.d \
+./User/sys.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

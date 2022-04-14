@@ -381,7 +381,7 @@ void inverter_medium_freq_task(void){
 	inverter_calc_I_D();
 	inverter_calc_I_balance();
 
-	inverter_autozero();
+	analog_autozero();
 
 
 }
@@ -427,63 +427,6 @@ void inverter_calc_I_balance(void){
 
 	inverter.I_balance = err_V_DC_diff; /* Return the value of the "direct" current */
 
-}
-
-void inverter_autozero(void){
-
-/**************State machine for autozero conditions**************************************************/
-
-
-	static uint16_t successive_approximation;
-	static uint8_t bit_position;
-
-	bool conditions_ok = inverter_check_autozero_conditions_ok();
-
-	if((!conditions_ok) && inverter_safety.autozero_state != AUTOZERO_DONE){ /* If conditions not ok and the autozero isn't finished*/
-		inverter_safety.autozero_state = AUTOZERO_STANDBY; // Reset
-		// AUTOZERO_STANDBY state entry code here
-	}
-
-	switch(inverter_safety.autozero_state){
-
-		case AUTOZERO_STANDBY:
-			// Do nothing
-			break;
-
-		case AUTOZERO_WAIT_FOR_CONDITIONS:
-
-			if(conditions_ok){
-
-				// AUTOZERO_WAIT_FOR_CONDITIONS state exit code here
-				inverter_safety.autozero_state = AUTOZERO_IN_PROGRESS;// Go to next state
-
-				// AUTOZERO_IN_PROGRESS state entry code here
-
-
-			}
-			//
-			break;
-
-		case AUTOZERO_IN_PROGRESS:
-
-
-
-			//
-			break;
-
-		case AUTOZERO_DONE:
-			//
-			break;
-
-		default: // If un-handled state, that's an error
-			inverter_safety.autozero_state = AUTOZERO_STANDBY; //Reset
-	}
-
-}
-
-bool inverter_check_autozero_conditions_ok(void){
-	/* Voltages on the busses high enough that no current is drawn on the xformer and the AC relay and precharge are open (high) */
-	return (analog_in.V_DC_plus > VBUS_MIN_FOR_AUTOZERO) && (analog_in.V_DC_minus < -VBUS_MIN_FOR_AUTOZERO) && PC2 && PC4;
 }
 
 void inverter_reset_main_errors(void){

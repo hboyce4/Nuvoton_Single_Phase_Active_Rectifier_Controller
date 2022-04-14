@@ -69,7 +69,7 @@ User/UI.o: ../User/UI.c ../User/UI.h ../User/PLL.h ../User/main.h \
  ../Library/StdDriver/inc/sdh.h ../Library/StdDriver/inc/usbd.h \
  ../Library/StdDriver/inc/hsusbd.h ../Library/StdDriver/inc/otg.h \
  ../Library/StdDriver/inc/hsotg.h ../User/constants.h \
- ../User/inverter_control.h ../User/UART_over_DMA.h
+ ../User/inverter_control.h ../User/UART_over_DMA.h ../User/interrupt.h
 
 ../User/UI.h:
 
@@ -264,3 +264,5 @@ User/UI.o: ../User/UI.c ../User/UI.h ../User/PLL.h ../User/main.h \
 ../User/inverter_control.h:
 
 ../User/UART_over_DMA.h:
+
+../User/interrupt.h:

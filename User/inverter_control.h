@@ -73,17 +73,12 @@
 
 #define D_MARGIN 0.15 /* Duty cycle margin. If the theoretical duty cycle is smaller than D_MARGIN, or greater than 1-D_MARGIN, don't run the inverter*/
 
-// Autozero conditions
-#define VBUS_MIN_FOR_AUTOZERO 20
-
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Type definitions           				                                                               */
 /*---------------------------------------------------------------------------------------------------------*/
 
 typedef enum {OPER_OFF = 0, OPER_PRECHARGE = 1, OPER_WAIT_FOR_CLOSE = 2, OPER_DWELL = 3, OPER_CHARGE = 4, OPER_AC_ON = 5} operating_state_t;
-
-typedef enum {AUTOZERO_STANDBY, AUTOZERO_WAIT_FOR_CONDITIONS, AUTOZERO_IN_PROGRESS, AUTOZERO_DONE} autozero_state_t;
 
 typedef struct { /* Safety and operational statuses and conditions */
 
@@ -102,7 +97,6 @@ typedef struct { /* Safety and operational statuses and conditions */
 	//volatile contactor_state_t DC_contactor_state;
 	//volatile contactor_state_t AC_contactor_state;
 	volatile operating_state_t operating_state;
-	volatile autozero_state_t autozero_state;
 
 	/* Slow refresh*/
 	volatile bool HT_Transformer;
@@ -206,9 +200,6 @@ void inverter_medium_freq_task(void);
 
 void inverter_calc_I_D(void);
 void inverter_calc_I_balance(void);
-
-void inverter_autozero(void);
-bool inverter_check_autozero_conditions_ok(void);
 
 void inverter_reset_main_errors(void);
 void inverter_reset_charge_errors(void);

@@ -12,10 +12,13 @@
 /*---------------------------------------------------------------------------------------------------------*/
 volatile bool g_New_startup_from_user = 0;
 
+uint8_t page_number = 1; /* Keeps track of the info page we're on*/
+
 /*---------------------------------------------------------------------------------------------------------*/
 /* Function definitions                                                                                    */
 /*---------------------------------------------------------------------------------------------------------*/
 
+//TODO: Add double buffering
 
 /* 363us in Debug, 219us in Release ( -O2 ) */
 void draw_UI(int8_t row_sel, int8_t col_sel){/* 60-ish characters width*/
@@ -34,19 +37,13 @@ void draw_UI(int8_t row_sel, int8_t col_sel){/* 60-ish characters width*/
 	draw_UI_line_7(&p_line_counter);
 	draw_UI_line_8(&p_line_counter);
 	draw_UI_line_9(&p_line_counter);
-	draw_UI_line_10(&p_line_counter);
-	draw_UI_line_11(&p_line_counter);
-	draw_UI_line_12(&p_line_counter);
 
 	draw_UI_line_separator(&p_line_counter);
 	/* Menu input*/
 	draw_UI_line_A(&p_line_counter,row_sel, col_sel);
 	draw_UI_line_B(&p_line_counter,row_sel, col_sel);
 	draw_UI_line_C(&p_line_counter,row_sel, col_sel);
-
-	draw_UI_line_separator(&p_line_counter);
-
-	draw_UI_debug(&p_line_counter);
+	draw_UI_line_D(&p_line_counter,row_sel, col_sel);
 
 	draw_UI_line_separator(&p_line_counter);
 
@@ -131,51 +128,91 @@ void read_user_input(int8_t* p_row_sel, int8_t* p_col_sel){
 
 void increment_UI_value(int8_t row_sel, int8_t col_sel){
 
-	if(row_sel == 0){
-		if(col_sel == 0){
-			if(!inverter_setpoints.inverter_active){ // if the inverter is off and we'll be turning it on in the next line
-				inverter_reset_charge_errors(); // Reset the charge errors
-				g_New_startup_from_user = true;
+	switch(row_sel){
+
+		case 0:
+			if(col_sel == 0){
+				if(!inverter_setpoints.inverter_active){ // if the inverter is off and we'll be turning it on in the next line
+					inverter_reset_charge_errors(); // Reset the charge errors
+					g_New_startup_from_user = true;
+				}
+				inverter_setpoints.inverter_active = true;
+			}else if (col_sel == 1){
+				inverter_setpoints.V_DC_total_setpoint += FLOAT_INCREMENT;
 			}
-			inverter_setpoints.inverter_active = true;
-		}else if (col_sel == 1){
-			inverter_setpoints.V_DC_total_setpoint += FLOAT_INCREMENT;
-		}
-	} else if(row_sel == 1){
-		if(col_sel == 0){
-			inverter_setpoints.precharge_threshold += FLOAT_INCREMENT;
-		}else if (col_sel == 1){
-			inverter_setpoints.V_DC_diff_setpoint += FLOAT_INCREMENT;
-		}
-	} else if(row_sel == 2){
-		if(col_sel == 0){
-			PA2 = true;
-		}else if (col_sel == 1){
-			PA5 = true;
-		}
+			break;
+
+
+		case 1:
+			if(col_sel == 0){
+				inverter_setpoints.precharge_threshold += FLOAT_INCREMENT;
+			}else if (col_sel == 1){
+				inverter_setpoints.V_DC_diff_setpoint += FLOAT_INCREMENT;
+			}
+			break;
+
+
+		case 2:
+			if(col_sel == 0){
+				PA2 = true;
+			}else if (col_sel == 1){
+				PA5 = true;
+			}
+			break;
+
+
+		case 3:
+
+			if(col_sel == 0){
+				if(page_number < NB_PAGES){
+					page_number += 1;
+				}
+			}else if (col_sel == 1){
+				autozero_state = AUTOZERO_WAIT_FOR_CONDITIONS;// Do nothing
+			}
+			break;
+
 	}
+
 }
 
 void decrement_UI_value(int8_t row_sel, int8_t col_sel){
 
-	if(row_sel == 0){
-		if(col_sel == 0){
-			inverter_setpoints.inverter_active = false;
-		}else if (col_sel == 1){
-			inverter_setpoints.V_DC_total_setpoint -= FLOAT_INCREMENT;
-		}
-	} else if(row_sel == 1){
-		if(col_sel == 0){
-			inverter_setpoints.precharge_threshold -= FLOAT_INCREMENT;
-		}else if (col_sel == 1){
-			inverter_setpoints.V_DC_diff_setpoint -= FLOAT_INCREMENT;
-		}
-	} else if(row_sel == 2){
-		if(col_sel == 0){
-			PA2 = false;
-		}else if (col_sel == 1){
-			PA5 = false;
-		}
+	switch(row_sel){
+
+		case 0:
+			if(col_sel == 0){
+				inverter_setpoints.inverter_active = false;
+			}else if (col_sel == 1){
+				inverter_setpoints.V_DC_total_setpoint -= FLOAT_INCREMENT;
+			}
+			break;
+		case 1:
+			if(col_sel == 0){
+				inverter_setpoints.precharge_threshold -= FLOAT_INCREMENT;
+			}else if (col_sel == 1){
+				inverter_setpoints.V_DC_diff_setpoint -= FLOAT_INCREMENT;
+			}
+			break;
+
+		case 2:
+			if(col_sel == 0){
+				PA2 = false;
+			}else if (col_sel == 1){
+				PA5 = false;
+			}
+			break;
+
+		case 3:
+			if(col_sel == 0){
+				if(page_number > 1){
+					page_number -= 1;
+				}
+			}else if (col_sel == 1){
+				autozero_state = AUTOZERO_STANDBY;// Do nothing
+			}
+			break;
+
 	}
 }
 
@@ -271,71 +308,98 @@ void draw_UI_line_6(uint8_t* p_line_counter) {
 	static char line_6_str[LINE_WIDTH];
 	static char xformer_temp_color_str[ESCAPE_SEQUENCE_LENGTH];
 	static char inverter_temp_color_str[ESCAPE_SEQUENCE_LENGTH];
-	if (inverter_safety.OT_Transformer) {
-		/* If transformer is over temperature */
-		strcpy(xformer_temp_color_str, "\x1B[91m"); /* Red */
-	} else if (inverter_safety.HT_Transformer) {
-		/* Else if the transformer has a high temperature*/
-		strcpy(xformer_temp_color_str, "\x1B[93m"); /* Yellow */
-	} else {
-		/* Else the temperature is OK*/
-		strcpy(xformer_temp_color_str, COLOUR_DEFAULT); /* default*/
+
+	switch(page_number){
+		case 1:
+			if (inverter_safety.OT_Transformer) {
+				/* If transformer is over temperature */
+				strcpy(xformer_temp_color_str, "\x1B[91m"); /* Red */
+			} else if (inverter_safety.HT_Transformer) {
+				/* Else if the transformer has a high temperature*/
+				strcpy(xformer_temp_color_str, "\x1B[93m"); /* Yellow */
+			} else {
+				/* Else the temperature is OK*/
+				strcpy(xformer_temp_color_str, COLOUR_DEFAULT); /* default*/
+			}
+
+			if (inverter_safety.OT_Inverter) {
+				/* If transformer is over temperature */
+				strcpy(inverter_temp_color_str, "\x1B[91m"); /* Red */
+			} else if (inverter_safety.HT_Inverter) {
+				/* Else if the transformer has a high temperature*/
+				strcpy(inverter_temp_color_str, "\x1B[93m"); /* Yellow */
+			} else {
+				/* Else the temperature is OK*/
+				strcpy(inverter_temp_color_str, COLOUR_DEFAULT); /* default*/
+			}
+
+			sprintf(line_6_str,
+					"Xformer temp: %s%2.1fC%s\tInverter temp: %s%2.1fC%s \n\r",
+					xformer_temp_color_str, analog_in.T_transformer,
+					COLOUR_DEFAULT, inverter_temp_color_str,
+					analog_in.T_inverter, COLOUR_DEFAULT);
+			break;
+
+		case 2:
+			sprintf(line_6_str,"Avg. v Mid: %d\n\r",analog_avgs.v_Mid);
+//
+			break;
 	}
 
-	if (inverter_safety.OT_Inverter) {
-		/* If transformer is over temperature */
-		strcpy(inverter_temp_color_str, "\x1B[91m"); /* Red */
-	} else if (inverter_safety.HT_Inverter) {
-		/* Else if the transformer has a high temperature*/
-		strcpy(inverter_temp_color_str, "\x1B[93m"); /* Yellow */
-	} else {
-		/* Else the temperature is OK*/
-		strcpy(inverter_temp_color_str, COLOUR_DEFAULT); /* default*/
-	}
-
-	sprintf(line_6_str,
-			"Xformer temp: %s%2.1fC%s\tInverter temp: %s%2.1fC%s \n\r",
-			xformer_temp_color_str, analog_in.T_transformer,
-			COLOUR_DEFAULT, inverter_temp_color_str,
-			analog_in.T_inverter, COLOUR_DEFAULT);
 	(*p_line_counter)++;
 	push_UART2((char*) line_6_str);
 }
 
 void draw_UI_line_7(uint8_t* p_line_counter) {
 
+	static char line_7_str[LINE_WIDTH];
+
 	contactor_state_t AC_contactor_state;
 	contactor_state_t DC_contactor_state;
-	get_contactor_states(&AC_contactor_state, &DC_contactor_state);
 
-	static char line_7_str[LINE_WIDTH];
-	sprintf(line_7_str, "AC Contactor:");
-	if (AC_contactor_state == CONTACTOR_CLOSED) {
-		strcat(line_7_str, " Closed");
-	} else if (AC_contactor_state == CONTACTOR_PRECHARGE) {
-		strcat(line_7_str, "\x1B[93mPrecharge"); /*Yellow Precharge*/
-		strcat(line_7_str, COLOUR_DEFAULT);
-	} else if (AC_contactor_state == CONTACTOR_OPEN) {
-		strcat(line_7_str, " Open");
-	} else if (AC_contactor_state == CONTACTOR_DWELL) {
-			strcat(line_7_str, "\x1B[93mDwell"); /*Yellow Dwell*/
-			strcat(line_7_str, COLOUR_DEFAULT);
+
+	switch(page_number){
+
+		case 1:
+			//
+
+			get_contactor_states(&AC_contactor_state, &DC_contactor_state);
+
+			sprintf(line_7_str, "AC Contactor:");
+			if (AC_contactor_state == CONTACTOR_CLOSED) {
+				strcat(line_7_str, " Closed");
+			} else if (AC_contactor_state == CONTACTOR_PRECHARGE) {
+				strcat(line_7_str, "\x1B[93mPrecharge"); /*Yellow Precharge*/
+				strcat(line_7_str, COLOUR_DEFAULT);
+			} else if (AC_contactor_state == CONTACTOR_OPEN) {
+				strcat(line_7_str, " Open");
+			} else if (AC_contactor_state == CONTACTOR_DWELL) {
+					strcat(line_7_str, "\x1B[93mDwell"); /*Yellow Dwell*/
+					strcat(line_7_str, COLOUR_DEFAULT);
+			}
+
+			strcat(line_7_str, "\tDC Contactor:");
+			if (DC_contactor_state == CONTACTOR_CLOSED) {
+				strcat(line_7_str, " Closed");
+			} else if (DC_contactor_state == CONTACTOR_PRECHARGE) {
+				strcat(line_7_str, "\x1B[93mPrecharge"); /*Yellow Precharge*/
+				strcat(line_7_str, COLOUR_DEFAULT);
+			} else if (DC_contactor_state == CONTACTOR_OPEN) {
+				strcat(line_7_str, " Open");
+			} else if (DC_contactor_state == CONTACTOR_DWELL) {
+					strcat(line_7_str, "\x1B[93mDwell"); /*Yellow Dwell*/
+					strcat(line_7_str, COLOUR_DEFAULT);
+			}
+
+			strcat(line_7_str, "\n\r");
+			break;
+
+		case 2:
+			sprintf(line_7_str,"Error code:%x\t\tOper. State:%d\n\r",UI_get_faults_code(),inverter_safety.operating_state);
+			break;
+
 	}
 
-	strcat(line_7_str, "\tDC Contactor:");
-	if (DC_contactor_state == CONTACTOR_CLOSED) {
-		strcat(line_7_str, " Closed");
-	} else if (DC_contactor_state == CONTACTOR_PRECHARGE) {
-		strcat(line_7_str, "\x1B[93mPrecharge"); /*Yellow Precharge*/
-		strcat(line_7_str, COLOUR_DEFAULT);
-	} else if (DC_contactor_state == CONTACTOR_OPEN) {
-		strcat(line_7_str, " Open");
-	} else if (DC_contactor_state == CONTACTOR_DWELL) {
-			strcat(line_7_str, "\x1B[93mDwell"); /*Yellow Dwell*/
-			strcat(line_7_str, COLOUR_DEFAULT);
-	}
-
-	strcat(line_7_str, "\n\r");
 	(*p_line_counter)++;
 	push_UART2((char*) line_7_str);
 }
@@ -343,23 +407,36 @@ void draw_UI_line_7(uint8_t* p_line_counter) {
 void draw_UI_line_8(uint8_t* p_line_counter) {
 
 	static char line_8_str[LINE_WIDTH];
-	sprintf(line_8_str, "PLL sync: ");
-	if (inverter_safety.PLL_sync) {
-		strcat(line_8_str, "\x1B[92mYES"); /* Green YES*/
-		strcat(line_8_str, COLOUR_DEFAULT);
-	} else {
-		strcat(line_8_str, "\x1B[93mNO"); /* Yellow NO*/
-		strcat(line_8_str, COLOUR_DEFAULT);
+
+	switch(page_number){
+
+		case 1:
+
+			sprintf(line_8_str, "PLL sync: ");
+			if (inverter_safety.PLL_sync) {
+				strcat(line_8_str, "\x1B[92mYES"); /* Green YES*/
+				strcat(line_8_str, COLOUR_DEFAULT);
+			} else {
+				strcat(line_8_str, "\x1B[93mNO"); /* Yellow NO*/
+				strcat(line_8_str, COLOUR_DEFAULT);
+			}
+			strcat(line_8_str, "\t\ti sync: ");
+			if (inverter_safety.i_sync) {
+				strcat(line_8_str, "\x1B[92mYES"); /* Green YES*/
+				strcat(line_8_str, COLOUR_DEFAULT);
+			} else {
+				strcat(line_8_str, "\x1B[91mNO"); /* Red NO*/
+				strcat(line_8_str, COLOUR_DEFAULT);
+			}
+			strcat(line_8_str, "\n\r");
+			break;
+
+		case 2:
+
+			sprintf(line_8_str,"i PV avg: %d\t\ti PV offs: %d\n\r",analog_avgs.i_PV, analog_offsets.i_PV);
+			break;
 	}
-	strcat(line_8_str, "\t\ti sync: ");
-	if (inverter_safety.i_sync) {
-		strcat(line_8_str, "\x1B[92mYES"); /* Green YES*/
-		strcat(line_8_str, COLOUR_DEFAULT);
-	} else {
-		strcat(line_8_str, "\x1B[91mNO"); /* Red NO*/
-		strcat(line_8_str, COLOUR_DEFAULT);
-	}
-	strcat(line_8_str, "\n\r");
+
 	(*p_line_counter)++;
 	push_UART2((char*) line_8_str);
 }
@@ -368,40 +445,22 @@ void draw_UI_line_9(uint8_t* p_line_counter) {
 
 	static char line_9_str[LINE_WIDTH];
 
-	sprintf(line_9_str,"PLL freq: %2.2f Hz\n\r",PLL.freq_Hz);
+	switch(page_number){
+
+		case 1:
+			sprintf(line_9_str,"PLL freq: %2.2f Hz\n\r",PLL.freq_Hz);
+			break;
+
+		case 2:
+			sprintf(line_9_str,"v AC avg: %d\t\tv AC offs: %d\n\r",analog_avgs.v_AC, analog_offsets.v_AC);
+			break;
+
+	}
+
+
 	(*p_line_counter)++;
 
 	push_UART2((char*) line_9_str);
-}
-
-void draw_UI_line_10(uint8_t* p_line_counter) {
-
-	static char line_10_str[LINE_WIDTH];
-
-	sprintf(line_10_str,"v AC avg: %d\tv AC offs: %d\n\r",analog_avgs.v_AC, analog_offsets.v_AC);
-	(*p_line_counter)++;
-
-	push_UART2((char*) line_10_str);
-}
-
-void draw_UI_line_11(uint8_t* p_line_counter) {
-
-	static char line_11_str[LINE_WIDTH];
-
-	sprintf(line_11_str,"i PV avg: %d\ti PV offs: %d\n\r",analog_avgs.i_PV, analog_offsets.i_PV);
-	(*p_line_counter)++;
-
-	push_UART2((char*) line_11_str);
-}
-
-void draw_UI_line_12(uint8_t* p_line_counter) {
-
-	static char line_12_str[LINE_WIDTH];
-
-	sprintf(line_12_str,"Avg. v Mid: %d\n\r",analog_avgs.v_Mid);
-	(*p_line_counter)++;
-
-	push_UART2((char*) line_12_str);
 }
 
 
@@ -505,6 +564,54 @@ void draw_UI_line_C(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
 
 }
 
+void draw_UI_line_D(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
+
+	static char line_D_str[LINE_WIDTH];
+
+	char colour_left_value_str[ESCAPE_SEQUENCE_LENGTH];
+	char colour_right_value_str[ESCAPE_SEQUENCE_LENGTH];
+
+	/* Column 0 */
+	if(row_sel == 3 && col_sel == 0){
+		strcpy(colour_left_value_str, COLOUR_SELECTED);
+	}else{
+		strcpy(colour_left_value_str, COLOUR_NOT_SELECTED);
+	}
+
+	/* Column 1 */
+	if(row_sel == 3 && col_sel == 1){
+		strcpy(colour_right_value_str, COLOUR_SELECTED);
+	}else{
+		strcpy(colour_right_value_str, COLOUR_NOT_SELECTED);
+	}
+
+	static char autozero_str[LINE_WIDTH];
+
+	switch(autozero_state){
+
+		case AUTOZERO_STANDBY:
+			strcpy(autozero_str,"Standby");
+			break;
+		case AUTOZERO_WAIT_FOR_CONDITIONS:
+			strcpy(autozero_str,"Wait");
+			break;
+		case AUTOZERO_IN_PROGRESS:
+			strcpy(autozero_str,"In Progress");
+			break;
+		case AUTOZERO_DONE:
+			strcpy(autozero_str,"Done");
+			break;
+
+	}
+
+	sprintf(line_D_str,"Page: %s%d%s\t\t\tAutoZero: %s%s%s\n\r",colour_left_value_str,page_number,COLOUR_DEFAULT,
+			colour_right_value_str,autozero_str,COLOUR_DEFAULT);
+	(*p_line_counter)++;
+
+	push_UART2((char*) line_D_str);
+
+}
+
 void get_contactor_states(contactor_state_t* AC_contactor_state, contactor_state_t*DC_contactor_state){
 
 	*AC_contactor_state = ((PC->PIN)&(BIT2|BIT4))>>2; // Pins for AC contactor are at PC2 and PC4. PC2 is precharge, and PC4 is the relay. Signals are active low.
@@ -542,19 +649,7 @@ uint32_t UI_get_faults_code(void){
 	/* Bit 11*/UI_serialize_code(&faults_code, 11, inverter_faults.charge_timeout_fault);
 	/* Bit 12*/UI_serialize_code(&faults_code, 12, g_Interrupt_real_time_fault);
 
-
 	return faults_code;
 }
 
-void draw_UI_debug(uint8_t* p_line_counter){
-
-	static char debug_str[LINE_WIDTH];
-
-		sprintf(debug_str,"Error code:%x\tOper. State:%d\n\r",UI_get_faults_code(),inverter_safety.operating_state);
-
-		(*p_line_counter)++;
-
-		push_UART2((char*) debug_str);
-
-}
 

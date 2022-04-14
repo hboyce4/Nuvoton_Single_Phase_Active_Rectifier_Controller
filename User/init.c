@@ -215,11 +215,11 @@ void init_DAC(void){
 
 	EPWM1->CLKPSC[1] = 0;/* CLKPSC[1] is EPWM_CLKPSC2_3 which is the prescaler for channels 2 & 3*/
 
-	EPWM1->PERIOD[2] = (uint16_t)RES_11BIT; /* 192MHz/2048 = 93.75 kHz*/
-	EPWM1->PERIOD[3] = (uint16_t)RES_11BIT;
+	EPWM1->PERIOD[2] = (uint16_t)DAC_RES_COUNT; /* 192MHz/2048 = 93.75 kHz*/
+	EPWM1->PERIOD[3] = (uint16_t)DAC_RES_COUNT;
 
-	EPWM1->CMPDAT[2] = (uint16_t)(RES_11BIT/2);/* Some initial value*/
-	EPWM1->CMPDAT[3] = (uint16_t)(RES_11BIT/2);
+	EPWM1->CMPDAT[2] = (uint16_t)(DAC_RES_COUNT/2);/* Some initial value*/
+	EPWM1->CMPDAT[3] = (uint16_t)(DAC_RES_COUNT/2);
 
 	EPWM1->WGCTL0 = (EPWM1->WGCTL0 & ~(EPWM_WGCTL0_PRDPCTL2_Msk | EPWM_WGCTL0_ZPCTL2_Msk)) | ((uint32_t)EPWM_OUTPUT_HIGH << EPWM_WGCTL0_ZPCTL2_Pos);
 	EPWM1->WGCTL0 = (EPWM1->WGCTL0 & ~(EPWM_WGCTL0_PRDPCTL3_Msk | EPWM_WGCTL0_ZPCTL3_Msk)) | ((uint32_t)EPWM_OUTPUT_HIGH << EPWM_WGCTL0_ZPCTL3_Pos);
