@@ -20,6 +20,7 @@
 #include "inverter_control.h"
 #include "UART_over_DMA.h"
 #include "interrupt.h"
+#include "autozero.h"
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Local Macros           				                                                                      */
@@ -50,6 +51,7 @@ typedef enum {CONTACTOR_DWELL = 0, CONTACTOR_CLOSED = 1, CONTACTOR_PRECHARGE = 4
 /*---------------------------------------------------------------------------------------------------------*/
 extern volatile bool g_New_startup_from_user;
 
+extern volatile uint32_t g_d_ff_zero_state;
 /*---------------------------------------------------------------------------------------------------------*/
 /* Functions declaration                                                                              */
 /*---------------------------------------------------------------------------------------------------------*/

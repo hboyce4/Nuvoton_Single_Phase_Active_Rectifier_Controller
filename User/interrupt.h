@@ -8,10 +8,10 @@
 #ifndef INTERRUPT_H_
 #define INTERRUPT_H_
 
-#include "NuMicro.h"
-#include "analog.h"
-#include "UART_over_DMA.h"
-#include "UI.h"
+//#include "NuMicro.h"
+
+//#include "UART_over_DMA.h"
+//#include "UI.h"
 
 
 /*---------------------------------------------------------------------------------------------------------*/

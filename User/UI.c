@@ -14,6 +14,8 @@ volatile bool g_New_startup_from_user = 0;
 
 uint8_t page_number = 1; /* Keeps track of the info page we're on*/
 
+volatile uint32_t g_d_ff_zero_state = 0;
+
 /*---------------------------------------------------------------------------------------------------------*/
 /* Function definitions                                                                                    */
 /*---------------------------------------------------------------------------------------------------------*/
@@ -145,9 +147,11 @@ void increment_UI_value(int8_t row_sel, int8_t col_sel){
 
 		case 1:
 			if(col_sel == 0){
-				inverter_setpoints.precharge_threshold += FLOAT_INCREMENT;
+				/*inverter_setpoints.precharge_threshold += FLOAT_INCREMENT;*/
+				g_d_ff_zero_state = true;
 			}else if (col_sel == 1){
-				inverter_setpoints.V_DC_diff_setpoint += FLOAT_INCREMENT;
+				/*inverter_setpoints.V_DC_diff_setpoint += FLOAT_INCREMENT;*/
+				measurement_offsets.d_FF += 1;
 			}
 			break;
 
@@ -189,9 +193,11 @@ void decrement_UI_value(int8_t row_sel, int8_t col_sel){
 			break;
 		case 1:
 			if(col_sel == 0){
-				inverter_setpoints.precharge_threshold -= FLOAT_INCREMENT;
+				/*inverter_setpoints.precharge_threshold = FLOAT_INCREMENT;*/
+				g_d_ff_zero_state = false;
 			}else if (col_sel == 1){
-				inverter_setpoints.V_DC_diff_setpoint -= FLOAT_INCREMENT;
+				/*inverter_setpoints.V_DC_diff_setpoint -= FLOAT_INCREMENT;*/
+				measurement_offsets.d_FF -= 1;
 			}
 			break;
 
@@ -252,9 +258,9 @@ void draw_UI_line_2(uint8_t* p_line_counter) {
 	}
 
 	sprintf(line_2_str, "V bus +: %s%2.2f V%s \tV bus -: %s%2.2f V%s\n\r",
-			colour_V_DC_plus, analog_in.V_DC_plus,
+			colour_V_DC_plus, measurements_in.V_DC_plus,
 			COLOUR_DEFAULT, colour_V_DC_minus,
-			analog_in.V_DC_minus,COLOUR_DEFAULT);
+			measurements_in.V_DC_minus,COLOUR_DEFAULT);
 	(*p_line_counter)++;
 	push_UART2((char*) line_2_str);
 }
@@ -335,13 +341,13 @@ void draw_UI_line_6(uint8_t* p_line_counter) {
 
 			sprintf(line_6_str,
 					"Xformer temp: %s%2.1fC%s\tInverter temp: %s%2.1fC%s \n\r",
-					xformer_temp_color_str, analog_in.T_transformer,
+					xformer_temp_color_str, measurements_in.T_transformer,
 					COLOUR_DEFAULT, inverter_temp_color_str,
-					analog_in.T_inverter, COLOUR_DEFAULT);
+					measurements_in.T_inverter, COLOUR_DEFAULT);
 			break;
 
 		case 2:
-			sprintf(line_6_str,"Avg. v Mid: %d\n\r",analog_avgs.v_Mid);
+			sprintf(line_6_str,"Avg. v Mid: %d\n\r",measurement_avgs.v_Mid);
 //
 			break;
 	}
@@ -433,7 +439,7 @@ void draw_UI_line_8(uint8_t* p_line_counter) {
 
 		case 2:
 
-			sprintf(line_8_str,"i PV avg: %d\t\ti PV offs: %d\n\r",analog_avgs.i_PV, analog_offsets.i_PV);
+			sprintf(line_8_str,"i PV avg: %d\t\ti PV offs: %d\n\r",measurement_avgs.i_PV, measurement_offsets.i_PV);
 			break;
 	}
 
@@ -452,7 +458,7 @@ void draw_UI_line_9(uint8_t* p_line_counter) {
 			break;
 
 		case 2:
-			sprintf(line_9_str,"v AC avg: %d\t\tv AC offs: %d\n\r",analog_avgs.v_AC, analog_offsets.v_AC);
+			sprintf(line_9_str,"v AC avg: %d\t\tv AC offs: %d\n\r",measurement_avgs.v_AC, measurement_offsets.v_AC);
 			break;
 
 	}
@@ -511,14 +517,14 @@ void draw_UI_line_A(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel) {
 void draw_UI_line_B(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
 
 	static char line_B_str[LINE_WIDTH];
-	char colour_other_str[ESCAPE_SEQUENCE_LENGTH];
+	char colour_left_str[ESCAPE_SEQUENCE_LENGTH];
 	char colour_V_diff_str[ESCAPE_SEQUENCE_LENGTH];
 
 	/* Column 0 */
 	if(row_sel == 1 && col_sel == 0){
-		strcpy(colour_other_str, COLOUR_SELECTED);
+		strcpy(colour_left_str, COLOUR_SELECTED);
 	}else{
-		strcpy(colour_other_str, COLOUR_NOT_SELECTED);
+		strcpy(colour_left_str, COLOUR_NOT_SELECTED);
 	}
 
 	/* Column 1 */
@@ -528,8 +534,18 @@ void draw_UI_line_B(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
 		strcpy(colour_V_diff_str, COLOUR_NOT_SELECTED);
 	}
 
-	sprintf(line_B_str,"UV2: %s%2.2f%s\t\tV DC diff set: %s%2.2f V%s\n\r",colour_other_str,inverter_setpoints.precharge_threshold,COLOUR_DEFAULT,
-			colour_V_diff_str,inverter_setpoints.V_DC_diff_setpoint,COLOUR_DEFAULT);
+	/*sprintf(line_B_str,"UV2: %s%2.2f%s\t\tV DC diff set: %s%2.2f V%s\n\r",colour_other_str,inverter_setpoints.precharge_threshold,COLOUR_DEFAULT,
+			colour_V_diff_str,inverter_setpoints.V_DC_diff_setpoint,COLOUR_DEFAULT);*/
+
+	static char d_ff_zero_str[LINE_WIDTH];
+
+	if(g_d_ff_zero_state){
+		strcpy(d_ff_zero_str,"ON");
+	}else{
+		strcpy(d_ff_zero_str,"OFF");
+	}
+	sprintf(line_B_str,"d_FF zero: %s%s%s\t\td_FF Offset: %s%i%s\n\r",colour_left_str,d_ff_zero_str,COLOUR_DEFAULT,
+	colour_V_diff_str,measurement_offsets.d_FF,COLOUR_DEFAULT);
 	(*p_line_counter)++;
 
 	push_UART2((char*) line_B_str);
@@ -604,7 +620,7 @@ void draw_UI_line_D(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
 
 	}
 
-	sprintf(line_D_str,"Page: %s%d%s\t\t\tAutoZero: %s%s%s\n\r",colour_left_value_str,page_number,COLOUR_DEFAULT,
+	sprintf(line_D_str,"Info page: %s%d%s\t\tAutoZero: %s%s%s\n\r",colour_left_value_str,page_number,COLOUR_DEFAULT,
 			colour_right_value_str,autozero_str,COLOUR_DEFAULT);
 	(*p_line_counter)++;
 

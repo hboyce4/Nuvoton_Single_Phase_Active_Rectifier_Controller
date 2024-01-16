@@ -6,6 +6,8 @@
  */
 
 #include "init.h"
+#include "analog.h"
+#include "timers.h"
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
@@ -55,6 +57,8 @@ void SYS_Init(void)
     CLK->APBCLK1 |= CLK_APBCLK1_DACCKEN_Msk;	/* DAC 0 & 1  Clock enable*/
 #endif
     CLK->APBCLK1 |= CLK_APBCLK1_BPWM1CKEN_Msk; /* BPWM 1 Clock enable*/
+    CLK->APBCLK1 |= CLK_APBCLK1_BPWM0CKEN_Msk; /* BPWM 0 Clock enable (For duty cycle capture */
+
 
     CLK->AHBCLK  |= CLK_AHBCLK_PDMACKEN_Msk; // PDMA Clock Enable
 
@@ -84,6 +88,8 @@ void SYS_Init(void)
     CLK->CLKDIV0 &= ~(CLK_CLKDIV0_EADCDIV_Msk);/* Reset EADCDIV */
     CLK->CLKDIV0 |= 1 << CLK_CLKDIV0_EADCDIV_Pos; /* EADC divider is EADCDIV + 1 . So EADC Clock will be PCLK1/2 (48MHz/1 = 48MHz) */
 
+
+    CLK_SetModuleClock(BPWM0_MODULE, CLK_CLKSEL2_BPWM0SEL_PLL, 0); /* For duty cycle capture. Make this uniform with the others in the future. */
 
     /* Update System Core Clock */
     /* User can use SystemCoreClockUpdate() to calculate SystemCoreClock. */
@@ -134,6 +140,13 @@ void SYS_Init(void)
 	 GPIO_DISABLE_DIGITAL_PATH(PB, /*BIT12 |*/ BIT13);
 #endif
 
+
+	 //SYS->GPF_MFPL &= ~SYS_GPF_MFPL_PF4MFP_Msk; /* Clear the bits of PF4 multi function port selection */
+	 //SYS->GPF_MFPL |= SYS_GPF_MFPL_PF4MFP_BPWM0_CH5;/* Set PF4 as BPWM0 channel 5*/
+
+	 SYS->GPA_MFPH &= ~SYS_GPA_MFPH_PA10MFP_Msk; // Set multifuntion pin for BPWM0_CH1 for duty cycle capture
+	 SYS->GPA_MFPH |= SYS_GPA_MFPH_PA10MFP_BPWM0_CH1;
+
     /* Lock protected registers */
     SYS_LockReg();
 }
@@ -165,35 +178,43 @@ void init_ADC(void){
     /* Set input mode as single-end and enable the A/D converter */
     EADC_Open(EADC, EADC_CTL_DIFFEN_SINGLE_END);
 
-    /* Configure the sample 4 module for analog input channel 0 and enable ADINT0 trigger source */
-    EADC_ConfigSampleModule(EADC, 0, EADC_ADINT0_TRIGGER, 0);
-    /* Configure the sample 5 module for analog input channel 1 and enable ADINT0 trigger source */
-    EADC_ConfigSampleModule(EADC, 1, EADC_ADINT0_TRIGGER, 1);
-    /* Configure the sample 6 module for analog input channel 2 and enable ADINT0 trigger source */
-    EADC_ConfigSampleModule(EADC, 2, EADC_ADINT0_TRIGGER, 2);
-    /* Configure the sample 7 module for analog input channel 3 and enable ADINT0 trigger source */
-    EADC_ConfigSampleModule(EADC, 3, EADC_ADINT0_TRIGGER, 3);
-    /* Configure the sample 4 module for analog input channel 0 and enable ADINT0 trigger source */
-    EADC_ConfigSampleModule(EADC, 4, EADC_ADINT0_TRIGGER, 4);
-    /* Configure the sample 5 module for analog input channel 1 and enable ADINT0 trigger source */
-    EADC_ConfigSampleModule(EADC, 5, EADC_ADINT0_TRIGGER, 5);
-    /* Configure the sample 6 module for analog input channel 2 and enable ADINT0 trigger source */
-    EADC_ConfigSampleModule(EADC, 6, EADC_ADINT0_TRIGGER, 6);
-    /* Configure the sample 7 module for analog input channel 3 and enable ADINT0 trigger source */
-    EADC_ConfigSampleModule(EADC, 7, EADC_ADINT0_TRIGGER, 7);
+//    /* Configure the sample 4 module for analog input channel 0 and enable ADINT0 trigger source */
+//    EADC_ConfigSampleModule(EADC, 0, EADC_ADINT0_TRIGGER, 0);
+//    /* Configure the sample 5 module for analog input channel 1 and enable ADINT0 trigger source */
+//    EADC_ConfigSampleModule(EADC, 1, EADC_ADINT0_TRIGGER, 1);
+//    /* Configure the sample 6 module for analog input channel 2 and enable ADINT0 trigger source */
+//    EADC_ConfigSampleModule(EADC, 2, EADC_ADINT0_TRIGGER, 2);
+//    /* Configure the sample 7 module for analog input channel 3 and enable ADINT0 trigger source */
+//    EADC_ConfigSampleModule(EADC, 3, EADC_ADINT0_TRIGGER, 3);
+//    /* Configure the sample 4 module for analog input channel 0 and enable ADINT0 trigger source */
+//    EADC_ConfigSampleModule(EADC, 4, EADC_ADINT0_TRIGGER, 4);
+//    /* Configure the sample 5 module for analog input channel 1 and enable ADINT0 trigger source */
+//    EADC_ConfigSampleModule(EADC, 5, EADC_ADINT0_TRIGGER, 5);
+//    /* Configure the sample 6 module for analog input channel 2 and enable ADINT0 trigger source */
+//    EADC_ConfigSampleModule(EADC, 6, EADC_ADINT0_TRIGGER, 6);
+//    /* Configure the sample 7 module for analog input channel 3 and enable ADINT0 trigger source */
+//    EADC_ConfigSampleModule(EADC, 7, EADC_ADINT0_TRIGGER, 7);
+
+    uint8_t i;
+    for(i = EADC_FIRST_CHANNEL; i <= EADC_LAST_CHANNEL; i++){
+
+    	/* Configure the sample i module for analog input channel i and enable ADINT0 trigger source */
+    	EADC_ConfigSampleModule(EADC, i, EADC_ADINT0_TRIGGER, i);
+    }
+
 
     /* Clear the A/D ADINT0 interrupt flag for safety */
     EADC_CLR_INT_FLAG(EADC, EADC_STATUS2_ADIF0_Msk);
 
-    /* Enable the sample module 7 interrupt */
+    /* Enable the last sample module interrupt */
     EADC_ENABLE_INT(EADC, BIT0);//Enable sample module  A/D ADINT0 interrupt.
-    EADC_ENABLE_SAMPLE_MODULE_INT(EADC, 0, BIT7);//Enable sample module 7 interrupt.
+    EADC_ENABLE_SAMPLE_MODULE_INT(EADC, 0, (1 << EADC_LAST_CHANNEL));//Enable sample module 7 interrupt.
     NVIC_SetPriority(EADC00_IRQn, ADC_INT_PRIORITY);
 
     /* Reset the ADC indicator and trigger sample module 7 to start A/D conversion */
     //g_u32AdcIntFlag = 0;
     //g_u32COVNUMFlag = 0;
-    EADC_START_CONV(EADC, BIT7);
+    EADC_START_CONV(EADC, (1 << EADC_LAST_CHANNEL));
 
     //__WFI();
 
@@ -265,13 +286,40 @@ void init_DAC(void){
 
 #endif
 
+}
+
+void init_BPWM0_duty_capture(void){// BPWM0 for duty cycle capture
+
+	BPWM_SET_PRESCALER(BPWM0, 1, 0);// Set presacler to (0+1). Set to 1 for highest resolution
+
+	/* set BPWM to up count type(edge aligned) */
+	BPWM0->CTL1 = BPWM_UP_COUNTER;
+
+
+	uint32_t BPWM1_CNR;
+
+	BPWM1_CNR = BPWM_GET_CNR(BPWM0, 1); // Normally 480 (192 Mhz cpu freq / 400 kHz PWM carrier freq = 480)
+
+	BPWM_SET_CNR(BPWM0, 1, (BPWM1_CNR + BPWM0_MARGIN)); // Count up to for fastest detection of underrun. BPWM1 cycle lasts 480 counts (Carrier period). Add a small margin on top of that to quickly detect overrun.
+
+	/* Enable Timer for BPWM0 channel 1 */
+	BPWM_Start(BPWM0, BPWM_CH_1_MASK);
+
+	/* Enable Capture Function for BPWM0 channel 1 */
+	BPWM_EnableCapture(BPWM0, BPWM_CH_1_MASK);
+
+	/* Enable rising capture reload */
+	BPWM0->CAPCTL |= BPWM_CAPCTL_RCRLDEN1_Msk;
+
+	/* Wait until BPWM0 channel 0 Timer start to count */
+	while((BPWM0->CNT) == 0);
 
 }
 
-void init_inverter_control(void){
+void init_BPWM1_carrier_generation(void){ // BPWM1 for PWM carrier generation
 
-    /*Using BPWM1, */
-    /* Begin to output the carrier waveform for the analog hardware PWModulator on PA.6 (pin 16 on the M481LIDAE) */
+	 /*Using BPWM1, */
+	/* Begin to output the carrier waveform for the analog hardware PWModulator on PA.6 (pin 16 on the M481LIDAE) */
 	BPWM_ConfigOutputChannel(BPWM1, 3, PWM_CARRIER_FREQ, 50); /* Set prescaler to 1, CNT to 480. Use the defined carrier freq, with 50% duty cycle */
 	BPWM1->POEN |= BPWM_POEN_POEN3_Msk; /* Enable CH5 (set 1 at bit position 5)*/
 	BPWM1->CNTEN = BPWM_CNTEN_CNTEN0_Msk;
@@ -280,6 +328,9 @@ void init_inverter_control(void){
 
 	delay_ms(10); /* Give the analog modulator some time to stabilize */
 
+}
+
+void init_inverter_control(void){
 
 	/* Start timer 1. Triggers the control loop interrupt */
     TIMER_Open(TIMER1, TIMER_PERIODIC_MODE, F_CALC); /* Set the interrupt frequency as F_CALC*/

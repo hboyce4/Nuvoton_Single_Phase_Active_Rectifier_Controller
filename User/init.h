@@ -38,6 +38,8 @@ void SYS_Init(void);
 void init_general_IO(void);
 void init_ADC(void);
 void init_DAC(void);
+void init_BPWM0_duty_capture(void);// BPWM0 timer for duty cycle capture
+void init_BPWM1_carrier_generation(void); //BPWM1 for PWM carrier generation
 void init_inverter_control(void);
 
 

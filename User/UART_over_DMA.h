@@ -57,6 +57,6 @@ void init_UART2_DMA(void); /* Needs SysTick!! */
 void start_UART2_DMA_Xfer(UART_DMA_Xfer_t);
 int8_t push_UART2(char*);
 int8_t pop_UART2(UART_DMA_Xfer_t*);
-
+void UART_DMA_process_interrupt(void);
 
 #endif /* UART_OVER_DMA_H_ */

@@ -41,7 +41,7 @@
 /*---------------------------------------------------------------------------------------------------------*/
 /* Functions declaration                                                                            	   */
 /*---------------------------------------------------------------------------------------------------------*/
-void delay_ms(uint32_t time); /*Generates a milliseconds delay. NOT ACCURATE. Use a hardware timer for accuracy*/
+//void delay_ms(uint32_t time); /*Generates a milliseconds delay. NOT ACCURATE. Use a hardware timer for accuracy*/
 
 //void PDMA_IRQHandler(void);
 //void UART_PDMATest(void);

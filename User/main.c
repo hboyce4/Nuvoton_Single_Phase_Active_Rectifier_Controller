@@ -57,6 +57,11 @@ int main()
     init_general_IO();
 
     init_ADC();
+
+    init_BPWM0_duty_capture(); // Initialize BPWM0 for duty cycle capture
+
+    init_BPWM1_carrier_generation();// Initialize BPWM1 for carrier generation. Generate a square wave for the analog PWM modulator
+
 #ifndef PWM_DAC
     init_DAC();
 #endif

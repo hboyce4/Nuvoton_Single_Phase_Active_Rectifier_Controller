@@ -282,4 +282,5 @@
 			<resource resourceType="PROJECT" workspacePath="/Nuvoton_Single_Phase_Active_Rectifier_Controller"/>
 		</configuration>
 	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cproject>

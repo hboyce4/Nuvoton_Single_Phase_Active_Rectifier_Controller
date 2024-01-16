@@ -8,6 +8,7 @@ C_SRCS += \
 ../User/UART_over_DMA.c \
 ../User/UI.c \
 ../User/analog.c \
+../User/autozero.c \
 ../User/init.c \
 ../User/interrupt.c \
 ../User/inverter_control.c \
@@ -19,6 +20,7 @@ OBJS += \
 ./User/UART_over_DMA.o \
 ./User/UI.o \
 ./User/analog.o \
+./User/autozero.o \
 ./User/init.o \
 ./User/interrupt.o \
 ./User/inverter_control.o \
@@ -30,6 +32,7 @@ C_DEPS += \
 ./User/UART_over_DMA.d \
 ./User/UI.d \
 ./User/analog.d \
+./User/autozero.d \
 ./User/init.d \
 ./User/interrupt.d \
 ./User/inverter_control.d \
@@ -38,10 +41,10 @@ C_DEPS += \
 
 
 # Each subdirectory must supply rules for building sources it contributes
-User/%.o: ../User/%.c
+User/%.o: ../User/%.c User/subdir.mk
 	@echo 'Building file: $<'
 	@echo 'Invoking: Cross ARM GNU C Compiler'
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O2 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -I"../Library/CMSIS/Include" -I"../Library/Device/Nuvoton/M480/Include" -I"../Library/StdDriver/inc" -std=gnu11 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<"
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O2 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -I"../Library/CMSIS/Include" -I"../Library/Device/Nuvoton/M480/Include" -I"../Library/StdDriver/inc" -std=gnu11 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -c -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

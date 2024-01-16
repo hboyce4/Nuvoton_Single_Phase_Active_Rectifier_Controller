@@ -62,7 +62,7 @@ void inverter_check_PLL_sync(void){
 
 	static uint16_t set_count, reset_count;
 
-	if((analog_in.v_AC_n > PLL.b_beta-PLL_SYNC_TOL) && (analog_in.v_AC_n < PLL.b_beta+PLL_SYNC_TOL)){ /* If the input voltage is within tolerance of the estimated voltage*/
+	if((measurements_in.v_AC_n > PLL.b_beta-PLL_SYNC_TOL) && (measurements_in.v_AC_n < PLL.b_beta+PLL_SYNC_TOL)){ /* If the input voltage is within tolerance of the estimated voltage*/
 		reset_count = 0;
 		set_count++;
 	}else{/* Else it's out of tolerance*/
@@ -88,7 +88,7 @@ void inverter_check_i_sync(void){
 
 	static uint16_t set_count, reset_count;
 
-	if((analog_in.i_PV > inverter.i_SP-I_SYNC_TOL) && (analog_in.i_PV < inverter.i_SP+I_SYNC_TOL)){ /* If the input voltage is within tolerance of the estimated voltage*/
+	if((measurements_in.i_PV > inverter.i_SP-I_SYNC_TOL) && (measurements_in.i_PV < inverter.i_SP+I_SYNC_TOL)){ /* If the input voltage is within tolerance of the estimated voltage*/
 		reset_count = 0;
 		set_count++;
 	}else{/* Else it's out of tolerance*/
@@ -111,7 +111,7 @@ void inverter_check_i_sync(void){
 void inverter_check_voltage_limits(void){
 
 	/************* VBUS+ Overvoltage **************************************************************************************/
-	if(analog_in.V_DC_plus > OV_LIMIT){ /* If VBUS+ is over the overvoltage limit*/
+	if(measurements_in.V_DC_plus > OV_LIMIT){ /* If VBUS+ is over the overvoltage limit*/
 		inverter_safety.OV_V_DC_plus = TRUE; /* There is currently an overvoltage condition */
 		inverter_faults.OV_V_DC_plus_fault = TRUE; /* Memorize the fault */
 	}else{
@@ -120,7 +120,7 @@ void inverter_check_voltage_limits(void){
 	/************* VBUS+ Overvoltage end **********************************************************************************/
 
 	/************* VBUS- Overvoltage **************************************************************************************/
-	if(analog_in.V_DC_minus < -OV_LIMIT){ /* If VBUS- exceeds the overvoltage limit*/
+	if(measurements_in.V_DC_minus < -OV_LIMIT){ /* If VBUS- exceeds the overvoltage limit*/
 		inverter_safety.OV_V_DC_minus = TRUE; /* There is currently an overvoltage condition */
 		inverter_faults.OV_V_DC_minus_fault = TRUE; /* Memorize the fault */
 	}else{
@@ -129,7 +129,7 @@ void inverter_check_voltage_limits(void){
 	/************* VBUS- Overvoltage end ***********************************************************************************/
 
 	/************* VBUS+ Undervoltage **************************************************************************************/
-	if(analog_in.V_DC_plus < UV_LIMIT){ /* If VBUS+ is under the undervoltage limit*/
+	if(measurements_in.V_DC_plus < UV_LIMIT){ /* If VBUS+ is under the undervoltage limit*/
 		inverter_safety.UV_V_DC_plus = TRUE; /* There is currently an undervoltage condition */
 		inverter_faults.UV_V_DC_plus_fault = TRUE; /* Memorize the fault */
 	}else{
@@ -138,7 +138,7 @@ void inverter_check_voltage_limits(void){
 	/************* VBUS+ Undervoltage end **********************************************************************************/
 
 	/************* VBUS+ Undervoltage 2 **************************************************************************************/
-	if(analog_in.V_DC_plus < /*UV2_LIMIT*/inverter_setpoints.precharge_threshold){ /* If VBUS+ is under the second undervoltage limit*/
+	if(measurements_in.V_DC_plus < /*UV2_LIMIT*/inverter_setpoints.precharge_threshold){ /* If VBUS+ is under the second undervoltage limit*/
 		inverter_safety.UV2_V_DC_plus = TRUE; /* There is currently an undervoltage 2 condition */
 		inverter_faults.UV2_V_DC_plus_fault = TRUE; /* Memorize the fault */
 	}else{
@@ -147,7 +147,7 @@ void inverter_check_voltage_limits(void){
 	/************* VBUS+ Undervoltage 2 end **********************************************************************************/
 
 	/************* VBUS- Undervoltage **************************************************************************************/
-	if(analog_in.V_DC_minus > -UV_LIMIT){ /* If VBUS- exceeds the undervoltage limit*/
+	if(measurements_in.V_DC_minus > -UV_LIMIT){ /* If VBUS- exceeds the undervoltage limit*/
 		inverter_safety.UV_V_DC_minus = TRUE; /* There is currently an undervoltage condition */
 		inverter_faults.UV_V_DC_minus_fault = TRUE; /* Memorize the fault */
 
@@ -158,7 +158,7 @@ void inverter_check_voltage_limits(void){
 	/************* VBUS- Undervoltage end ***********************************************************************************/
 
 	/************* VBUS- Undervoltage 2 **************************************************************************************/
-	if(analog_in.V_DC_minus > /*-UV2_LIMIT*/-inverter_setpoints.precharge_threshold){ /* If VBUS- exceeds the second undervoltage limit*/
+	if(measurements_in.V_DC_minus > /*-UV2_LIMIT*/-inverter_setpoints.precharge_threshold){ /* If VBUS- exceeds the second undervoltage limit*/
 		inverter_safety.UV2_V_DC_minus = TRUE; /* There is currently an undervoltage 2 condition */
 		inverter_faults.UV2_V_DC_minus_fault = TRUE; /* Memorize the fault */
 	}else{
@@ -168,7 +168,7 @@ void inverter_check_voltage_limits(void){
 
 
 	/************* VBUS imbalance **************************************************************************************/
-	if(fabs(analog_in.V_DC_diff) > DIFF_LIMIT){ /* If VBUS+ is over the overvoltage limit*/
+	if(fabs(measurements_in.V_DC_diff) > DIFF_LIMIT){ /* If VBUS+ is over the overvoltage limit*/
 		inverter_safety.OV_V_DC_diff = TRUE; /* There is currently an overvoltage condition */
 		inverter_faults.OV_V_DC_diff_fault = TRUE; /* Memorize the fault */
 	}else{
@@ -184,9 +184,9 @@ void inverter_calc_duty_cycle(void){
 
 	float d; /* Theoretical duty cycle*/
 
-	if(analog_in.V_DC_total != 0){ /* If we're not dividing by zero*/
+	if(measurements_in.V_DC_total != 0){ /* If we're not dividing by zero*/
 
-		d = (analog_in.v_AC-analog_in.V_DC_minus)/analog_in.V_DC_total; // Calc the duty cycle
+		d = (measurements_in.v_AC-measurements_in.V_DC_minus)/measurements_in.V_DC_total; // Calc the duty cycle
 
 		/* Saturate between 0 and 1 (0% and 100%) and make the value available for the analog output*/
 		if(d < 0){
@@ -377,11 +377,11 @@ void inverter_medium_freq_task(void){
 		inverter_reset_main_errors();
 	}
 
-	/* Calculate the current (i) setpoint */
-	inverter_calc_I_D();
-	inverter_calc_I_balance();
+	/* Calculate the (DC) current setpoint (i) */
+	inverter_calc_I_D(); /* Direct axis */
+	inverter_calc_I_balance(); /* balancing component */
 
-	analog_autozero();
+	autozero_state_machine();/* Autozeroing state machine */
 
 
 }
@@ -390,7 +390,7 @@ void inverter_calc_I_D(void){
 
 	//static float V_DC_total_filtered;
 
-	inverter.V_DC_total_filtered = inverter.V_DC_total_filtered + (((analog_in.V_DC_total-inverter.V_DC_total_filtered)*T_SYSTICK)/VBUS_TOTAL_LPF_TAU); // Low pass filter
+	inverter.V_DC_total_filtered = inverter.V_DC_total_filtered + (((measurements_in.V_DC_total-inverter.V_DC_total_filtered)*T_SYSTICK)/VBUS_TOTAL_LPF_TAU); // Low pass filter
 
 	float err_V_DC_total = inverter.V_DC_total_filtered - inverter_setpoints.V_DC_total_setpoint; // Calculate the error
 
@@ -412,7 +412,7 @@ void inverter_calc_I_balance(void){
 
 	//static float V_DC_diff_filtered;
 
-	inverter.V_DC_diff_filtered = inverter.V_DC_diff_filtered + (((analog_in.V_DC_diff-inverter.V_DC_diff_filtered)*T_SYSTICK)/VBUS_DIFF_LPF_TAU); // Low pass filter
+	inverter.V_DC_diff_filtered = inverter.V_DC_diff_filtered + (((measurements_in.V_DC_diff-inverter.V_DC_diff_filtered)*T_SYSTICK)/VBUS_DIFF_LPF_TAU); // Low pass filter
 
 	float err_V_DC_diff = inverter.V_DC_diff_filtered - inverter_setpoints.V_DC_diff_setpoint; // Calculate the error
 

@@ -1,0 +1,63 @@
+/*
+ * autozero.h
+ *
+ *  Created on: Sep. 26, 2023
+ *      Author: Hugo Boyce
+ */
+
+#ifndef AUTOZERO_H_
+#define AUTOZERO_H_
+
+#include <stdbool.h>
+#include <math.h>
+#include "NuMicro.h"
+#include "analog.h"
+
+/*---------------------------------------------------------------------------------------------------------*/
+/* Macros           				                                                                      */
+/*---------------------------------------------------------------------------------------------------------*/
+
+// Autozero conditions
+#define VBUS_MIN_FOR_AUTOZERO 20 /* [V] Minimum voltage on the busses to perform autozero */
+#define COUNT_MARGIN_FOR_AUTOZERO 1750 /* [counts] Margin, in ADC counts, to consider the signal saturated (to 3.3V or GND))*/
+#define FLOAT_MARGIN_FOR_AUTOZERO 0.425 /* [D] Margin, in proportion of D (1) to consider the signal saturated (to 3.3V or GND))*/
+
+/*---------------------------------------------------------------------------------------------------------*/
+/* Type definitions           				                                                                       */
+/*---------------------------------------------------------------------------------------------------------*/
+
+typedef enum {AUTOZERO_STANDBY, AUTOZERO_WAIT_FOR_CONDITIONS, AUTOZERO_I_IN_PROGRESS, AUTOZERO_D_IN_PROGRESS, AUTOZERO_DONE} autozero_state_t;
+
+typedef struct { /* */
+
+	static uint16_t guess;
+	static int8_t bit_position;
+
+} autozero_i_t;
+
+typedef struct { /* */
+
+	static uint16_t fdfdfdfdf;
+	static int8_t dfdfdf;
+
+} autozero_d_t;
+
+/*---------------------------------------------------------------------------------------------------------*/
+/* External global variables                                                                               */
+/*---------------------------------------------------------------------------------------------------------*/
+
+extern volatile autozero_state_t autozero_state; //UI needs to be able to read this
+
+/*---------------------------------------------------------------------------------------------------------*/
+/* Functions declaration                                                                              */
+/*---------------------------------------------------------------------------------------------------------*/
+
+
+void autozero_state_machine(void);
+bool autozero_check_conditions_ok(void);
+
+void autozero_I_in_progress_ENTRY(void);
+void autozero_I_in_progress_EXIT(void);
+
+
+#endif /* AUTOZERO_H_ */
