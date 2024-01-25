@@ -44,7 +44,10 @@ void TMR1_IRQHandler(void){ /*High frequency interrupt (F_CALC). Keep light!!! *
         Measurement_convert_to_float(); // Service analog input values (convert ints from ADC to float for maths
 		PLL_main(); // Service the PLL. Needs up-to-date analog input values.
 		inverter_control_main(); // Service the inverter. Needs up-to-date PLL and analog input values.
-		Measurement_convert_to_int_and_write(); // Convert the calculated output values to int and output them
+
+		if(autozero_state == AUTOZERO_DONE || autozero_state == AUTOZERO_STANDBY){ // Unless the autozero is in progress
+			Measurement_convert_to_int_and_write(); // Convert the calculated output values to int and output them
+		}
 
 		if(TIMER_GetIntFlag(TIMER1) == 1){/* If timer interrupt retrigerred before it's finished, we have a real time fault (cannot finish task on time)*/
 			g_Interrupt_real_time_fault = true;

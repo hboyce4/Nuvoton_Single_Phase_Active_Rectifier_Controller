@@ -28,11 +28,11 @@ inverter_faults_t inverter_faults;
 void inverter_control_main(void){ // Service the inverter. Needs up-to-date PLL and analog input values.
 	/* High frequency -> Use T_CALC */
 	PA4 = false;
-	inverter_safety.d_ok = false;
+	inverter_safety.d_ff_ok = false;
 
 	inverter_check_safety_operational_status();
 
-	if(inverter_safety.d_ok){
+	if(inverter_safety.d_ff_ok){
 		PA4 = true; /* rising edge to enable the inverter*/
 	}
 
@@ -51,7 +51,7 @@ void inverter_check_safety_operational_status(void){
 	inverter_check_PLL_sync();
 	inverter_check_i_sync();
 	inverter_check_voltage_limits();
-	inverter_calc_duty_cycle();
+	inverter_calc_d_ff();
 
 	/* Calculate the operating state*/
 	inverter_calc_state();
@@ -178,7 +178,7 @@ void inverter_check_voltage_limits(void){
 
 }
 
-void inverter_calc_duty_cycle(void){
+void inverter_calc_d_ff(void){
 
 	/* Calculate the duty cycle feedforward value */
 
@@ -198,14 +198,14 @@ void inverter_calc_duty_cycle(void){
 		}
 
 		if((d > D_MARGIN)&&(d < 1-D_MARGIN)){ /*If the duty cycle is within the inverter's capabilities*/
-			inverter_safety.d_ok = true;
+			inverter_safety.d_ff_ok = true;
 		}else{
-			inverter_safety.d_ok = false;
+			inverter_safety.d_ff_ok = false;
 		}
 
 	}else{
 		inverter.d_feedforward = 0.5; /* don't do the calculation and just pick 50% */
-		inverter_safety.d_ok = false;
+		inverter_safety.d_ff_ok = false;
 	}
 }
 
@@ -256,7 +256,7 @@ void inverter_calc_state(void){
 			if(precharge_timer){ /* If time left on the timer*/
 				precharge_timer--; /* Decrease timer*/
 			}else{ /* Else timer has elapsed */
-				// PRECHARGE state exit code would go here
+				// PRECHARGE state exit code goes here
 
 				inverter_safety.operating_state = OPER_OFF; // switch to the OFF state immediately
 				inverter_setpoints.inverter_active = FALSE; // To avoid cycling

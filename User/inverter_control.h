@@ -85,7 +85,7 @@ typedef struct { /* Safety and operational statuses and conditions */
 	/* Fast refresh */
 	volatile bool PLL_sync;
 	volatile bool i_sync;
-	volatile bool d_ok;
+	volatile bool d_ff_ok;
 	volatile bool OV_v_AC;
 	volatile bool OV_V_DC_plus;
 	volatile bool OV_V_DC_minus;
@@ -192,7 +192,7 @@ void inverter_check_i_sync(void);
 void inverter_check_safety_operational_status(void);
 void inverter_check_voltage_limits(void);
 
-void inverter_calc_duty_cycle(void);
+void inverter_calc_d_ff(void);// Calculate duty cycle feedforward term
 
 void inverter_calc_state(void);
 

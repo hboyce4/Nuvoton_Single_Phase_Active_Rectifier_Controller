@@ -109,12 +109,12 @@ void Measurement_convert_to_int_and_write(void){
 	}
 	d_ff_val += (int32_t)measurement_offsets.d_FF; /* Centered around D_FF_OFFSET */
 
-	if(autozero_state != AUTOZERO_I_IN_PROGRESS){
 
-		DAC_write_i_SP((uint32_t)i_sp_val);
-		EPWM1->CMPDAT[3] = (uint32_t)d_ff_val;/* d_FF DAC, DAC0 pin */
 
-	}
+	DAC_write_i_SP((uint32_t)i_sp_val);
+	EPWM1->CMPDAT[3] = (uint32_t)d_ff_val;/* d_FF DAC, DAC0 pin */
+
+
 
 }
 
