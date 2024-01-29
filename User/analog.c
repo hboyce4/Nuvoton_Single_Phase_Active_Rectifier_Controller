@@ -54,5 +54,21 @@ void DAC_write_i_SP(uint32_t value){
 
 }
 
+void DAC_write_d_FF(uint32_t value){
+#ifdef PWM_DAC
+		EPWM1->CMPDAT[3] = value;/* d_FF DAC, DAC0 pin */
+		#else
+		/* Do nothing*/
+		#endif
 
+}
+
+uint32_t DAC_read_d_FF(void){
+#ifdef PWM_DAC
+		return EPWM1->CMPDAT[3];/* d_FF DAC, DAC0 pin */
+		#else
+		/* Do nothing*/
+		#endif
+
+}
 

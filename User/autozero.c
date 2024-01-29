@@ -6,6 +6,8 @@
  */
 
 #include "autozero.h"
+#include <stdint.h>
+#include "inverter_control.h"
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
@@ -63,8 +65,8 @@ void autozero_state_machine(void){
 
 			if(autozero_i.bit_position >= 0){ /* If there are bit positions left to evaluate, that is, bit position is not negative*/
 
-				if(PA5){/* If compensator reset is active*/
-					PA5 = false; /* remove the compensator reset (it was active for one cycle), and wait for the next execution, to give time to the compensator to saturate*/
+				if(COMP_RESET_PIN){/* If compensator reset is active*/
+					COMP_RESET_PIN = false; /* remove the compensator reset (it was active for one cycle), and wait for the next execution, to give time to the compensator to saturate*/
 				}else{
 					if(measurements_in.d > (1.0-FLOAT_MARGIN_FOR_AUTOZERO)/*ADC_raw_val[D_COMP_CHANNEL] > ((uint16_t)(ADC_RES_COUNT - COUNT_MARGIN_FOR_AUTOZERO))*/){/* If d_COMP saturated high*/
 						/* That means the guess was too high */
@@ -76,7 +78,7 @@ void autozero_state_machine(void){
 							/* Prepare the next guess*/
 							autozero_i.guess |= (1 << autozero_i.bit_position);/* set bit to 1 in guess at new bit position*/
 							DAC_write_i_SP((uint32_t)autozero_i.guess);/* Write the guess to the DAC*/
-							PA5 = true; /* Put the compensator in the reset state and leave it to reset for the next cycle*/
+							COMP_RESET_PIN = true; /* Put the compensator in the reset state and leave it to reset for the next cycle*/
 						}
 
 
@@ -89,7 +91,7 @@ void autozero_state_machine(void){
 							/* Prepare the next guess*/
 							autozero_i.guess |= (1 << autozero_i.bit_position); /* set bit to 1 in guess at new bit position*/
 							DAC_write_i_SP((uint32_t)autozero_i.guess); /* Write the guess to the DAC*/
-							PA5 = true; /* Put the compensator in the reset state and leave it to reset for the next cycle*/
+							COMP_RESET_PIN = true; /* Put the compensator in the reset state and leave it to reset for the next cycle*/
 						}
 
 
@@ -105,8 +107,8 @@ void autozero_state_machine(void){
 				autozero_I_in_progress_EXIT();
 
 
-				// AUTOZERO_DONE state entry code here
-				autozero_state = AUTOZERO_DONE;
+				// AUTOZERO_D_IN_PROGRESS state entry code here
+				autozero_D_in_progress_ENTRY();
 
 
 			}
@@ -116,6 +118,25 @@ void autozero_state_machine(void){
 
 		case AUTOZERO_D_IN_PROGRESS:
 			// Zeroing of the duty cycle at 50% during compensator reset using the d_FF offset value
+			uint32_t error;
+
+			error = abs(PWM_raw_count-(BPWM_GET_CNR(BPWM1,0)/2));
+
+			if(error < autozero_d.error_of_best_guess){
+				autozero_d.error_of_best_guess = error;
+				autozero_d.best_guess = DAC_read_d_FF();
+			}
+
+			DAC_write_d_FF(DAC_read_d_FF()+1); /* Increment d_FF by one*/
+
+
+			if(/*Exit condition: end of sweep reached*/){
+				// AUTOZERO_D_IN_PROGRESS state exit code here
+				autozero_D_in_progress_EXIT();
+
+				// AUTOZERO_DONE state entry code here
+				autozero_state = AUTOZERO_DONE;
+			}
 
 
 			break;
@@ -145,7 +166,7 @@ void autozero_I_in_progress_ENTRY(void){
 	autozero_i.bit_position = DAC_RES_BITS - 1;
 	autozero_i.guess = ((uint16_t)DAC_RES_COUNT)>>1; /* Initial guess, half the full DAC range */
 	DAC_write_i_SP((uint32_t)autozero_i.guess);
-	PA5 = true; /* Put the compensator in the reset state and leave it to reset for the next cycle*/
+	COMP_RESET_PIN = true; /* Put the compensator in the reset state and leave it to reset for the next cycle*/
 
 }
 
@@ -154,5 +175,21 @@ void autozero_I_in_progress_EXIT(void){
 	measurement_offsets.i_SP = autozero_i.guess; // Save the value found
 	measurement_offsets.v_AC = measurement_avgs.v_AC; /* Zero the average voltage*/
 	measurement_offsets.i_PV = measurement_avgs.i_PV; /* Zero the input current*/
+
+}
+
+void autozero_D_in_progress_ENTRY(void){
+	autozero_state = AUTOZERO_D_IN_PROGRESS;
+
+	DAC_write_d_FF((uint32_t)STARTING_GUESS_FOR_D_AUTOZERO); /* Set the d_FF output to the starting guess*/
+	autozero_d.error_of_best_guess = INT16_MAX; /*Largest possible value to start */
+
+	COMP_RESET_PIN = true; /* Put the compensator in the reset state*/
+	/* Set the COMP reset pin!!! */
+
+}
+
+void autozero_D_in_progress_EXIT(void){
+
 
 }

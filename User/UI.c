@@ -134,11 +134,11 @@ void increment_UI_value(int8_t row_sel, int8_t col_sel){
 
 		case 0:
 			if(col_sel == 0){
-				if(!inverter_setpoints.inverter_active){ // if the inverter is off and we'll be turning it on in the next line
+				if(!inverter_setpoints.contactor_close_request){ // if the inverter is off and we'll be turning it on in the next line
 					inverter_reset_charge_errors(); // Reset the charge errors
 					g_New_startup_from_user = true;
 				}
-				inverter_setpoints.inverter_active = true;
+				inverter_setpoints.contactor_close_request = true;
 			}else if (col_sel == 1){
 				inverter_setpoints.V_DC_total_setpoint += FLOAT_INCREMENT;
 			}
@@ -186,7 +186,7 @@ void decrement_UI_value(int8_t row_sel, int8_t col_sel){
 
 		case 0:
 			if(col_sel == 0){
-				inverter_setpoints.inverter_active = false;
+				inverter_setpoints.contactor_close_request = false;
 			}else if (col_sel == 1){
 				inverter_setpoints.V_DC_total_setpoint -= FLOAT_INCREMENT;
 			}
@@ -360,8 +360,8 @@ void draw_UI_line_7(uint8_t* p_line_counter) {
 
 	static char line_7_str[LINE_WIDTH];
 
-	contactor_state_t AC_contactor_state;
-	contactor_state_t DC_contactor_state;
+	cont_display_state_t AC_contactor_state;
+	cont_display_state_t DC_contactor_state;
 
 
 	switch(page_number){
@@ -369,30 +369,30 @@ void draw_UI_line_7(uint8_t* p_line_counter) {
 		case 1:
 			//
 
-			get_contactor_states(&AC_contactor_state, &DC_contactor_state);
+			get_cont_display_states(&AC_contactor_state, &DC_contactor_state); // Contactor state for display purposes.
 
 			sprintf(line_7_str, "AC Contactor:");
-			if (AC_contactor_state == CONTACTOR_CLOSED) {
+			if (AC_contactor_state == CONT_DISPLAY_CLOSED) {
 				strcat(line_7_str, " Closed");
-			} else if (AC_contactor_state == CONTACTOR_PRECHARGE) {
+			} else if (AC_contactor_state == CONT_DISPLAY_PRECHARGE) {
 				strcat(line_7_str, "\x1B[93mPrecharge"); /*Yellow Precharge*/
 				strcat(line_7_str, COLOUR_DEFAULT);
-			} else if (AC_contactor_state == CONTACTOR_OPEN) {
+			} else if (AC_contactor_state == CONT_DISPLAY_OPEN) {
 				strcat(line_7_str, " Open");
-			} else if (AC_contactor_state == CONTACTOR_DWELL) {
+			} else if (AC_contactor_state == CONT_DISPLAY_DWELL) {
 					strcat(line_7_str, "\x1B[93mDwell"); /*Yellow Dwell*/
 					strcat(line_7_str, COLOUR_DEFAULT);
 			}
 
 			strcat(line_7_str, "\tDC Contactor:");
-			if (DC_contactor_state == CONTACTOR_CLOSED) {
+			if (DC_contactor_state == CONT_DISPLAY_CLOSED) {
 				strcat(line_7_str, " Closed");
-			} else if (DC_contactor_state == CONTACTOR_PRECHARGE) {
+			} else if (DC_contactor_state == CONT_DISPLAY_PRECHARGE) {
 				strcat(line_7_str, "\x1B[93mPrecharge"); /*Yellow Precharge*/
 				strcat(line_7_str, COLOUR_DEFAULT);
-			} else if (DC_contactor_state == CONTACTOR_OPEN) {
+			} else if (DC_contactor_state == CONT_DISPLAY_OPEN) {
 				strcat(line_7_str, " Open");
-			} else if (DC_contactor_state == CONTACTOR_DWELL) {
+			} else if (DC_contactor_state == CONT_DISPLAY_DWELL) {
 					strcat(line_7_str, "\x1B[93mDwell"); /*Yellow Dwell*/
 					strcat(line_7_str, COLOUR_DEFAULT);
 			}
@@ -401,7 +401,7 @@ void draw_UI_line_7(uint8_t* p_line_counter) {
 			break;
 
 		case 2:
-			sprintf(line_7_str,"Error code:%x\t\tOper. State:%d\n\r",UI_get_faults_code(),inverter_safety.operating_state);
+			sprintf(line_7_str,"Error code:%x\t\tOper. State:%d\n\r",UI_get_faults_code(),inverter_safety.contactor_state);
 			break;
 
 	}
@@ -492,7 +492,7 @@ void draw_UI_line_A(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel) {
 		strcpy(colour_on_off_str, COLOUR_NOT_SELECTED);
 	}
 
-	if(inverter_setpoints.inverter_active){
+	if(inverter_setpoints.contactor_close_request){
 		strcpy(on_off_str, "ON");
 	}else{
 		strcpy(on_off_str, "OFF");
@@ -506,7 +506,7 @@ void draw_UI_line_A(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel) {
 	}
 
 
-	sprintf(line_A_str,"Inverter: %s%s%s\t\tV DC set: %s%2.2f V%s\n\r",colour_on_off_str,on_off_str,COLOUR_DEFAULT,
+	sprintf(line_A_str,"Cont. close req.: %s%s%s\t\tV DC set: %s%2.2f V%s\n\r",colour_on_off_str,on_off_str,COLOUR_DEFAULT,
 			colour_v_setpoint_str,inverter_setpoints.V_DC_total_setpoint,COLOUR_DEFAULT);
 	(*p_line_counter)++;
 
@@ -611,8 +611,8 @@ void draw_UI_line_D(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
 		case AUTOZERO_WAIT_FOR_CONDITIONS:
 			strcpy(autozero_str,"Wait");
 			break;
-		case AUTOZERO_IN_PROGRESS:
-			strcpy(autozero_str,"In Progress");
+		case AUTOZERO_I_IN_PROGRESS:
+			strcpy(autozero_str,"In Progress (i)");
 			break;
 		case AUTOZERO_DONE:
 			strcpy(autozero_str,"Done");
@@ -628,7 +628,7 @@ void draw_UI_line_D(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
 
 }
 
-void get_contactor_states(contactor_state_t* AC_contactor_state, contactor_state_t*DC_contactor_state){
+void get_cont_display_states(cont_display_state_t* AC_contactor_state, cont_display_state_t*DC_contactor_state){ // Contactor state for display purposes.
 
 	*AC_contactor_state = ((PC->PIN)&(BIT2|BIT4))>>2; // Pins for AC contactor are at PC2 and PC4. PC2 is precharge, and PC4 is the relay. Signals are active low.
 

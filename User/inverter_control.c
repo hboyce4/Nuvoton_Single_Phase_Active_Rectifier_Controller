@@ -6,6 +6,7 @@
  */
 
 #include "inverter_control.h"
+#include "sys.h"
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
@@ -13,7 +14,7 @@
 
 inverter_state_variables_t inverter = {.I_D = 0};
 inverter_state_safety_t inverter_safety;
-inverter_state_setpoints_t inverter_setpoints = {.inverter_active = 0,
+inverter_state_setpoints_t inverter_setpoints = {.contactor_close_request = 0,
 												 .precharge_threshold = UV2_LIMIT,
 												 .V_DC_total_setpoint = VBUS_TOTAL_DEFAULT,
 												 .V_DC_diff_setpoint = VBUS_DIFF_DEFAULT};
@@ -217,24 +218,24 @@ void inverter_calc_state(void){
 	static uint32_t charge_timer = 0;
 
 
-	if((!inverter_safety.PLL_sync)||(!inverter_setpoints.inverter_active)){ // If no PLL sync or inverter set to off by user
-		inverter_safety.operating_state = OPER_OFF; // switch to the OFF state immediately
+	if((!inverter_safety.PLL_sync)||(!inverter_setpoints.contactor_close_request)){ // If no PLL sync or inverter set to off by user
+		inverter_safety.contactor_state = CONTACTOR_OFF; // switch to the OFF state immediately
 	}
 
-	switch(inverter_safety.operating_state){
+	switch(inverter_safety.contactor_state){
 
-		case OPER_OFF:
+		case CONTACTOR_OFF:
 
 			//Set all relays off here (signals are active low)
-			PC2 = TRUE; // Precharge opto
-			PC4 = TRUE; // Relay
-			PA14 = TRUE;// Turn OFF red LED
+			AC_PRECHARGE_PIN = TRUE; // Precharge opto
+			AC_RELAY_PIN = TRUE; // Relay
+			RED_LED_PIN = TRUE;// Turn OFF red LED
 
-			if(inverter_safety.PLL_sync && inverter_setpoints.inverter_active){ // If we have PLL sync and the inverter is set to ON
+			if(inverter_safety.PLL_sync && inverter_setpoints.contactor_close_request){ // If we have PLL sync and the inverter is set to ON
 
 
 
-				inverter_safety.operating_state = OPER_PRECHARGE; // Go into precharge state
+				inverter_safety.contactor_state = CONTACTOR_AC_PRECHARGE; // Go into precharge state
 
 				// PRECHARGE state entry code here
 				precharge_timer = PRECHARGE_TIMEOUT;// Set the precharge timer
@@ -244,12 +245,12 @@ void inverter_calc_state(void){
 			break;
 
 
-		case OPER_PRECHARGE:
+		case CONTACTOR_AC_PRECHARGE:
 
 			// Turn on only precharge opto here (signals are active low)
-			PC2 = FALSE; // Precharge opto
-			PC4 = TRUE; // Relay OFF
-			PA14 = TRUE;// Turn OFF red LED
+			AC_PRECHARGE_PIN = FALSE; // Precharge opto
+			AC_RELAY_PIN = TRUE; // Relay OFF
+			RED_LED_PIN = TRUE;// Turn OFF red LED
 
 
 			/* Timeout here*/
@@ -258,8 +259,8 @@ void inverter_calc_state(void){
 			}else{ /* Else timer has elapsed */
 				// PRECHARGE state exit code goes here
 
-				inverter_safety.operating_state = OPER_OFF; // switch to the OFF state immediately
-				inverter_setpoints.inverter_active = FALSE; // To avoid cycling
+				inverter_safety.contactor_state = CONTACTOR_OFF; // switch to the OFF state immediately
+				inverter_setpoints.contactor_close_request = FALSE; // To avoid cycling
 				inverter_faults.precharge_timeout_fault = TRUE; // To save the fault event
 
 				// OFF state entry code would go here
@@ -272,7 +273,7 @@ void inverter_calc_state(void){
 				precharge_timer = 0;
 				// PRECHARGE state exit code end
 
-				inverter_safety.operating_state = OPER_WAIT_FOR_CLOSE; // go to the WAIT_FOR_CLOSE state
+				inverter_safety.contactor_state = CONTACTOR_AC_WAIT_FOR_CLOSE; // go to the WAIT_FOR_CLOSE state
 
 				// WAIT_FOR_CLOSE state entry code here
 
@@ -280,29 +281,29 @@ void inverter_calc_state(void){
 			break;
 
 
-		case OPER_WAIT_FOR_CLOSE:
+		case CONTACTOR_AC_WAIT_FOR_CLOSE:
 
 			//**** Turn on precharge opto AND AC relay here (signals are active low)
-			PC2 = FALSE; // Precharge opto
-			PC4 = FALSE; // Relay ON
-			PA14 = FALSE;// Turn on red LED
+			AC_PRECHARGE_PIN = FALSE; // Precharge opto
+			AC_RELAY_PIN = FALSE; // Relay ON
+			RED_LED_PIN = FALSE;// Turn on red LED
 
 
 			if(PLL.theta_est > SLIGHTLY_LESS_THAN_2_PI){ /* If the end of the cycle and the zero crossing is near*/
-				inverter_safety.operating_state = OPER_DWELL; // go to the dwell state;
+				inverter_safety.contactor_state = CONTACTOR_AC_DWELL; // go to the dwell state;
 			}
 
 			break;
 
-		case OPER_DWELL:
+		case CONTACTOR_AC_DWELL:
 
 			//**** Turn on precharge opto AND AC relay here (signals are active low)
-			PC2 = FALSE; // Precharge opto
-			PC4 = FALSE; // Relay ON
-			PA14 = FALSE;// Turn on red LED
+			AC_PRECHARGE_PIN = FALSE; // Precharge opto
+			AC_RELAY_PIN = FALSE; // Relay ON
+			RED_LED_PIN = FALSE;// Turn on red LED
 
 			if((PLL.theta_est < SLIGHTLY_LESS_THAN_2_PI)&&(PLL.theta_est > THETA_MIN_GARANTEED_CLOSE)){/*If we are some time after the 0-crossing, we are sure the relay has closed and we can turn off the precharge*/
-				inverter_safety.operating_state = OPER_CHARGE; // go to the CHARGE state;
+				inverter_safety.contactor_state = CONTACTOR_AC_CHARGE; // go to the CHARGE state;
 
 				// CHARGE state entry code here
 				charge_timer = CHARGE_TIMEOUT;// Set the precharge timer
@@ -311,12 +312,12 @@ void inverter_calc_state(void){
 			}
 			break;
 
-		case OPER_CHARGE:
+		case CONTACTOR_AC_CHARGE:
 
 			//**** Turn on only relay here (signals are active low)
-			PC2 = TRUE; // Precharge opto
-			PC4 = FALSE; // Relay ON
-			PA14 = FALSE;// Turn on red LED
+			AC_PRECHARGE_PIN = TRUE; // Precharge opto
+			AC_RELAY_PIN = FALSE; // Relay ON
+			RED_LED_PIN = FALSE;// Turn on red LED
 
 			/* Timeout here*/
 			if(charge_timer){ /* If time left on the timer*/
@@ -325,15 +326,15 @@ void inverter_calc_state(void){
 
 				// CHARGE state exit code would go here
 
-				inverter_safety.operating_state = OPER_OFF; // switch to the OFF state immediately
-				inverter_setpoints.inverter_active = FALSE; // To avoid cycling
+				inverter_safety.contactor_state = CONTACTOR_OFF; // switch to the OFF state immediately
+				inverter_setpoints.contactor_close_request = FALSE; // To avoid cycling
 				inverter_faults.charge_timeout_fault = TRUE; // To save the fault event
 				// OFF state entry code would go here
 			}
 
 			if((!inverter_safety.UV_V_DC_minus) && (!inverter_safety.UV_V_DC_plus)){/* If no undervoltage condition is present*/
 
-				inverter_safety.operating_state = OPER_AC_ON; // go to the AC_ON state;
+				inverter_safety.contactor_state = OPER_AC_ON; // go to the AC_ON state;
 
 				// CHARGE state exit code here
 				precharge_timer = 0;
@@ -352,15 +353,19 @@ void inverter_calc_state(void){
 		case OPER_AC_ON:
 
 			//**** Turn on only relay here (signals are active low)
-			PC2 = TRUE; // Precharge opto
-			PC4 = FALSE; // Relay ON
-			PA14 = FALSE;// Turn on red LED
+			AC_PRECHARGE_PIN = TRUE; // Precharge opto
+			AC_RELAY_PIN = FALSE; // Relay ON
+			RED_LED_PIN = FALSE;// Turn on red LED
 
 			// No exit condition other than user OFF or PLL desync;
 			break;
 
 		default: // If unknown state
-			inverter_safety.operating_state = OPER_OFF; // switch to the OFF state immediately
+			inverter_safety.contactor_state = CONTACTOR_OFF; // switch to the OFF state immediately
+			//Set all relays off here (signals are active low)
+			AC_PRECHARGE_PIN = TRUE; // Precharge opto
+			AC_RELAY_PIN = TRUE; // Relay
+			RED_LED_PIN = TRUE;// Turn OFF red LED
 
 	}
 /**************End of state machine for startup and operational conditions**************************************************/

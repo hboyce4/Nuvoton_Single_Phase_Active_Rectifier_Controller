@@ -67,7 +67,7 @@ void Measurement_convert_to_float(void){
 	/* V AC */
 	measurements_in.v_AC = ((float)ADC_raw_val[V_AC_CHANNEL] - (float)measurement_offsets.v_AC)*(VREF_VOLTAGE/(ADC_RES_COUNT*V_AC_GAIN));
 	/* V AC normalized to 1 */
-	measurements_in.v_AC_n = measurements_in.v_AC*(1/(V_AC_NOMINAL_RMS_VALUE*M_SQRT2)); /* needs math.h */
+	measurements_in.v_AC_n = measurements_in.v_AC*(1/(V_AC_NOMINAL_RMS_VALUE*((float)M_SQRT2))); /* needs math.h */
 	/* Current process value (actual amperage) */
 	measurements_in.i_PV = ((float)ADC_raw_val[I_PV_CHANNEL] - (float)measurement_offsets.i_PV)*(VREF_VOLTAGE/(ADC_RES_COUNT*I_PV_GAIN));
 
@@ -85,7 +85,7 @@ void Measurement_convert_to_float(void){
 		 }
 
 	}else{
-		measurements_in.d = (float)(PWM_raw_count)/480.0f; //TODO: Remove magic number. Equal to CNR of BPWM1
+		measurements_in.d = (float)(PWM_raw_count)/((float)BPWM_GET_CNR(BPWM1,0));
 	}
 
 
@@ -109,16 +109,13 @@ void Measurement_convert_to_int_and_write(void){
 	}
 	d_ff_val += (int32_t)measurement_offsets.d_FF; /* Centered around D_FF_OFFSET */
 
-
-
 	DAC_write_i_SP((uint32_t)i_sp_val);
-	EPWM1->CMPDAT[3] = (uint32_t)d_ff_val;/* d_FF DAC, DAC0 pin */
-
-
+	DAC_write_d_FF((uint32_t)d_ff_val);/* d_FF DAC, DAC0 pin */
 
 }
 
-void Measurement_calc_averages(void){
+
+void Measurement_calc_averages(void){ /*TODO: Replace this with a IIR low pass filter */
 
 	static uint32_t v_AC_accumulator = 0;
 	static uint32_t i_PV_accumulator = 0;

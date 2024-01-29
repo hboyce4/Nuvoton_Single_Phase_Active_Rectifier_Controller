@@ -22,6 +22,9 @@
 #define COUNT_MARGIN_FOR_AUTOZERO 1750 /* [counts] Margin, in ADC counts, to consider the signal saturated (to 3.3V or GND))*/
 #define FLOAT_MARGIN_FOR_AUTOZERO 0.425 /* [D] Margin, in proportion of D (1) to consider the signal saturated (to 3.3V or GND))*/
 
+#define STARTING_GUESS_FOR_D_AUTOZERO 1500
+
+
 /*---------------------------------------------------------------------------------------------------------*/
 /* Type definitions           				                                                                       */
 /*---------------------------------------------------------------------------------------------------------*/
@@ -37,8 +40,8 @@ typedef struct { /* */
 
 typedef struct { /* */
 
-	static uint16_t fdfdfdfdf;
-	static int8_t dfdfdf;
+	static uint16_t best_guess;
+	static int16_t error_of_best_guess;
 
 } autozero_d_t;
 
@@ -59,5 +62,7 @@ bool autozero_check_conditions_ok(void);
 void autozero_I_in_progress_ENTRY(void);
 void autozero_I_in_progress_EXIT(void);
 
+void autozero_D_in_progress_ENTRY(void);
+void autozero_D_in_progress_EXIT(void);
 
 #endif /* AUTOZERO_H_ */
