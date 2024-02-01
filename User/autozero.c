@@ -120,17 +120,17 @@ void autozero_state_machine(void){
 			// Zeroing of the duty cycle at 50% during compensator reset using the d_FF offset value
 			uint32_t error;
 
-			error = abs(PWM_raw_count-(BPWM_GET_CNR(BPWM1,0)/2));
+			error = abs(PWM_raw_count-((BPWM_GET_CNR(BPWM1,0)+1)/2));/* The period is CNR + 1 */
 
-			if(error < autozero_d.error_of_best_guess){
-				autozero_d.error_of_best_guess = error;
-				autozero_d.best_guess = DAC_read_d_FF();
+			if(error < autozero_d.error_of_best_guess){ /* If the new measured error is better than the previous best guess*/
+				autozero_d.error_of_best_guess = error; /* Save the new error */
+				autozero_d.best_guess = DAC_read_d_FF();/* Save the d_FF value at which this lowest error occurs. */
 			}
 
 			DAC_write_d_FF(DAC_read_d_FF()+1); /* Increment d_FF by one*/
 
 
-			if(/*Exit condition: end of sweep reached*/){
+			if(DAC_read_d_FF() > LAST_GUESS_FOR_D_AUTOZERO){
 				// AUTOZERO_D_IN_PROGRESS state exit code here
 				autozero_D_in_progress_EXIT();
 
@@ -191,5 +191,6 @@ void autozero_D_in_progress_ENTRY(void){
 
 void autozero_D_in_progress_EXIT(void){
 
+	measurement_offsets.d_FF = autozero_d.best_guess; /* Zero the input current*/
 
 }

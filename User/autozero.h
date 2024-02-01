@@ -22,7 +22,8 @@
 #define COUNT_MARGIN_FOR_AUTOZERO 1750 /* [counts] Margin, in ADC counts, to consider the signal saturated (to 3.3V or GND))*/
 #define FLOAT_MARGIN_FOR_AUTOZERO 0.425 /* [D] Margin, in proportion of D (1) to consider the signal saturated (to 3.3V or GND))*/
 
-#define STARTING_GUESS_FOR_D_AUTOZERO 1500
+#define STARTING_GUESS_FOR_D_AUTOZERO 500 /* Starting value for doing the sweep to zero the d_FF value. The zero should be around DAC_RES_COUNT/2 */
+#define LAST_GUESS_FOR_D_AUTOZERO 1500 /* Finishing value for doing the sweep to zero the d_FF value. The zero should be around DAC_RES_COUNT/2 */
 
 
 /*---------------------------------------------------------------------------------------------------------*/
