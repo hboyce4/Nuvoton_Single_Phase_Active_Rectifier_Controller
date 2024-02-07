@@ -84,7 +84,10 @@
 /* Type definitions           				                                                               */
 /*---------------------------------------------------------------------------------------------------------*/
 
-typedef enum {CONTACTOR_OFF = 0, CONTACTOR_AC_PRECHARGE = 1, CONTACTOR_AC_WAIT_FOR_CLOSE = 2, CONTACTOR_AC_DWELL = 3, CONTACTOR_AC_CHARGE = 4, OPER_AC_ON = 5} contactor_state_t;
+typedef enum {CONTACTOR_OFF = 0, CONTACTOR_AC_PRECHARGE = 1, CONTACTOR_AC_WAIT_FOR_CLOSE = 2, CONTACTOR_AC_DWELL = 3, CONTACTOR_AC_CHARGE = 4, CONTACTOR_AC_CLOSED_DC_OPEN = 5, CONTACTOR_AC_CLOSED_DC_PRECHARGE = 6, CONTACTOR_AC_DC_CLOSED = 7} contactor_state_t;
+
+typedef enum {MODE_DC_REGULATION = 0, MODE_CONSTANT_AC_CURRENT = 1, MODE_CONSTANT_AC_VOLTAGE = 2, MODE_LAST = 3} operation_mode_t;
+
 
 typedef struct { /* Safety and operational statuses and conditions */
 
@@ -139,6 +142,8 @@ typedef struct inverter_state_variables{ /* Process values or state variables */
 	//volatile float i_PV;
 	volatile float d;
 	volatile float d_feedforward;
+
+	volatile operation_mode_t operation_mode;
 
 } inverter_state_variables_t;
 
@@ -200,12 +205,18 @@ void inverter_check_voltage_limits(void);
 
 void inverter_calc_d_ff(void);// Calculate duty cycle feedforward term
 
-void inverter_calc_state(void);
+
+void inverter_contactor_control_DC_regulation_mode(void);
+void inverter_contactor_control_constant_AC_current_mode(void);
+void inverter_contactor_control_constant_AC_voltage_mode(void);
 
 void inverter_medium_freq_task(void);
 
 void inverter_calc_I_D(void);
 void inverter_calc_I_balance(void);
+
+void inverter_try_next_mode(void);
+void inverter_try_prev_mode(void);
 
 void inverter_reset_main_errors(void);
 void inverter_reset_charge_errors(void);

@@ -102,7 +102,7 @@ void Measurement_convert_to_int_and_write(void){
 	i_sp_val += (int32_t)measurement_offsets.i_SP; /* signal centered around I_SP_OFFSET */
 
 	/* Convert the duty cycle feedforward value from int to float */
-	if(g_d_ff_zero_state){
+	if(/*g_d_ff_zero_state*/true){
 		d_ff_val = 0;
 	}else{
 		d_ff_val = (int32_t)((inverter.d_feedforward-0.5)*D_FF_GAIN*(DAC_RES_COUNT/VREF_VOLTAGE)); /* add -0.5 shift to make signal between -0.5 and 0.5 */

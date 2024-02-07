@@ -14,7 +14,7 @@ volatile bool g_New_startup_from_user = 0;
 
 uint8_t page_number = 1; /* Keeps track of the info page we're on*/
 
-volatile uint32_t g_d_ff_zero_state = 0;
+//volatile uint32_t g_d_ff_zero_state = 0;
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Function definitions                                                                                    */
@@ -537,14 +537,32 @@ void draw_UI_line_B(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
 	/*sprintf(line_B_str,"UV2: %s%2.2f%s\t\tV DC diff set: %s%2.2f V%s\n\r",colour_other_str,inverter_setpoints.precharge_threshold,COLOUR_DEFAULT,
 			colour_V_diff_str,inverter_setpoints.V_DC_diff_setpoint,COLOUR_DEFAULT);*/
 
-	static char d_ff_zero_str[LINE_WIDTH];
+	static char oper_mode_str[LINE_WIDTH];
 
-	if(g_d_ff_zero_state){
+	/*if(g_d_ff_zero_state){
 		strcpy(d_ff_zero_str,"ON");
 	}else{
 		strcpy(d_ff_zero_str,"OFF");
+	}*/
+	switch(inverter.operation_mode){
+
+		case MODE_DC_REGULATION:
+			strcpy(oper_mode_str,"DC const. V");
+			break;
+		case MODE_CONSTANT_AC_CURRENT:
+			strcpy(oper_mode_str,"AC const. I");
+			break;
+		case MODE_CONSTANT_AC_VOLTAGE:
+			strcpy(oper_mode_str,"AC const. V");
+			break;
+
+		default:
+			strcpy(oper_mode_str,"Unknown");
+
 	}
-	sprintf(line_B_str,"d_FF zero: %s%s%s\t\td_FF Offset: %s%i%s\n\r",colour_left_str,d_ff_zero_str,COLOUR_DEFAULT,
+
+
+	sprintf(line_B_str,"Mode: %s%s%s\td_FF Offset: %s%i%s\n\r",colour_left_str,oper_mode_str,COLOUR_DEFAULT,
 	colour_V_diff_str,measurement_offsets.d_FF,COLOUR_DEFAULT);
 	(*p_line_counter)++;
 

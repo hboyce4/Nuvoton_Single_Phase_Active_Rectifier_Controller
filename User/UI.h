@@ -51,7 +51,7 @@ typedef enum {CONT_DISPLAY_DWELL = 0, CONT_DISPLAY_CLOSED = 1, CONT_DISPLAY_PREC
 /*---------------------------------------------------------------------------------------------------------*/
 extern volatile bool g_New_startup_from_user;
 
-extern volatile uint32_t g_d_ff_zero_state;
+//extern volatile uint32_t g_d_ff_zero_state;
 /*---------------------------------------------------------------------------------------------------------*/
 /* Functions declaration                                                                              */
 /*---------------------------------------------------------------------------------------------------------*/

@@ -12,7 +12,9 @@
 /* Global variables                                                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
 
-inverter_state_variables_t inverter = {.I_D = 0};
+inverter_state_variables_t inverter = {.I_D = 0,
+									.operation_mode = MODE_DC_REGULATION};
+
 inverter_state_safety_t inverter_safety;
 inverter_state_setpoints_t inverter_setpoints = {.contactor_close_request = 0,
 												 .precharge_threshold = UV2_LIMIT,
@@ -55,7 +57,27 @@ void inverter_check_safety_operational_status(void){
 	inverter_calc_d_ff();
 
 	/* Calculate the operating state*/
-	inverter_calc_state();
+	switch(inverter.operation_mode){
+
+	 case MODE_DC_REGULATION:
+		 inverter_contactor_control_DC_regulation_mode();
+		 break;
+
+	 case MODE_CONSTANT_AC_CURRENT:
+		 inverter_contactor_control_constant_AC_current_mode();
+		 break;
+
+	 case MODE_CONSTANT_AC_VOLTAGE:
+		 inverter_contactor_control_constant_AC_voltage_mode();
+		 break;
+
+	 default:
+		 /* Set everything off*/
+		 inverter_safety.contactor_state = CONTACTOR_OFF; // switch to the OFF state immediately
+		 inverter_setpoints.contactor_close_request = FALSE; // To avoid cycling
+
+	}
+
 
 }
 
@@ -210,7 +232,7 @@ void inverter_calc_d_ff(void){
 	}
 }
 
-void inverter_calc_state(void){
+void inverter_contactor_control_DC_regulation_mode(void){
 
 /**************State machine for startup and operational conditions**************************************************/
 
@@ -229,6 +251,9 @@ void inverter_calc_state(void){
 			//Set all relays off here (signals are active low)
 			AC_PRECHARGE_PIN = TRUE; // Precharge opto
 			AC_RELAY_PIN = TRUE; // Relay
+			DC_PRECHARGE_PIN = TRUE; // Precharge opto
+			DC_RELAY_PIN = TRUE; // Relay
+
 			RED_LED_PIN = TRUE;// Turn OFF red LED
 
 			if(inverter_safety.PLL_sync && inverter_setpoints.contactor_close_request){ // If we have PLL sync and the inverter is set to ON
@@ -250,6 +275,10 @@ void inverter_calc_state(void){
 			// Turn on only precharge opto here (signals are active low)
 			AC_PRECHARGE_PIN = FALSE; // Precharge opto
 			AC_RELAY_PIN = TRUE; // Relay OFF
+			DC_PRECHARGE_PIN = TRUE; // Precharge opto
+			DC_RELAY_PIN = TRUE; // Relay
+
+
 			RED_LED_PIN = TRUE;// Turn OFF red LED
 
 
@@ -334,7 +363,7 @@ void inverter_calc_state(void){
 
 			if((!inverter_safety.UV_V_DC_minus) && (!inverter_safety.UV_V_DC_plus)){/* If no undervoltage condition is present*/
 
-				inverter_safety.contactor_state = OPER_AC_ON; // go to the AC_ON state;
+				inverter_safety.contactor_state = CONTACTOR_AC_CLOSED_DC_OPEN; // go to the AC_ON state;
 
 				// CHARGE state exit code here
 				precharge_timer = 0;
@@ -350,7 +379,7 @@ void inverter_calc_state(void){
 			};
 			break;
 
-		case OPER_AC_ON:
+		case CONTACTOR_AC_CLOSED_DC_OPEN:
 
 			//**** Turn on only relay here (signals are active low)
 			AC_PRECHARGE_PIN = TRUE; // Precharge opto
@@ -362,6 +391,7 @@ void inverter_calc_state(void){
 
 		default: // If unknown state
 			inverter_safety.contactor_state = CONTACTOR_OFF; // switch to the OFF state immediately
+			inverter_setpoints.contactor_close_request = FALSE; // To avoid cycling
 			//Set all relays off here (signals are active low)
 			AC_PRECHARGE_PIN = TRUE; // Precharge opto
 			AC_RELAY_PIN = TRUE; // Relay
@@ -433,6 +463,35 @@ void inverter_calc_I_balance(void){
 	inverter.I_balance = err_V_DC_diff; /* Return the value of the "direct" current */
 
 }
+
+
+void inverter_try_next_mode(void){
+
+	if(inverter_safety.contactor_state == CONTACTOR_OFF){/* The mode can ONLY be changed if all contactors are off */
+
+		inverter.operation_mode++; /* Increment the mode */
+		if(inverter.operation_mode >= MODE_LAST){ /*If the last mode is reached*/
+			inverter.operation_mode = 0; /* Go to the first mode */
+		}
+	}
+
+}
+
+void inverter_try_prev_mode(void){
+
+	if(inverter_safety.contactor_state == CONTACTOR_OFF){/* The mode can ONLY be changed if all contactors are off */
+
+		if(inverter.operation_mode <= 0){/* If we're at mode zero, there is no previous mode so go back to last mode*/
+			inverter.operation_mode = MODE_LAST - 1;
+		}else{
+			inverter.operation_mode--; /* Decrement the mode */
+		}
+
+	}
+
+}
+
+
 
 void inverter_reset_main_errors(void){
 
