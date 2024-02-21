@@ -93,7 +93,7 @@ typedef struct inverter_state_variables{
 
 } inverter_state_variables_t;
 
-//float some_float_state_variable;
+float some_float_state_variable;
 
 typedef struct {
 
