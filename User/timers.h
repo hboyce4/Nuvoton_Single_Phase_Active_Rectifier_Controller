@@ -8,6 +8,9 @@
 #ifndef TIMERS_H_
 #define TIMERS_H_
 
+
+
+#include <stdint.h>
 // Timers used:
 // BPWM0 for analog PWM duty cycle capture
 // BPWM1 for PWM carrier generation. Generates a square wave for the analog PWModulator

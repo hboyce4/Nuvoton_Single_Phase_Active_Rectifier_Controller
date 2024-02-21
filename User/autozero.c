@@ -7,6 +7,7 @@
 
 #include "autozero.h"
 #include <stdint.h>
+#include <stdlib.h>
 #include "inverter_control.h"
 
 /*---------------------------------------------------------------------------------------------------------*/
@@ -32,7 +33,7 @@ void autozero_state_machine(void){
 /**************State machine for autozero conditions**************************************************/
 
 
-
+	uint32_t d_error;
 	/* For the autozero to take place, some other function must bring the voltage high enough,
 	 *  open the relays, and set the state to AUTOZERO_WAIT_FOR_CONDITIONS */
 	bool conditions_ok = autozero_check_conditions_ok();
@@ -118,12 +119,12 @@ void autozero_state_machine(void){
 
 		case AUTOZERO_D_IN_PROGRESS:
 			// Zeroing of the duty cycle at 50% during compensator reset using the d_FF offset value
-			uint32_t error;
 
-			error = abs(PWM_raw_count-((BPWM_GET_CNR(BPWM1,0)+1)/2));/* The period is CNR + 1 */
 
-			if(error < autozero_d.error_of_best_guess){ /* If the new measured error is better than the previous best guess*/
-				autozero_d.error_of_best_guess = error; /* Save the new error */
+			d_error = abs(PWM_raw_count-((BPWM_GET_CNR(BPWM1,0)+1)/2));/* The period is CNR + 1 */
+
+			if(d_error < autozero_d.error_of_best_guess){ /* If the new measured error is better than the previous best guess*/
+				autozero_d.error_of_best_guess = d_error; /* Save the new error */
 				autozero_d.best_guess = DAC_read_d_FF();/* Save the d_FF value at which this lowest error occurs. */
 			}
 

@@ -20,6 +20,7 @@
 #include "constants.h"
 #include "PLL.h"
 #include "inverter_control.h"
+#include "measurement.h"
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Macros           				                                                                      */
@@ -96,6 +97,7 @@
 /* External global variables                                                                               */
 /*---------------------------------------------------------------------------------------------------------*/
 extern volatile measurement_inputs_t measurements_in; /* directly measured values */
+extern volatile uint32_t ADC_raw_val[EADC_LAST_CHANNEL+1];
 extern volatile uint16_t ADC_acq_buff[EADC_LAST_CHANNEL+1];
 extern volatile uint8_t ADC_acq_count;
 

@@ -402,6 +402,15 @@ void inverter_contactor_control_DC_regulation_mode(void){
 
 }
 
+void inverter_contactor_control_constant_AC_current_mode(void){
+ /* Do nothing for now */
+}
+
+void inverter_contactor_control_constant_AC_voltage_mode(void){
+	/* Do nothing for now*/
+}
+
+
 void inverter_medium_freq_task(void){
 	/* Medium frequency -> Use T_SYSTICK */
 

@@ -6,6 +6,7 @@
  */
 
 #include "UI.h"
+#include "inverter_control.h"
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
@@ -148,7 +149,7 @@ void increment_UI_value(int8_t row_sel, int8_t col_sel){
 		case 1:
 			if(col_sel == 0){
 				/*inverter_setpoints.precharge_threshold += FLOAT_INCREMENT;*/
-				g_d_ff_zero_state = true;
+				inverter_try_next_mode();
 			}else if (col_sel == 1){
 				/*inverter_setpoints.V_DC_diff_setpoint += FLOAT_INCREMENT;*/
 				measurement_offsets.d_FF += 1;
@@ -194,7 +195,7 @@ void decrement_UI_value(int8_t row_sel, int8_t col_sel){
 		case 1:
 			if(col_sel == 0){
 				/*inverter_setpoints.precharge_threshold = FLOAT_INCREMENT;*/
-				g_d_ff_zero_state = false;
+				inverter_try_prev_mode();
 			}else if (col_sel == 1){
 				/*inverter_setpoints.V_DC_diff_setpoint -= FLOAT_INCREMENT;*/
 				measurement_offsets.d_FF -= 1;

@@ -10,6 +10,7 @@
 
 #include <stdbool.h>
 #include <math.h>
+#include <stdint.h>
 #include "NuMicro.h"
 #include "analog.h"
 
@@ -34,15 +35,15 @@ typedef enum {AUTOZERO_STANDBY, AUTOZERO_WAIT_FOR_CONDITIONS, AUTOZERO_I_IN_PROG
 
 typedef struct { /* */
 
-	static uint16_t guess;
-	static int8_t bit_position;
+	volatile uint16_t guess;
+	volatile int8_t bit_position;
 
 } autozero_i_t;
 
 typedef struct { /* */
 
-	static uint16_t best_guess;
-	static int16_t error_of_best_guess;
+	volatile uint16_t best_guess;
+	volatile int16_t error_of_best_guess;
 
 } autozero_d_t;
 

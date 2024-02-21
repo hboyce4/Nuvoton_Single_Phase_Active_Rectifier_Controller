@@ -10,6 +10,9 @@
 
 //#include "NuMicro.h"
 
+#include <stdbool.h>
+#include <stdint.h>
+
 //#include "UART_over_DMA.h"
 //#include "UI.h"
 
