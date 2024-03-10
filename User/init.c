@@ -298,7 +298,7 @@ void init_BPWM0_duty_capture(void){// BPWM0 for duty cycle capture
 
 	uint32_t BPWM1_CNR;
 
-	BPWM1_CNR = BPWM_GET_CNR(BPWM0, 1); // Normally 480 (192 Mhz cpu freq / 400 kHz PWM carrier freq = 480)
+	BPWM1_CNR = BPWM_GET_CNR(BPWM1, 1); // Normally 480 (192 Mhz cpu freq / 400 kHz PWM carrier freq = 480)
 
 	BPWM_SET_CNR(BPWM0, 1, (BPWM1_CNR + BPWM0_MARGIN)); // Count up to for fastest detection of underrun. BPWM1 cycle lasts 480 counts (Carrier period). Add a small margin on top of that to quickly detect overrun.
 

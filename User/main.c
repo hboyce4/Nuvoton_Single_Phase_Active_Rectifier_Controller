@@ -58,15 +58,15 @@ int main()
 
     init_ADC();
 
-    init_BPWM0_duty_capture(); // Initialize BPWM0 for duty cycle capture
-
     init_BPWM1_carrier_generation();// Initialize BPWM1 for carrier generation. Generate a square wave for the analog PWM modulator
+
+    init_BPWM0_duty_capture(); // MUST COME AFTER BPWM1 init!!! It reads BPWM1's CNR. Initialize BPWM0 for duty cycle capture
 
 #ifndef PWM_DAC
     init_DAC();
 #endif
     printf("Building sine table...\n");
-    init_sin_table(sin_table,SIN_TABLE_SIZE);	// Initialise le tableau de référence pour la fonction sinus (Look-up table, LUT)
+    init_sin_table(sin_table,SIN_TABLE_SIZE);	// Initialise le tableau de rï¿½fï¿½rence pour la fonction sinus (Look-up table, LUT)
 
     init_inverter_control();
 
