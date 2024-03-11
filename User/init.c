@@ -62,6 +62,10 @@ void SYS_Init(void)
 
     CLK->AHBCLK  |= CLK_AHBCLK_PDMACKEN_Msk; // PDMA Clock Enable
 
+    /***************************** CRC *****************************************/
+    CLK_EnableModuleClock(CRC_MODULE);
+    /***************************** CRC end *************************************/
+
     /* Select IP clock source from HXT */
     //CLK_SetModuleClock(UART0_MODULE, CLK_CLKSEL1_UART0SEL_HXT, CLK_CLKDIV0_UART0(1));
     //CLK_SetModuleClock(TMR0_MODULE, CLK_CLKSEL1_TMR0SEL_HXT, 0);
@@ -87,6 +91,7 @@ void SYS_Init(void)
     /* Set divider for EADC */
     CLK->CLKDIV0 &= ~(CLK_CLKDIV0_EADCDIV_Msk);/* Reset EADCDIV */
     CLK->CLKDIV0 |= 1 << CLK_CLKDIV0_EADCDIV_Pos; /* EADC divider is EADCDIV + 1 . So EADC Clock will be PCLK1/2 (48MHz/1 = 48MHz) */
+
 
 
     CLK_SetModuleClock(BPWM0_MODULE, CLK_CLKSEL2_BPWM0SEL_PLL, 0); /* For duty cycle capture. Make this uniform with the others in the future. */

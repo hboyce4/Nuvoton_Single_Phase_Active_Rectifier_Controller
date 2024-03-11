@@ -135,8 +135,8 @@ void autozero_state_machine(void){
 				// AUTOZERO_D_IN_PROGRESS state exit code here
 				autozero_D_in_progress_EXIT();
 
+
 				// AUTOZERO_DONE state entry code here
-				autozero_state = AUTOZERO_DONE;
 			}
 
 
@@ -192,6 +192,9 @@ void autozero_D_in_progress_ENTRY(void){
 
 void autozero_D_in_progress_EXIT(void){
 
+	autozero_state = AUTOZERO_DONE;
 	measurement_offsets.d_FF = autozero_d.best_guess; /* Zero the input current*/
+	// All done, save the offsets
+	PD_SaveConfig();
 
 }

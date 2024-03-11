@@ -26,6 +26,7 @@
 #include "UI.h"
 #include "analog.h"
 #include "UART_over_DMA.h"
+#include "persistent_data.h"
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
@@ -46,6 +47,8 @@ int main()
 
     /* Init UART to 115200-8n1 to print message */
     UART_Open(UART0, 115200);
+
+    PD_Init();
 
     /* Open UART 2, for external communication, on pins 31 & 32*/
     UART_Open(UART2, 460800);
