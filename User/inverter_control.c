@@ -30,16 +30,16 @@ inverter_faults_t inverter_faults;
 
 void inverter_control_main(void){ // Service the inverter. Needs up-to-date PLL and analog input values.
 	/* High frequency -> Use T_CALC */
-	PA4 = false;
+	ENABLE_PULSE_PIN = false;
 	inverter_safety.d_ff_ok = false;
 
 	inverter_check_safety_operational_status();
 
 	if(inverter_safety.d_ff_ok){
-		PA4 = true; /* rising edge to enable the inverter*/
+		ENABLE_PULSE_PIN = true; /* rising edge to enable the inverter*/
 	}
 
-	PA15 = !PA3;/* Make the blue LED display the status of the current latch*/
+	BLUE_LED_PIN = !LATCH_Q_PIN;/* Make the blue LED display the status of the current latch*/
 
 	//saturate();
 	inverter.i_SP = (inverter.I_D * PLL.b_beta) + inverter.I_balance ; /* The current setpoint is the sum of the "direct" (iD) current and the balancing current*/
@@ -474,32 +474,34 @@ void inverter_calc_I_balance(void){
 }
 
 
-void inverter_try_next_mode(void){
+void inverter_mode_change(void){
 
 	if(inverter_safety.contactor_state == CONTACTOR_OFF){/* The mode can ONLY be changed if all contactors are off */
-
-		inverter.operation_mode++; /* Increment the mode */
-		if(inverter.operation_mode >= MODE_LAST){ /*If the last mode is reached*/
-			inverter.operation_mode = 0; /* Go to the first mode */
-		}
+		// Nothing for now
 	}
 
 }
 
-void inverter_try_prev_mode(void){
 
-	if(inverter_safety.contactor_state == CONTACTOR_OFF){/* The mode can ONLY be changed if all contactors are off */
+void inverter_req_next_mode(void){
 
-		if(inverter.operation_mode <= 0){/* If we're at mode zero, there is no previous mode so go back to last mode*/
-			inverter.operation_mode = MODE_LAST - 1;
-		}else{
-			inverter.operation_mode--; /* Decrement the mode */
-		}
-
+	inverter.mode_request++; /* Increment the mode */
+	if(inverter.mode_request >= MODE_LAST){ /*If the last mode is reached*/
+		inverter.mode_request = 0; /* Go to the first mode */
 	}
 
 }
 
+
+void inverter_req_prev_mode(void){
+
+	if(inverter.operation_mode <= 0){/* If we're at mode zero, there is no previous mode so go back to last mode*/
+		inverter.operation_mode = MODE_LAST - 1;
+	}else{
+		inverter.operation_mode--; /* Decrement the mode */
+	}
+
+}
 
 
 void inverter_reset_main_errors(void){

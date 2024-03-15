@@ -40,6 +40,7 @@ void draw_UI(int8_t row_sel, int8_t col_sel){/* 60-ish characters width*/
 	draw_UI_line_7(&p_line_counter);
 	draw_UI_line_8(&p_line_counter);
 	draw_UI_line_9(&p_line_counter);
+	draw_UI_line_10(&p_line_counter);
 
 	draw_UI_line_separator(&p_line_counter);
 	/* Menu input*/
@@ -149,7 +150,7 @@ void increment_UI_value(int8_t row_sel, int8_t col_sel){
 		case 1:
 			if(col_sel == 0){
 				/*inverter_setpoints.precharge_threshold += FLOAT_INCREMENT;*/
-				inverter_try_next_mode();
+				inverter_req_next_mode();
 			}else if (col_sel == 1){
 				/*inverter_setpoints.V_DC_diff_setpoint += FLOAT_INCREMENT;*/
 				measurement_offsets.d_FF += 1;
@@ -159,7 +160,7 @@ void increment_UI_value(int8_t row_sel, int8_t col_sel){
 
 		case 2:
 			if(col_sel == 0){
-				PA2 = true;
+				LATCH_SET_PIN = true;
 			}else if (col_sel == 1){
 				PA5 = true;
 			}
@@ -195,7 +196,7 @@ void decrement_UI_value(int8_t row_sel, int8_t col_sel){
 		case 1:
 			if(col_sel == 0){
 				/*inverter_setpoints.precharge_threshold = FLOAT_INCREMENT;*/
-				inverter_try_prev_mode();
+				inverter_req_prev_mode();
 			}else if (col_sel == 1){
 				/*inverter_setpoints.V_DC_diff_setpoint -= FLOAT_INCREMENT;*/
 				measurement_offsets.d_FF -= 1;
@@ -204,7 +205,7 @@ void decrement_UI_value(int8_t row_sel, int8_t col_sel){
 
 		case 2:
 			if(col_sel == 0){
-				PA2 = false;
+				LATCH_SET_PIN = false;
 			}else if (col_sel == 1){
 				PA5 = false;
 			}
@@ -402,7 +403,7 @@ void draw_UI_line_7(uint8_t* p_line_counter) {
 			break;
 
 		case 2:
-			sprintf(line_7_str,"Error code:%x\t\tOper. State:%d\n\r",UI_get_faults_code(),inverter_safety.contactor_state);
+			sprintf(line_7_str,"Error code:%x\t\tCont. State:%d\n\r",UI_get_faults_code(),inverter_safety.contactor_state);
 			break;
 
 	}
@@ -468,6 +469,32 @@ void draw_UI_line_9(uint8_t* p_line_counter) {
 	(*p_line_counter)++;
 
 	push_UART2((char*) line_9_str);
+}
+
+void draw_UI_line_10(uint8_t* p_line_counter) {
+
+	static char line_10_str[LINE_WIDTH];
+	static char mode_str[LINE_WIDTH];
+
+	switch(inverter.operation_mode){
+		case MODE_DC_REGULATION:
+			strcpy(mode_str,"DC const. V");
+			break;
+		case MODE_CONSTANT_AC_CURRENT:
+			strcpy(mode_str,"AC const. I");
+			break;
+		case MODE_CONSTANT_AC_VOLTAGE:
+			strcpy(mode_str,"AC const. V");
+			break;
+		default:
+			strcpy(mode_str,"Unknown");
+	}
+
+	sprintf(line_10_str,"Oper. Mode: %s\n\r", mode_str);
+
+	(*p_line_counter)++;
+
+	push_UART2((char*) line_10_str);
 }
 
 
@@ -538,32 +565,32 @@ void draw_UI_line_B(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
 	/*sprintf(line_B_str,"UV2: %s%2.2f%s\t\tV DC diff set: %s%2.2f V%s\n\r",colour_other_str,inverter_setpoints.precharge_threshold,COLOUR_DEFAULT,
 			colour_V_diff_str,inverter_setpoints.V_DC_diff_setpoint,COLOUR_DEFAULT);*/
 
-	static char oper_mode_str[LINE_WIDTH];
+	static char mode_req_str[LINE_WIDTH];
 
 	/*if(g_d_ff_zero_state){
 		strcpy(d_ff_zero_str,"ON");
 	}else{
 		strcpy(d_ff_zero_str,"OFF");
 	}*/
-	switch(inverter.operation_mode){
+	switch(inverter.mode_request){
 
 		case MODE_DC_REGULATION:
-			strcpy(oper_mode_str,"DC const. V");
+			strcpy(mode_req_str,"DC const. V");
 			break;
 		case MODE_CONSTANT_AC_CURRENT:
-			strcpy(oper_mode_str,"AC const. I");
+			strcpy(mode_req_str,"AC const. I");
 			break;
 		case MODE_CONSTANT_AC_VOLTAGE:
-			strcpy(oper_mode_str,"AC const. V");
+			strcpy(mode_req_str,"AC const. V");
 			break;
 
 		default:
-			strcpy(oper_mode_str,"Unknown");
+			strcpy(mode_req_str,"Unknown");
 
 	}
 
 
-	sprintf(line_B_str,"Mode: %s%s%s\td_FF Offset: %s%i%s\n\r",colour_left_str,oper_mode_str,COLOUR_DEFAULT,
+	sprintf(line_B_str,"Req.Mode: %s%s%s\td_FF Offset: %s%i%s\n\r",colour_left_str,mode_req_str,COLOUR_DEFAULT,
 	colour_V_diff_str,measurement_offsets.d_FF,COLOUR_DEFAULT);
 	(*p_line_counter)++;
 
@@ -591,8 +618,8 @@ void draw_UI_line_C(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
 		strcpy(colour_right_value_str, COLOUR_NOT_SELECTED);
 	}
 
-	sprintf(line_C_str,"Latch Set Pin: %s%d%s\tComp Reset Pin: %s%d%s\n\r",colour_left_value_str,PA2,COLOUR_DEFAULT,
-			colour_right_value_str,PA5,COLOUR_DEFAULT);
+	sprintf(line_C_str,"Latch Set Pin: %s%d%s\tComp Reset Pin: %s%d%s\n\r",colour_left_value_str, LATCH_SET_PIN,COLOUR_DEFAULT,
+			colour_right_value_str, COMP_RESET_PIN, COLOUR_DEFAULT);
 	(*p_line_counter)++;
 
 	push_UART2((char*) line_C_str);

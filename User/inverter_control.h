@@ -79,6 +79,9 @@
 #define DC_RELAY_PIN PC5
 
 #define COMP_RESET_PIN PA5
+#define LATCH_SET_PIN PA2
+#define LATCH_Q_PIN PA3
+#define ENABLE_PULSE_PIN PA4
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Type definitions           				                                                               */
@@ -143,7 +146,8 @@ typedef struct inverter_state_variables{ /* Process values or state variables */
 	volatile float d;
 	volatile float d_feedforward;
 
-	volatile operation_mode_t operation_mode;
+	volatile operation_mode_t operation_mode; // The actual mode the converter is operating in
+	volatile operation_mode_t mode_request;  // The user requested mode.
 
 } inverter_state_variables_t;
 

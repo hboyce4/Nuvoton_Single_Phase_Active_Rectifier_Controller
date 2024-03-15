@@ -42,9 +42,9 @@ typedef struct measurement_inputs{ /* Process values or state variables */
 
 typedef struct measurement_averages{ /* measured long-term averages at the inputs, for zeroing */
 
-	volatile uint32_t v_Mid;
-	volatile uint32_t v_AC;
-	volatile uint32_t i_PV;
+	volatile uint32_t v_Mid;	// [ADC Counts] For zeroing
+	volatile uint32_t v_AC;		// [ADC Counts] For zeroing
+	volatile uint32_t i_PV;		// [ADC Counts] For zeroing
 
 } measurement_averages_t;
 
