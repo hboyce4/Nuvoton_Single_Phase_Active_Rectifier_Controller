@@ -22,11 +22,11 @@
 #include "UI.h"
 
 /*---------------------------------------------------------------------------------------------------------*/
-/* Local Macros           				                                                                       */
+/* Exposed Macros           				                                                                       */
 /*---------------------------------------------------------------------------------------------------------*/
 
 // Tolerance for PLL synchronisation
-#define PLL_SYNC_TOL 				0.25 /* [units] Tolerance within which the signal is considered in sync */
+#define PLL_SYNC_TOL 				0.25f /* [units] Tolerance within which the signal is considered in sync */
 #define PLL_SYNC_COUNT_FOR_SET		600	/* [counts] Number of times the signal must be found within tolerance to be considered in sync */
 #define PLL_SYNC_COUNT_FOR_RESET	10	/* [counts] Number of times the signal must be found OUT of tolerance to be considered out of sync */
 
@@ -62,16 +62,16 @@
 //#define VBUS_DIFF_KP 1 /* Proportional gain of the V_DC_diff controller */
 #define VBUS_DIFF_KP 0.33f /* Proportional gain of the V_DC_diff controller */
 //#define VBUS_TOTAL_KP 5 /* Proportional gain of the V_DC_total controller */
-#define VBUS_TOTAL_KP (5/3) /* Proportional gain of the V_DC_total controller */
+#define VBUS_TOTAL_KP 1.66667f /* Proportional gain of the V_DC_total controller */
 
 
 // Maximum currents
 //#define I_D_MAX 33 /* [A] Maximum allowable peak AC current */
-#define I_D_MAX 11 /* [A] Maximum allowable peak AC current */
+#define I_D_MAX 11.0f /* [A] Maximum allowable peak AC current */
 //#define I_BALANCE_MAX 3 /* [A] Maximum allowable balancing (DC) current */
-#define I_BALANCE_MAX 1 /* [A] Maximum allowable balancing (DC) current */
+#define I_BALANCE_MAX 1.0f /* [A] Maximum allowable balancing (DC) current */
 
-#define D_MARGIN 0.15 /* Duty cycle margin. If the theoretical duty cycle is smaller than D_MARGIN, or greater than 1-D_MARGIN, don't run the inverter*/
+#define D_MARGIN 0.15f /* Duty cycle margin. If the theoretical duty cycle is smaller than D_MARGIN, or greater than 1-D_MARGIN, don't run the inverter*/
 
 #define AC_PRECHARGE_PIN PC2
 #define DC_PRECHARGE_PIN PC3
@@ -89,7 +89,20 @@
 
 typedef enum {CONTACTOR_OFF = 0, CONTACTOR_AC_PRECHARGE = 1, CONTACTOR_AC_WAIT_FOR_CLOSE = 2, CONTACTOR_AC_DWELL = 3, CONTACTOR_AC_CHARGE = 4, CONTACTOR_AC_CLOSED_DC_OPEN = 5, CONTACTOR_AC_CLOSED_DC_PRECHARGE = 6, CONTACTOR_AC_DC_CLOSED = 7} contactor_state_t;
 
-typedef enum {MODE_DC_REGULATION = 0, MODE_CONSTANT_AC_CURRENT = 1, MODE_CONSTANT_AC_VOLTAGE = 2, MODE_LAST = 3} operation_mode_t;
+
+/* Operation modes
+ *
+ * DC_REGULATION: Aims to Keep the DC voltage constant. Needs a bidirectionnal AC voltage source.
+ *
+ * CONSTANT_AC_CURRENT_PLL: Tries to keep the AC current constant, while maintaining synchronization to the grid with the PLL. Needs a bidirectionnal AC voltage source.
+ *
+ * CONSTANT_CURRENT_OL: Outputs a constant AC current, but in open loop, with a fixed frequency (no PLL). Needs a passive load on the AC side.
+ *
+ * CONSTANT_AC_VOLTAGE: Outputs a constant AC voltage, in open loop, with fixed frequency and no current regulation. Needs a passive load on the AC side.
+ *
+ * MODE_LAST: Indicates the last mode (needed to cycle throught the modes)
+ */
+typedef enum {MODE_DC_REGULATION = 0, MODE_CONSTANT_AC_CURRENT_PLL = 1, MODE_CONSTANT_AC_CURRENT_OL = 2, MODE_CONSTANT_AC_VOLTAGE = 3, MODE_LAST = 4} operation_mode_t;
 
 
 typedef struct { /* Safety and operational statuses and conditions */
@@ -136,7 +149,7 @@ typedef struct inverter_state_variables{ /* Process values or state variables */
 	/* "Constant" (slow varying) values for power calculation */
 	volatile float V_AC_RMS;
 	volatile float I_AC_RMS;
-	volatile float P_AC_RMS;
+	volatile float P_AC_AVG;
 
 	/* Dynamic (fast varying) values for control */
 	//volatile float v_AC;
@@ -147,20 +160,30 @@ typedef struct inverter_state_variables{ /* Process values or state variables */
 	volatile float d_feedforward;
 
 	volatile operation_mode_t operation_mode; // The actual mode the converter is operating in
-	volatile operation_mode_t mode_request;  // The user requested mode.
+
+
 
 } inverter_state_variables_t;
 
 
 typedef struct { /* Uset selectable setpoints and modes */
 
-	//volatile float I_Q;
 	volatile bool contactor_close_request;
-	//volatile bool latch_set;
-	//volatile float some_setpoint;
+
+	// Setpoint for constant DC voltage mode
 	volatile float V_DC_total_setpoint;
 	volatile float V_DC_diff_setpoint;
 	volatile float precharge_threshold;
+
+	// Setpoint for constant AC voltage mode
+	volatile float V_AC_setpoint; //[V] Peak value, sqrt(2) times the RMS value, half the peak-to-peak value, etc.
+
+	// Setpoint for constant AC current mode
+	volatile float I_AC_setpoint; //[A] Peak value, sqrt(2) times the RMS value, half the peak-to-peak value, etc.
+
+	volatile operation_mode_t requested_operation_mode;  // The user requested mode.
+	/* Switching enable request */
+	volatile bool requested_sw_en;
 
 } inverter_state_setpoints_t;
 
@@ -204,23 +227,27 @@ void inverter_control_main(void);
 void inverter_check_PLL_sync(void);
 void inverter_check_i_sync(void);
 
-void inverter_check_safety_operational_status(void);
+void inverter_contactor_service(void);
 void inverter_check_voltage_limits(void);
 
 void inverter_calc_d_ff(void);// Calculate duty cycle feedforward term
 
 
 void inverter_contactor_control_DC_regulation_mode(void);
-void inverter_contactor_control_constant_AC_current_mode(void);
+void inverter_contactor_control_constant_AC_current_PLL_mode(void);
+void inverter_contactor_control_constant_AC_current_OL_mode(void);
 void inverter_contactor_control_constant_AC_voltage_mode(void);
+void inverter_contactor_control_update_outputs(void);
 
 void inverter_medium_freq_task(void);
 
 void inverter_calc_I_D(void);
 void inverter_calc_I_balance(void);
 
-void inverter_try_next_mode(void);
-void inverter_try_prev_mode(void);
+void inverter_mode_change(void);
+
+void inverter_req_next_mode(void);
+void inverter_req_prev_mode(void);
 
 void inverter_reset_main_errors(void);
 void inverter_reset_charge_errors(void);

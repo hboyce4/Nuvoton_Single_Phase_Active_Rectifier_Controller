@@ -169,9 +169,9 @@ void init_general_IO(void){
 	GPIO_SetMode(PC, BIT2|BIT3|BIT4|BIT5, GPIO_MODE_OUTPUT); // Set optocoupler pins to outputs
 
 	// Inverter control pins
-	PA5 = true; // Compensator reset pin is active high. It should be in the reset state when the inverter is not running to prevent windup.
-	PA4 = false; // Enable pulse is idle in low state. Rising-edge trigerred
-	PA2 = false; // Current_ok_latch is set by setting the pin high
+	COMP_RESET_PIN = true; // Compensator reset pin is active high. It should be in the reset state when the inverter is not running to prevent windup.
+	ENABLE_PULSE_PIN = false; // Enable pulse is idle in low state. Rising-edge trigerred
+	LATCH_SET_PIN = false; // Current_ok_latch is set by setting the pin high
 	GPIO_SetMode(PA, BIT2|BIT4|BIT5, GPIO_MODE_OUTPUT);
 	GPIO_SetMode(PA, BIT3, GPIO_MODE_INPUT); // input for Current_ok_latch state
 
@@ -343,5 +343,12 @@ void init_inverter_control(void){
     NVIC_EnableIRQ(TMR1_IRQn);
     NVIC_SetPriority(TMR1_IRQn, TMR1_INT_PRIORITY);
     TIMER_Start(TIMER1);
+
+    // Arm (set) the overcurrent protection latch.
+    // By pulsing the latch set pin.
+    ENABLE_PULSE_PIN = false;// Enable pulse must be low while we set the latch else the enable signal will be trigerred
+    LATCH_SET_PIN = true;
+    delay_ms(2);// It is actually much faster than 2 milliseconds
+    LATCH_SET_PIN = false;
 
 }

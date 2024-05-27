@@ -7,6 +7,12 @@
 #include "measurement.h"
 #include "analog.h"
 
+/*---------------------------------------------------------------------------------------------------------*/
+/* Local Macros           				                                                                   */
+/*---------------------------------------------------------------------------------------------------------*/
+
+#define OMEGA_SHORT_TERM_AVERAGE 6.28f //[rad/s] Cutoff frequency for the low pass filter for the long term averages
+#define ABS_AVG_TO_RMS 1.11072f //Factor to transfrom from absolute average to RMS *for a perfect sine wave* Equalt to (pi/2)/sqrt(2)
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
@@ -102,10 +108,10 @@ void Measurement_convert_to_int_and_write(void){
 	i_sp_val += (int32_t)measurement_offsets.i_SP; /* signal centered around I_SP_OFFSET */
 
 	/* Convert the duty cycle feedforward value from int to float */
-	if(/*g_d_ff_zero_state*/true){
+	if(/*g_d_ff_zero_state*/false){
 		d_ff_val = 0;
 	}else{
-		d_ff_val = (int32_t)((inverter.d_feedforward-0.5)*D_FF_GAIN*(DAC_RES_COUNT/VREF_VOLTAGE)); /* add -0.5 shift to make signal between -0.5 and 0.5 */
+		d_ff_val = (int32_t)((inverter.d_feedforward-0.5f)*D_FF_GAIN*(DAC_RES_COUNT/VREF_VOLTAGE)); /* add -0.5 shift to make signal between -0.5 and 0.5 */
 	}
 	d_ff_val += (int32_t)measurement_offsets.d_FF; /* Centered around D_FF_OFFSET */
 
@@ -114,8 +120,30 @@ void Measurement_convert_to_int_and_write(void){
 
 }
 
+void Measurement_calc_averages_short_term(void){
+	float inst_power;
 
-void Measurement_calc_averages(void){ /*TODO: Replace this with a IIR low pass filter */
+	inst_power = measurements_in.v_AC * measurements_in.i_PV;
+
+	//Forward euler
+	inverter.P_AC_AVG += T_CALC * OMEGA_SHORT_TERM_AVERAGE * (inst_power - inverter.P_AC_AVG);
+
+	static float abs_avg_V_AC, abs_avg_I_AC;
+
+	//Forward euler
+	abs_avg_V_AC += T_CALC * OMEGA_SHORT_TERM_AVERAGE * (fabsf(measurements_in.v_AC) - abs_avg_V_AC);
+	abs_avg_I_AC += T_CALC * OMEGA_SHORT_TERM_AVERAGE * (fabsf(measurements_in.i_PV) - abs_avg_I_AC);
+
+	/* Transform absolute average to RMS using a factor valid for some waveforms*/
+	inverter.V_AC_RMS = abs_avg_V_AC * ABS_AVG_TO_RMS;
+	inverter.I_AC_RMS = abs_avg_I_AC * ABS_AVG_TO_RMS;
+
+}
+
+
+void Measurement_calc_averages_longterm(void){ /*TODO: Replace this with a IIR low pass filter */
+
+	// Used to autozero offsets
 
 	static uint32_t v_AC_accumulator = 0;
 	static uint32_t i_PV_accumulator = 0;

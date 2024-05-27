@@ -38,12 +38,12 @@
 typedef struct {
 
 	//volatile float I_Q;
-	volatile float PI_ctrl_integ_term;
-	volatile float w_est;
-	volatile float theta_est;
-	volatile float b_beta;
+	volatile float PI_ctrl_integ_term; /* Integral term of the PLL's PI controller when in closed loop. Meaningless when open loop.*/
+	volatile float w_est; /* [rad/s] angular velocity of the network (frequency times 2*pi) */
+	volatile float theta_est; /* [rad] Angle of the b_bete sine wave */
+	volatile float b_beta; /* A sine wave [-1, 1], in sync with the grid if the PLL is in closed-loop, free running at a fixed frequency if open-loop.*/
 	volatile float freq_Hz; /* Frequency value, low pass filtered and converted to hertz*/
-	volatile bool zero_crossing;
+	volatile bool zero_crossing; /* True during a sample following a zero crossing (positive-going or negative-going) */
 
 } PLL_state_variables_t;
 

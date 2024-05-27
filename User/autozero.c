@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "inverter_control.h"
+#include "persistent_data.h"
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
@@ -69,7 +70,7 @@ void autozero_state_machine(void){
 				if(COMP_RESET_PIN){/* If compensator reset is active*/
 					COMP_RESET_PIN = false; /* remove the compensator reset (it was active for one cycle), and wait for the next execution, to give time to the compensator to saturate*/
 				}else{
-					if(measurements_in.d > (1.0-FLOAT_MARGIN_FOR_AUTOZERO)/*ADC_raw_val[D_COMP_CHANNEL] > ((uint16_t)(ADC_RES_COUNT - COUNT_MARGIN_FOR_AUTOZERO))*/){/* If d_COMP saturated high*/
+					if(measurements_in.d > (1.0f-FLOAT_MARGIN_FOR_AUTOZERO)/*ADC_raw_val[D_COMP_CHANNEL] > ((uint16_t)(ADC_RES_COUNT - COUNT_MARGIN_FOR_AUTOZERO))*/){/* If d_COMP saturated high*/
 						/* That means the guess was too high */
 						/* Put the bit back to zero in the guess*/
 						autozero_i.guess &= ~(1 << autozero_i.bit_position);

@@ -11,13 +11,15 @@
 
 #include "PLL.h"
 #include <math.h>
+#define ARM_MATH_CM4
+#include <arm_math.h>
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
 
 PLL_state_variables_t PLL = {.PI_ctrl_integ_term = 0,
-							.w_est = NETWORK_FREQ_F,
+							.w_est = 2*PI_F*NETWORK_FREQ_F,
 							.theta_est = 0};
 
 float sin_table[SIN_TABLE_SIZE];
@@ -32,7 +34,7 @@ void init_sin_table(float* sin_table, uint8_t table_size){
 
 	for (i = 0; i <= table_size; i++){
 
-		sin_table[i] = sin((((float)i)/table_size)*(M_PI/2));
+		sin_table[i] = sin((((float)i)/table_size)*(PI/2));
 
 
 	}
@@ -68,9 +70,9 @@ void PLL_main(void){ // Service the PLL. Needs up-to-date analog input values.
 
 
 /****************************PI Controller begin***************************************/
-	PLL.PI_ctrl_integ_term += err * PLL_KI * T_CALC; /* int�gration de l'erreur avec le gain int�gral */
+	PLL.PI_ctrl_integ_term += err * PLL_KI * T_CALC; /* integration de l'erreur avec le gain integral */
 
-	if (PLL.PI_ctrl_integ_term > 2*PI_F*MAX_FREQ_DEVIATION){ /* Saturation de la fr�quence pour emp�cher le PLL de partir � la d�rive si il y a perte de verouillage*/
+	if (PLL.PI_ctrl_integ_term > 2*PI_F*MAX_FREQ_DEVIATION){ /* Saturation de la frequence pour empecher le PLL de partir a la derive si il y a perte de verouillage */
 
 		PLL.PI_ctrl_integ_term = 2*PI_F*MAX_FREQ_DEVIATION;
 
@@ -81,7 +83,18 @@ void PLL_main(void){ // Service the PLL. Needs up-to-date analog input values.
 	}
 
 	float old_w_est = PLL.w_est; /* Save the old w_est for Tustin/Bilinear/Trapezoidal integration */
-	PLL.w_est = err*PLL_KP + PLL.PI_ctrl_integ_term + 2*PI_F*NETWORK_FREQ_F;	/* Output = err*Kp + err*Ki*(1/s) + Feedforward */
+
+	/* If the inverter mode is one of the open loop modes
+	 * (Either AC constant voltage or constant current with OL)*/
+	if(inverter.operation_mode == MODE_CONSTANT_AC_CURRENT_OL || inverter.operation_mode == MODE_CONSTANT_AC_VOLTAGE){
+		//Keep the Integral term reset
+		//PLL.PI_ctrl_integ_term = 0;
+		// Force the frequency to the network frequency
+		PLL.w_est = 2*PI_F*NETWORK_FREQ_F;
+
+	}else{/* Else, it is one of the normal closed-loop modes*/
+		PLL.w_est = err*PLL_KP + PLL.PI_ctrl_integ_term + 2*PI_F*NETWORK_FREQ_F;	/* Output = err*Kp + err*Ki*(1/s) + Feedforward */
+	}
 
 /****************************PI Controller end*****************************************/
 

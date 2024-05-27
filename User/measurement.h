@@ -68,6 +68,10 @@ void Measurement_process_oversampling(void);
 void Measurement_convert_to_float(void);
 void Measurement_convert_to_int_and_write(void);
 
-void Measurement_calc_averages(void);
+// shorter term avgs, in float form, for power calculation
+void Measurement_calc_averages_short_term(void);
+
+// Long term averages in integer form, for autozero
+void Measurement_calc_averages_longterm(void);
 
 #endif /* MEASUREMENT_H_ */

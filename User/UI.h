@@ -39,7 +39,7 @@
 #define COLOUR_SELECTED "\x1B[30m\x1B[105m" /* black text, bright magenta backgroung*/
 #define COLOUR_NOT_SELECTED "\x1B[95m\x1B[40m" /* bright magenta text, black background*/
 
-#define FLOAT_INCREMENT 0.50
+#define FLOAT_INCREMENT 0.50f
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Type definitions           				                                                               */
@@ -68,6 +68,7 @@ void draw_UI_line_6(uint8_t*);
 void draw_UI_line_7(uint8_t*);
 void draw_UI_line_8(uint8_t*);
 void draw_UI_line_9(uint8_t*);
+void draw_UI_line_10(uint8_t*);
 
 
 void draw_UI_line_separator(uint8_t*);

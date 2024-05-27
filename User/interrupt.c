@@ -42,7 +42,8 @@ void TMR1_IRQHandler(void){ /*High frequency interrupt (F_CALC). Keep light!!! *
         /* Begin control loop iteration */
 		Measurement_process_oversampling(); // Service ADC routine
         Measurement_convert_to_float(); // Service analog input values (convert ints from ADC to float for maths
-		PLL_main(); // Service the PLL. Needs up-to-date analog input values.
+        Measurement_calc_averages_short_term();// Calculate the float average values
+
 		inverter_control_main(); // Service the inverter. Needs up-to-date PLL and analog input values.
 
 		if(autozero_state == AUTOZERO_DONE || autozero_state == AUTOZERO_STANDBY){ // Unless the autozero is in progress
@@ -68,7 +69,7 @@ void SysTick_Handler(void)	// Every millisecond (Medium frequency).
 
     inverter_medium_freq_task();
 
-    Measurement_calc_averages();
+    Measurement_calc_averages_longterm();
 
 	static uint16_t UI_refresh_counter = 0;
 	if(!UI_refresh_counter){

@@ -152,17 +152,17 @@ void increment_UI_value(int8_t row_sel, int8_t col_sel){
 				/*inverter_setpoints.precharge_threshold += FLOAT_INCREMENT;*/
 				inverter_req_next_mode();
 			}else if (col_sel == 1){
-				/*inverter_setpoints.V_DC_diff_setpoint += FLOAT_INCREMENT;*/
-				measurement_offsets.d_FF += 1;
+
+				inverter_setpoints.V_AC_setpoint += FLOAT_INCREMENT;
 			}
 			break;
 
 
 		case 2:
 			if(col_sel == 0){
-				LATCH_SET_PIN = true;
+				inverter_setpoints.requested_sw_en = true;
 			}else if (col_sel == 1){
-				PA5 = true;
+				inverter_setpoints.I_AC_setpoint += FLOAT_INCREMENT;
 			}
 			break;
 
@@ -198,16 +198,16 @@ void decrement_UI_value(int8_t row_sel, int8_t col_sel){
 				/*inverter_setpoints.precharge_threshold = FLOAT_INCREMENT;*/
 				inverter_req_prev_mode();
 			}else if (col_sel == 1){
-				/*inverter_setpoints.V_DC_diff_setpoint -= FLOAT_INCREMENT;*/
-				measurement_offsets.d_FF -= 1;
+
+				inverter_setpoints.V_AC_setpoint -= FLOAT_INCREMENT;
 			}
 			break;
 
 		case 2:
 			if(col_sel == 0){
-				LATCH_SET_PIN = false;
+				inverter_setpoints.requested_sw_en = false;
 			}else if (col_sel == 1){
-				PA5 = false;
+				inverter_setpoints.I_AC_setpoint -= FLOAT_INCREMENT;
 			}
 			break;
 
@@ -298,7 +298,7 @@ void draw_UI_line_5(uint8_t* p_line_counter) {
 
 	static char line_5_str[LINE_WIDTH];
 	static char power_flow_dir_str[ESCAPE_SEQUENCE_LENGTH];
-	if (inverter.P_AC_RMS > 0) {
+	if (inverter.P_AC_AVG > 0) {
 		/* If power is positive */
 		strcpy(power_flow_dir_str, "->"); /* DC towards AC */
 	} else {
@@ -306,7 +306,7 @@ void draw_UI_line_5(uint8_t* p_line_counter) {
 		strcpy(power_flow_dir_str, "<-"); /* AC towards DC */
 	}
 	sprintf(line_5_str, "P AC RMS: %2.2f W\tPower flow: DC%sAC\n\r",
-			inverter.P_AC_RMS, power_flow_dir_str);
+			inverter.P_AC_AVG, power_flow_dir_str);
 	(*p_line_counter)++;
 	push_UART2((char*) line_5_str);
 }
@@ -480,8 +480,11 @@ void draw_UI_line_10(uint8_t* p_line_counter) {
 		case MODE_DC_REGULATION:
 			strcpy(mode_str,"DC const. V");
 			break;
-		case MODE_CONSTANT_AC_CURRENT:
-			strcpy(mode_str,"AC const. I");
+		case MODE_CONSTANT_AC_CURRENT_PLL:
+			strcpy(mode_str,"AC const. I, w/PLL");
+			break;
+		case MODE_CONSTANT_AC_CURRENT_OL:
+			strcpy(mode_str,"AC const. I, open loop");
 			break;
 		case MODE_CONSTANT_AC_VOLTAGE:
 			strcpy(mode_str,"AC const. V");
@@ -534,7 +537,7 @@ void draw_UI_line_A(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel) {
 	}
 
 
-	sprintf(line_A_str,"Cont. close req.: %s%s%s\t\tV DC set: %s%2.2f V%s\n\r",colour_on_off_str,on_off_str,COLOUR_DEFAULT,
+	sprintf(line_A_str,"Cont. close req.: %s%s%s\t\tV DC mode set: %s%2.2f V%s\n\r",colour_on_off_str,on_off_str,COLOUR_DEFAULT,
 			colour_v_setpoint_str,inverter_setpoints.V_DC_total_setpoint,COLOUR_DEFAULT);
 	(*p_line_counter)++;
 
@@ -546,7 +549,7 @@ void draw_UI_line_B(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
 
 	static char line_B_str[LINE_WIDTH];
 	char colour_left_str[ESCAPE_SEQUENCE_LENGTH];
-	char colour_V_diff_str[ESCAPE_SEQUENCE_LENGTH];
+	char colour_right_str[ESCAPE_SEQUENCE_LENGTH];
 
 	/* Column 0 */
 	if(row_sel == 1 && col_sel == 0){
@@ -557,9 +560,9 @@ void draw_UI_line_B(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
 
 	/* Column 1 */
 	if(row_sel == 1 && col_sel == 1){
-		strcpy(colour_V_diff_str, COLOUR_SELECTED);
+		strcpy(colour_right_str, COLOUR_SELECTED);
 	}else{
-		strcpy(colour_V_diff_str, COLOUR_NOT_SELECTED);
+		strcpy(colour_right_str, COLOUR_NOT_SELECTED);
 	}
 
 	/*sprintf(line_B_str,"UV2: %s%2.2f%s\t\tV DC diff set: %s%2.2f V%s\n\r",colour_other_str,inverter_setpoints.precharge_threshold,COLOUR_DEFAULT,
@@ -572,13 +575,16 @@ void draw_UI_line_B(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
 	}else{
 		strcpy(d_ff_zero_str,"OFF");
 	}*/
-	switch(inverter.mode_request){
+	switch(inverter_setpoints.requested_operation_mode){
 
 		case MODE_DC_REGULATION:
 			strcpy(mode_req_str,"DC const. V");
 			break;
-		case MODE_CONSTANT_AC_CURRENT:
-			strcpy(mode_req_str,"AC const. I");
+		case MODE_CONSTANT_AC_CURRENT_PLL:
+			strcpy(mode_req_str,"AC const. I, w/PLL");
+			break;
+		case MODE_CONSTANT_AC_CURRENT_OL:
+			strcpy(mode_req_str,"AC const. I, open loop");
 			break;
 		case MODE_CONSTANT_AC_VOLTAGE:
 			strcpy(mode_req_str,"AC const. V");
@@ -590,8 +596,8 @@ void draw_UI_line_B(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
 	}
 
 
-	sprintf(line_B_str,"Req.Mode: %s%s%s\td_FF Offset: %s%i%s\n\r",colour_left_str,mode_req_str,COLOUR_DEFAULT,
-	colour_V_diff_str,measurement_offsets.d_FF,COLOUR_DEFAULT);
+	sprintf(line_B_str,"Req.Mode: %s%s%s\tV AC mode set: %s%2.2f%s\n\r",colour_left_str,mode_req_str,COLOUR_DEFAULT,
+	colour_right_str, inverter_setpoints.V_AC_setpoint, COLOUR_DEFAULT);
 	(*p_line_counter)++;
 
 	push_UART2((char*) line_B_str);
@@ -618,8 +624,8 @@ void draw_UI_line_C(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
 		strcpy(colour_right_value_str, COLOUR_NOT_SELECTED);
 	}
 
-	sprintf(line_C_str,"Latch Set Pin: %s%d%s\tComp Reset Pin: %s%d%s\n\r",colour_left_value_str, LATCH_SET_PIN,COLOUR_DEFAULT,
-			colour_right_value_str, COMP_RESET_PIN, COLOUR_DEFAULT);
+	sprintf(line_C_str,"Req. SW enable: %s%d%s\tI AC mode set: %s%2.2f%s\n\r",colour_left_value_str, inverter_setpoints.requested_sw_en,COLOUR_DEFAULT,
+			colour_right_value_str, inverter_setpoints.I_AC_setpoint, COLOUR_DEFAULT);
 	(*p_line_counter)++;
 
 	push_UART2((char*) line_C_str);
@@ -673,6 +679,7 @@ void draw_UI_line_D(uint8_t* p_line_counter, int8_t row_sel, int8_t col_sel){
 	push_UART2((char*) line_D_str);
 
 }
+
 
 void get_cont_display_states(cont_display_state_t* AC_contactor_state, cont_display_state_t*DC_contactor_state){ // Contactor state for display purposes.
 

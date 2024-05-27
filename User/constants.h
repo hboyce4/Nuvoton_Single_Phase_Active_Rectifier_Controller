@@ -15,8 +15,9 @@
 
 #define T_CALC ((float)(1.0/F_CALC))	// [s] Control loop trigger period. Inverse of F_CALC.
 
+#define T_CACA 5
 
-#define T_SYSTICK (1.0/1000) // [s] 1 millisecond systick
+#define T_SYSTICK 0.001f //[s] 1 millisecond systick
 
 
 #define ADC_RES_BITS 12
