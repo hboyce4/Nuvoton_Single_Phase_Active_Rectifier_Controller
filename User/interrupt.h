@@ -8,9 +8,24 @@
 #ifndef INTERRUPT_H_
 #define INTERRUPT_H_
 
-#include "NuMicro.h"
-#include "user_sys.h"
-#include "analog.h"
+//#include "NuMicro.h"
+
+#include <stdbool.h>
+#include <stdint.h>
+
+//#include "UART_over_DMA.h"
+//#include "UI.h"
+
+
+/*---------------------------------------------------------------------------------------------------------*/
+/* Global variables to be made available externally                                                        */
+/*---------------------------------------------------------------------------------------------------------*/
+extern volatile uint64_t g_SysTickIntCnt;
+extern volatile bool g_UI_new_frame_tick;
+
+extern volatile bool g_Interrupt_real_time_fault;
+
+
 
 void PDMA_IRQHandler(void);
 void TMR1_IRQHandler(void);
