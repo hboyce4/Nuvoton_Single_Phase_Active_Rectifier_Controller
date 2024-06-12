@@ -15,6 +15,8 @@
 
 #define DELAY_OFF_FOR_MODE_CHANGE 1000 // milliseconds. Time the contactors need to have been off to allow a mode change.
 
+#define V_AC_MAX_FOR_START 0.2f // Maximum RMS voltage to start the constant V_AC mode
+
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
@@ -42,6 +44,7 @@ inverter_faults_t inverter_faults;
 void inverter_control_main(void){ // Service the inverter. Needs up-to-date analog input values.
 	/* High frequency -> Use T_CALC */
 
+	// Go to low state here, before the processing, to provide a low level for long enough that the monostable can register
 	ENABLE_PULSE_PIN = false;
 	//inverter_safety.d_ff_ok = false;
 
@@ -55,9 +58,9 @@ void inverter_control_main(void){ // Service the inverter. Needs up-to-date anal
 
 	inverter_contactor_service();
 
-	if(inverter_safety.d_ff_ok){
-		ENABLE_PULSE_PIN = true; /* rising edge to enable the inverter*/
-	}
+	// This will bring ENABLE_PULSE to a high level, providing a rising edge and enabling the switching, if the conditions are right
+	inverter_switching_enable_and_comp_reset_control();
+
 
 	BLUE_LED_PIN = !LATCH_Q_PIN;/* Make the blue LED display the status of the current latch*/
 
@@ -70,6 +73,8 @@ void inverter_control_main(void){ // Service the inverter. Needs up-to-date anal
 
 void inverter_contactor_service(void){
 
+//TODO: Go to contactor off and log a fault if Current OK latch is cleared
+	// In the meantime, hardware, just prevents switching
 
 	/* Calculate the contactor state*/
 	switch(inverter.operation_mode){
@@ -102,6 +107,27 @@ void inverter_contactor_service(void){
 
 
 }
+
+void inverter_switching_enable_and_comp_reset_control(void){
+
+	if(inverter_safety.d_ff_ok && inverter_setpoints.requested_sw_en && inverter_safety.contactor_state == CONTACTOR_AC_CLOSED_DC_OPEN){
+		ENABLE_PULSE_PIN = true; /* rising edge to enable the inverter*/
+
+		if(inverter.operation_mode != MODE_CONSTANT_AC_VOLTAGE){// If mode is not constant AC voltage
+			COMP_RESET_PIN = false; /* Compensator is not reset (free to act, and current is regulated) */
+		}else{// Else operation mode is constant voltage
+			COMP_RESET_PIN = true;// Compensator is held in reset
+		}
+
+	}else{
+		// Leave the ENABLE_PULSE low
+
+		// Set the compensator reset
+		COMP_RESET_PIN = true;
+	}
+
+}
+
 
 void inverter_check_PLL_sync(void){
 
@@ -445,9 +471,21 @@ void inverter_contactor_control_constant_AC_current_OL_mode(void){
 }
 
 void inverter_contactor_control_constant_AC_voltage_mode(void){
+
+	// reset conditions in any state
+
+	if(!inverter_setpoints.contactor_close_request || !LATCH_Q_PIN || inverter_safety.UV_V_DC_minus || inverter_safety.UV_V_DC_plus || inverter_safety.OV_V_DC_minus || inverter_safety.OV_V_DC_plus){
+		inverter_safety.contactor_state = CONTACTOR_OFF;
+		inverter_setpoints.contactor_close_request = FALSE; // To avoid cycling
+	}
+
 	switch(inverter_safety.contactor_state){
 
 			case CONTACTOR_OFF:
+
+				if((inverter.V_AC_RMS < V_AC_MAX_FOR_START) && inverter_setpoints.contactor_close_request){
+					inverter_safety.contactor_state = CONTACTOR_AC_CLOSED_DC_OPEN;
+				}
 
 				break;
 

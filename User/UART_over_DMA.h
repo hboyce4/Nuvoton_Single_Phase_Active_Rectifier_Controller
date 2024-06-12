@@ -26,10 +26,6 @@
 #define UART_DMA_JOB_BUFF_SIZE 32 	/* Must be a power of 2. Max = 256*/
 
 
-//#define EADC_DMA_CHANNEL 2
-//#define EADC_OVERSAMPLING_NUMBER 4
-//#define EADC_TOTAL_CHANNELS 8
-
 /*---------------------------------------------------------------------------------------------------------*/
 /* Type definitions           				                                                                       */
 /*---------------------------------------------------------------------------------------------------------*/

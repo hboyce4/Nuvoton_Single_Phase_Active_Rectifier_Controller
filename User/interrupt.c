@@ -11,6 +11,7 @@
 #include "analog.h"
 #include "measurement.h"
 #include "UART_over_DMA.h"
+#include "sys.h"
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
@@ -37,7 +38,7 @@ void TMR1_IRQHandler(void){ /*High frequency interrupt (F_CALC). Keep light!!! *
         TIMER_ClearIntFlag(TIMER1);
 
         //PA->DOUT &= ~(BIT12);//Turn ON green LED for timing measurements
-        PA12 = 0;
+        GREEN_LED_PIN = 0;
 
         /* Begin control loop iteration */
 		Measurement_process_oversampling(); // Service ADC routine
@@ -55,7 +56,7 @@ void TMR1_IRQHandler(void){ /*High frequency interrupt (F_CALC). Keep light!!! *
 		}
 
 		//PA->DOUT |= BIT12;//Turn OFF green LED for timing measurements
-		PA12 = 1;
+		GREEN_LED_PIN = 1;
     }
 
 

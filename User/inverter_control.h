@@ -71,7 +71,7 @@
 //#define I_BALANCE_MAX 3 /* [A] Maximum allowable balancing (DC) current */
 #define I_BALANCE_MAX 1.0f /* [A] Maximum allowable balancing (DC) current */
 
-#define D_MARGIN 0.15f /* Duty cycle margin. If the theoretical duty cycle is smaller than D_MARGIN, or greater than 1-D_MARGIN, don't run the inverter*/
+#define D_MARGIN 0.05f /* Duty cycle margin. If the theoretical duty cycle is smaller than D_MARGIN, or greater than 1-D_MARGIN, don't run the inverter*/
 
 #define AC_PRECHARGE_PIN PC2
 #define DC_PRECHARGE_PIN PC3
@@ -228,6 +228,8 @@ void inverter_check_PLL_sync(void);
 void inverter_check_i_sync(void);
 
 void inverter_contactor_service(void);
+void inverter_switching_enable_and_comp_reset_control(void);
+
 void inverter_check_voltage_limits(void);
 
 void inverter_calc_d_ff(void);// Calculate duty cycle feedforward term
