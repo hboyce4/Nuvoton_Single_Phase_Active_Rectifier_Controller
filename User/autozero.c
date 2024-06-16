@@ -30,6 +30,7 @@ volatile autozero_d_t autozero_d;
 void autozero_state_machine(void){
 
 //TODO: Add digital duty cycle feedback to be able to zero d_FF output as well. Analog duty cycle feedback would become also obsolete.
+	// -Done!!!
 
 /**************State machine for autozero conditions**************************************************/
 
@@ -122,7 +123,7 @@ void autozero_state_machine(void){
 			// Zeroing of the duty cycle at 50% during compensator reset using the d_FF offset value
 
 
-			d_error = abs(PWM_raw_count-((BPWM_GET_CNR(BPWM1,0)+1)/2));/* The period is CNR + 1 */
+			d_error = abs(PWM_raw_count-(((BPWM_GET_CNR(BPWM1,0)+1)*EADC_OVERSAMPLING)/2));/* The period is CNR + 1 */
 
 			if(d_error < autozero_d.error_of_best_guess){ /* If the new measured error is better than the previous best guess*/
 				autozero_d.error_of_best_guess = d_error; /* Save the new error */

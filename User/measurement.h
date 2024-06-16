@@ -74,4 +74,6 @@ void Measurement_calc_averages_short_term(void);
 // Long term averages in integer form, for autozero
 void Measurement_calc_averages_longterm(void);
 
+void Measurement_convert_temperatures(void);
+
 #endif /* MEASUREMENT_H_ */

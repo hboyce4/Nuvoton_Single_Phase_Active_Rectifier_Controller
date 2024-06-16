@@ -27,7 +27,7 @@
 #define PWM_CARRIER_FREQ 400000 //Used for BPWM1
 #define BPWM0_MARGIN 20 // Number of extra clock cycles of BPWM0 on top of BPWM1 (used for BPWM0)
 
-#define F_CALC 12000			// [Hz] Control loop frequency (used tof Timer1). Must be an integer multiple of
+#define F_CALC 30000			// [Hz] Control loop frequency (used tof Timer1). Must be an integer multiple of
 											//4 * NETWORK_FREQ so that DELAY_ARRAY_SIZE is an integer.
 /*---------------------------------------------------------------------------------------------------------*/
 /* External global variables                                                                               */

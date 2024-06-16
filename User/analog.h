@@ -27,8 +27,8 @@
 /*---------------------------------------------------------------------------------------------------------*/
 
 //#define EADC_DMA_CHANNEL 2
-#define EADC_OVERSAMPLING_NUMBER 8 /* MAX = 16 !!! 2^EADC_SHIFT_FOR_OVERSAMPLING_DIVISION = EADC_OVERSAMPLING_NUMBER*/
-#define EADC_SHIFT_FOR_OVERSAMPLING_DIVISION 3  /* MAX = 4 !!! Log base 2 of EADC_OVERSAMPLING_NUMBER equals EADC_SHIFT_FOR_OVERSAMPLING_DIVISION */
+#define EADC_OVERSAMPLING 8 /* MAX = 16 !!! 2^EADC_SHIFT_FOR_OVERSAMPLING_DIVISION = EADC_OVERSAMPLING_NUMBER*/
+#define EADC_OVERSAMPLING_SHIFT 3  /* MAX = 4 !!! Log base 2 of EADC_OVERSAMPLING_NUMBER equals EADC_SHIFT_FOR_OVERSAMPLING_DIVISION */
 #define EADC_FIRST_CHANNEL 1
 #define EADC_LAST_CHANNEL 7
 #define VREF_VOLTAGE 3.297f /*[V] Voltage of the chip's analog voltage reference (Vref)*/

@@ -14,6 +14,11 @@
 #define OMEGA_SHORT_TERM_AVERAGE 6.28f //[rad/s] Cutoff frequency for the low pass filter for the long term averages
 #define ABS_AVG_TO_RMS 1.11072f //Factor to transfrom from absolute average to RMS *for a perfect sine wave* Equalt to (pi/2)/sqrt(2)
 
+#define NTC_R_ZERO 10000.0f //Resistance @ /normal" temperature
+#define NTC_T_ZERO 298.15f /* [K] Equals 25 degree C. Temperature at which the NTC's R_Zero is measured. */
+#define NTC_BETA 3400.0f // Beta coefficient of the thermistors
+#define NTC_BIAS_RESISTOR 6200.0f // [Ohms] Value of the NTC biasing resistor
+
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
@@ -38,20 +43,22 @@ void Measurement_process_oversampling(void){
 	uint8_t channel;
 	for(channel = EADC_FIRST_CHANNEL; channel <= EADC_LAST_CHANNEL;channel++){/* For every channel */
 
-		/* this step could be skipped by integrating this calculation in the float conversion step*/
-		ADC_raw_val[channel]= (ADC_acq_buff[channel] >> EADC_SHIFT_FOR_OVERSAMPLING_DIVISION); /* Copy the acquisition buffer, dividing by the number of oversamples. */
+		/* DONE: this step could be skipped by integrating this calculation in the float conversion step*/
+		// Not being divided to cancel the oversampling anymore
+		ADC_raw_val[channel]= (uint32_t)ADC_acq_buff[channel]; /* Copy the acquisition buffer, dividing by the number of oversamples. */
 
 		ADC_acq_buff[channel] = 0;
 
 
 	}
 
-	PWM_raw_count = (PWM_acc_count >> EADC_SHIFT_FOR_OVERSAMPLING_DIVISION);
+	// Not being divided to cancel the oversampling anymore
+	PWM_raw_count = (PWM_acc_count);
 	/* Check saturation here or somewhere else*/
 	PWM_acc_count = 0;
 
 	/* Start ADC acquisition batch*/
-	ADC_acq_count = EADC_OVERSAMPLING_NUMBER;
+	ADC_acq_count = EADC_OVERSAMPLING_SHIFT;
 
 	EADC_CLR_INT_FLAG(EADC, EADC_STATUS2_ADIF0_Msk);      /* Clear the A/D ADINT0 interrupt flag */
 	NVIC_EnableIRQ(EADC00_IRQn);
@@ -63,19 +70,19 @@ void Measurement_process_oversampling(void){
 void Measurement_convert_to_float(void){
 
 	/* Vbus plus */
-	measurements_in.V_DC_plus = ((float)ADC_raw_val[VBUS_PLUS_CHANNEL])*(VREF_VOLTAGE/(ADC_RES_COUNT*VBUS_PLUS_GAIN))-VBUS_PLUS_OFFSET;
+	measurements_in.V_DC_plus = ((float)ADC_raw_val[VBUS_PLUS_CHANNEL])*(VREF_VOLTAGE/(ADC_RES_COUNT*EADC_OVERSAMPLING*VBUS_PLUS_GAIN))-VBUS_PLUS_OFFSET;
 	/* Vbus minus */
-	measurements_in.V_DC_minus = -(((float)ADC_raw_val[VBUS_MINUS_CHANNEL])*(VREF_VOLTAGE/(ADC_RES_COUNT*VBUS_MINUS_GAIN)))-VBUS_MINUS_OFFSET;
+	measurements_in.V_DC_minus = -(((float)ADC_raw_val[VBUS_MINUS_CHANNEL])*(VREF_VOLTAGE/(ADC_RES_COUNT*EADC_OVERSAMPLING*VBUS_MINUS_GAIN)))-VBUS_MINUS_OFFSET;
 	/* Vbus total */
 	measurements_in.V_DC_total = measurements_in.V_DC_plus - measurements_in.V_DC_minus;
 	/* Vbus diff */
 	measurements_in.V_DC_diff = measurements_in.V_DC_plus + measurements_in.V_DC_minus;
 	/* V AC */
-	measurements_in.v_AC = ((float)ADC_raw_val[V_AC_CHANNEL] - (float)measurement_offsets.v_AC)*(VREF_VOLTAGE/(ADC_RES_COUNT*V_AC_GAIN));
+	measurements_in.v_AC = ((float)ADC_raw_val[V_AC_CHANNEL] - (float)measurement_offsets.v_AC)*(VREF_VOLTAGE/(ADC_RES_COUNT*EADC_OVERSAMPLING*V_AC_GAIN));
 	/* V AC normalized to 1 */
 	measurements_in.v_AC_n = measurements_in.v_AC*(1/(V_AC_NOMINAL_RMS_VALUE*((float)M_SQRT2))); /* needs math.h */
 	/* Current process value (actual amperage) */
-	measurements_in.i_PV = ((float)ADC_raw_val[I_PV_CHANNEL] - (float)measurement_offsets.i_PV)*(VREF_VOLTAGE/(ADC_RES_COUNT*I_PV_GAIN));
+	measurements_in.i_PV = ((float)ADC_raw_val[I_PV_CHANNEL] - (float)measurement_offsets.i_PV)*(VREF_VOLTAGE/(ADC_RES_COUNT*EADC_OVERSAMPLING*I_PV_GAIN));
 
 
 	measurements_in.d_sat = (bool)((BPWM0->INTSTS) & BPWM_INTSTS_PIF0_Msk) >> BPWM_INTSTS_PIF0_Pos;/* Check if duty cycle is saturated*/
@@ -91,7 +98,7 @@ void Measurement_convert_to_float(void){
 		 }
 
 	}else{
-		measurements_in.d = (float)(PWM_raw_count)/((float)BPWM_GET_CNR(BPWM1,0));
+		measurements_in.d = (float)(PWM_raw_count)/((float)BPWM_GET_CNR(BPWM1,0)*EADC_OVERSAMPLING);
 	}
 
 
@@ -143,6 +150,8 @@ void Measurement_calc_averages_short_term(void){
 
 void Measurement_calc_averages_longterm(void){ /*TODO: Replace this with a IIR low pass filter */
 
+	//TODO: Adapt this for oversampled raw values!
+
 	// Used to autozero offsets
 
 	static uint32_t v_AC_accumulator = 0;
@@ -169,5 +178,21 @@ void Measurement_calc_averages_longterm(void){ /*TODO: Replace this with a IIR l
 		v_Mid_accumulator = 0;
 
 	}
+
+}
+
+void Measurement_convert_temperatures(void){
+
+	/* Using the Steinhart-Hart equation as per Wikipedia, get the Kelvin value */
+	float r_inf, r_NTC_inverter, r_NTC_transformer;
+	r_inf = NTC_R_ZERO * expf(-NTC_BETA / NTC_T_ZERO);
+
+	r_NTC_inverter = ((-((float)ADC_raw_val[PCB_TEMP_CHANNEL]) * NTC_BIAS_RESISTOR)/(ADC_raw_val[PCB_TEMP_CHANNEL] - EADC_OVERSAMPLING*ADC_RES_COUNT));
+
+	r_NTC_transformer = ((-((float)ADC_raw_val[XFORMER_TEMP_CHANNEL]) * NTC_BIAS_RESISTOR)/(ADC_raw_val[XFORMER_TEMP_CHANNEL] - EADC_OVERSAMPLING*ADC_RES_COUNT));;
+
+	measurements_in.T_inverter = NTC_BETA / logf(r_NTC_inverter/r_inf) - 273.15f; // Substract absolute zero
+
+	measurements_in.T_transformer = NTC_BETA / logf(r_NTC_transformer/r_inf) - 273.15f; // Substract absolute zero
 
 }

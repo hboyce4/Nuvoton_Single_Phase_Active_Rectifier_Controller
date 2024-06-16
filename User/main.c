@@ -27,6 +27,7 @@
 #include "analog.h"
 #include "UART_over_DMA.h"
 #include "persistent_data.h"
+#include "measurement.h"
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
@@ -82,6 +83,8 @@ int main()
     	if(g_UI_new_frame_tick){
     		g_UI_new_frame_tick = false;
 
+
+    		Measurement_convert_temperatures();
         	//PA->DOUT &= ~(BIT15);//Turn ON blue LED
         	draw_UI(row_sel, col_sel);
         	//PA->DOUT |= BIT15;//Turn OFF blue LED

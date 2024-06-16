@@ -24,7 +24,7 @@
 #define NETWORK_FREQ_F		60.0f						// [Hz] Frequence nominale du reseau electrique (float)
 
 #define DELAY_ARRAY_SIZE 	(F_CALC/(4*NETWORK_FREQ))	// Taille du tableau pour cr�er un d�lai de signal �quivalent � pi/4 [rad] � la fr�quence de NETWORK_FREQ
-#define SIN_TABLE_SIZE		200							// Taille de la LUT de la fct. sinus (max. 254)
+#define SIN_TABLE_SIZE		250							// Taille de la LUT de la fct. sinus (max. 254)
 #define MAX_FREQ_DEVIATION	6.0f							// [Hz] D�viation maximale � partir de la fr�quence nominale permise pour le verouillage
 #define PLL_KI				2500.0f						// Gain int�gral du compensateur PI
 #define	PLL_KP				50.0f							// Gain proportionnel du compensateur PI
