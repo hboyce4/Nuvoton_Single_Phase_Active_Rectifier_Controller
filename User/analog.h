@@ -63,11 +63,11 @@
 
 // Gain and offset for v AC (volts on alternating current side)
 #define V_AC_GAIN 0.058824f 		/* [V/V] Gain of the AC voltage front end*/
-#define V_AC_OFFSET 2048 			/* [ADC counts] Initial offset of the AC voltage front end. Will be auto-zeroed */
+#define V_AC_OFFSET (ADC_RES_COUNT/2)*EADC_OVERSAMPLING	 			/* [ADC counts] Initial offset of the AC voltage front end. Will be auto-zeroed */
 
 // Gain and offset for i PV (current, process value)
 #define I_PV_GAIN 0.033f			/* [V/A] Gain of the current process value (actual current) */
-#define I_PV_OFFSET 2048			/* [ADC counts] Initial offset of the current process value (actual current). Will be auto-zeroed */
+#define I_PV_OFFSET (ADC_RES_COUNT/2)*EADC_OVERSAMPLING			/* [ADC counts] Initial offset of the current process value (actual current). Will be auto-zeroed */
 
 /********************************/
 /*	Output gains and offsets	*/
@@ -79,7 +79,7 @@
 
 // Gain and offset for d FF (duty cycle, feedforward signal)
 #define D_FF_GAIN 1.0f				/*  Gain of the duty cycle feed forward value */
-#define D_FF_OFFSET (DAC_RES_COUNT/2)	/* [LSB] Offset of the duty cycle feed forward value. Will be auto-zeroed */
+#define D_FF_OFFSET (DAC_RES_COUNT/2)/* [LSB] Offset of the duty cycle feed forward value. Will be auto-zeroed */
 
 // Long term averages of alternating values
 #define NB_SAMPLES_LONG_TERM_AVG 1000 /* Number of samples for calculating the long term average of analog inputs. Max value somewhere around 524288 (31 bit int / 12 bit ADC resolution) */

@@ -27,7 +27,9 @@ volatile bool g_Interrupt_real_time_fault = false;
 /*---------------------------------------------------------------------------------------------------------*/
 void EADC00_IRQHandler(void){ /* Very high frequency interrupt. Keep very light!!! */
 
+	AMBER_LED_PIN = 0;
 	ADC_process_interrupt();
+	AMBER_LED_PIN = 1;
 }
 
 void TMR1_IRQHandler(void){ /*High frequency interrupt (F_CALC). Keep light!!! */
@@ -66,7 +68,7 @@ void SysTick_Handler(void)	// Every millisecond (Medium frequency).
 {
     g_SysTickIntCnt++;
 
-    PA13 = 0; // Turn on amber LED
+    //AMBER_LED_PIN = 0; // Turn on amber LED
 
     inverter_medium_freq_task();
 
@@ -81,7 +83,7 @@ void SysTick_Handler(void)	// Every millisecond (Medium frequency).
 
 	// TODO: Raise fault if retrigger before end of task
 
-	PA13 = 1; // Turn off amber LED
+	//AMBER_LED_PIN = 1; // Turn off amber LED
 
 }
 

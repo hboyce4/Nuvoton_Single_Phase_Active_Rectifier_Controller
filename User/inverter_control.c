@@ -110,21 +110,30 @@ void inverter_contactor_service(void){
 
 void inverter_switching_enable_and_comp_reset_control(void){
 
-	if(inverter_safety.d_ff_ok && inverter_setpoints.requested_sw_en && inverter_safety.contactor_state == CONTACTOR_AC_CLOSED_DC_OPEN){
-		ENABLE_PULSE_PIN = true; /* rising edge to enable the inverter*/
 
-		if(inverter.operation_mode != MODE_CONSTANT_AC_VOLTAGE){// If mode is not constant AC voltage
-			COMP_RESET_PIN = false; /* Compensator is not reset (free to act, and current is regulated) */
-		}else{// Else operation mode is constant voltage
-			COMP_RESET_PIN = true;// Compensator is held in reset
+	if(autozero_state == AUTOZERO_STANDBY){ // If autozero is not happening
+		// (Autozero needs control of the comp reset pin)
+		// This can probably be implemented in a much better way
+
+		if(inverter_safety.d_ff_ok && inverter_setpoints.requested_sw_en && inverter_safety.contactor_state == CONTACTOR_AC_CLOSED_DC_OPEN){
+			ENABLE_PULSE_PIN = true; /* rising edge to enable the inverter*/
+
+			if(inverter.operation_mode != MODE_CONSTANT_AC_VOLTAGE){// If mode is not constant AC voltage
+				COMP_RESET_PIN = false; /* Compensator is not reset (free to act, and current is regulated) */
+			}else{// Else operation mode is constant voltage
+				COMP_RESET_PIN = true;// Compensator is held in reset
+			}
+
+		}else{
+			// Leave the ENABLE_PULSE low
+
+			// Set the compensator reset
+			COMP_RESET_PIN = true;
 		}
 
-	}else{
-		// Leave the ENABLE_PULSE low
-
-		// Set the compensator reset
-		COMP_RESET_PIN = true;
 	}
+
+
 
 }
 

@@ -58,7 +58,7 @@ void Measurement_process_oversampling(void){
 	PWM_acc_count = 0;
 
 	/* Start ADC acquisition batch*/
-	ADC_acq_count = EADC_OVERSAMPLING_SHIFT;
+	ADC_acq_count = EADC_OVERSAMPLING;
 
 	EADC_CLR_INT_FLAG(EADC, EADC_STATUS2_ADIF0_Msk);      /* Clear the A/D ADINT0 interrupt flag */
 	NVIC_EnableIRQ(EADC00_IRQn);
