@@ -78,10 +78,10 @@
 #define AC_RELAY_PIN PC4
 #define DC_RELAY_PIN PC5
 
-#define COMP_RESET_PIN PA5
-#define LATCH_SET_PIN PA2
-#define LATCH_Q_PIN PA3
-#define ENABLE_PULSE_PIN PA4
+#define COMP_RESET_PIN PA5		/* Pin that resets (holds at zero) the analog current compensator. */
+#define LATCH_SET_PIN PA2		/* Pin connected to the "set" input of the overcurrent latch. The "reset" input is controlled by the overcurrent detection comparators, not buy the MCU */
+#define LATCH_Q_PIN PA3			/* Pin connected to the output of the overcurrent latch */
+#define ENABLE_PULSE_PIN PA4	/* Pulses on this pin enable switching. However, they are allowed through by hardware when the overcurrent latch is set. */
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Type definitions           				                                                               */
@@ -96,11 +96,11 @@ typedef enum {CONTACTOR_OFF = 0, CONTACTOR_AC_PRECHARGE = 1, CONTACTOR_AC_WAIT_F
  *
  * CONSTANT_AC_CURRENT_PLL: Tries to keep the AC current constant, while maintaining synchronization to the grid with the PLL. Needs a bidirectionnal AC voltage source.
  *
- * CONSTANT_CURRENT_OL: Outputs a constant AC current, but in open loop, with a fixed frequency (no PLL). Needs a passive load on the AC side.
+ * CONSTANT_AC_CURRENT_OL: Outputs a constant AC current, but in open loop, with a fixed frequency (no PLL). Needs a passive load on the AC side.
  *
  * CONSTANT_AC_VOLTAGE: Outputs a constant AC voltage, in open loop, with fixed frequency and no current regulation. Needs a passive load on the AC side.
  *
- * MODE_LAST: Indicates the last mode (needed to cycle throught the modes)
+ * MODE_LAST: Indicates the last mode (needed to cycle throught the modes). Never actually used.
  */
 typedef enum {MODE_DC_REGULATION = 0, MODE_CONSTANT_AC_CURRENT_PLL = 1, MODE_CONSTANT_AC_CURRENT_OL = 2, MODE_CONSTANT_AC_VOLTAGE = 3, MODE_LAST = 4} operation_mode_t;
 
@@ -246,7 +246,7 @@ void inverter_medium_freq_task(void);
 void inverter_calc_I_D(void);
 void inverter_calc_I_balance(void);
 
-void inverter_mode_change(void);
+void inverter_mode_change_req_serv(void);
 
 void inverter_req_next_mode(void);
 void inverter_req_prev_mode(void);

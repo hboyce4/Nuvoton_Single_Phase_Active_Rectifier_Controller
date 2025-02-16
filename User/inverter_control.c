@@ -476,10 +476,8 @@ void inverter_contactor_control_constant_AC_current_PLL_mode(void){
 }
 
 void inverter_contactor_control_constant_AC_current_OL_mode(void){
- /* Do nothing for now */
-}
 
-void inverter_contactor_control_constant_AC_voltage_mode(void){
+	/* For now, Constant AC current Open loop mode is identical to Constant AC Voltage mode */
 
 	// reset conditions in any state
 
@@ -492,7 +490,57 @@ void inverter_contactor_control_constant_AC_voltage_mode(void){
 
 			case CONTACTOR_OFF:
 
-				if((inverter.V_AC_RMS < V_AC_MAX_FOR_START) && inverter_setpoints.contactor_close_request){
+				if((inverter.V_AC_RMS < V_AC_MAX_FOR_START) && inverter_setpoints.contactor_close_request){ /* Only start if no significant AC voltage is present */
+					inverter_safety.contactor_state = CONTACTOR_AC_CLOSED_DC_OPEN;
+				}
+
+				break;
+
+
+			case CONTACTOR_AC_PRECHARGE:
+
+				break;
+
+			case CONTACTOR_AC_WAIT_FOR_CLOSE:
+
+				break;
+
+			case CONTACTOR_AC_DWELL:
+
+				break;
+
+			case CONTACTOR_AC_CHARGE:
+
+				break;
+
+			case CONTACTOR_AC_CLOSED_DC_OPEN:
+
+				break;
+
+			default: // If unknown state
+				inverter_safety.contactor_state = CONTACTOR_OFF; // switch to the OFF state immediately
+				inverter_setpoints.contactor_close_request = FALSE; // To avoid cycling
+
+		}
+
+}
+
+void inverter_contactor_control_constant_AC_voltage_mode(void){
+
+	/* For now, Constant AC current Open loop mode is identical to Constant AC Voltage mode */
+
+	// reset conditions in any state
+
+	if(!inverter_setpoints.contactor_close_request || !LATCH_Q_PIN || inverter_safety.UV_V_DC_minus || inverter_safety.UV_V_DC_plus || inverter_safety.OV_V_DC_minus || inverter_safety.OV_V_DC_plus){
+		inverter_safety.contactor_state = CONTACTOR_OFF;
+		inverter_setpoints.contactor_close_request = FALSE; // To avoid cycling
+	}
+
+	switch(inverter_safety.contactor_state){
+
+			case CONTACTOR_OFF:
+
+				if((inverter.V_AC_RMS < V_AC_MAX_FOR_START) && inverter_setpoints.contactor_close_request){ /* Only start if no significant AC voltage is present */
 					inverter_safety.contactor_state = CONTACTOR_AC_CLOSED_DC_OPEN;
 				}
 
@@ -641,7 +689,7 @@ void inverter_medium_freq_task(void){
 
 	autozero_state_machine();/* Autozeroing state machine */
 
-	inverter_mode_change(); /* The mode change request service routine*/
+	inverter_mode_change_req_serv(); /* The mode change request service routine*/
 
 }
 
@@ -662,7 +710,13 @@ void inverter_calc_I_D(void){
 		err_V_DC_total = -I_D_MAX;
 	}
 
-	inverter.I_D = err_V_DC_total; /* Return the value of the "direct" current */
+
+	if(inverter.operation_mode == MODE_CONSTANT_AC_CURRENT_PLL || inverter.operation_mode == MODE_CONSTANT_AC_CURRENT_OL){ /* If the mode is one of the two "constant AC current" ones */
+		inverter.I_D = inverter_setpoints.I_AC_setpoint; /* Use the fixed value determined in the UI */
+	}else{
+		inverter.I_D = err_V_DC_total; /* Use the value of the "direct" current  calculated by the control loop*/
+	}
+
 
 }
 
@@ -675,6 +729,7 @@ void inverter_calc_I_balance(void){
 
 	float err_V_DC_diff = inverter.V_DC_diff_filtered - inverter_setpoints.V_DC_diff_setpoint; // Calculate the error
 
+	/* Only a proportional term for now. */
 	err_V_DC_diff *= VBUS_DIFF_KP; /* Multiply by the gain to determine how big of a correction to apply */
 
 	/* Saturate */
@@ -684,12 +739,19 @@ void inverter_calc_I_balance(void){
 		err_V_DC_diff = -I_BALANCE_MAX;
 	}
 
-	inverter.I_balance = err_V_DC_diff; /* Return the value of the "direct" current */
+	/*For now, the balance current is forced to zero in the "Constant AC current Open loop". This is because we use this mode only while supplying DC with a bipolar source. (Open loop means there's no AC source, thus we need a DC source)
+	 * Hence no balancing is necessary. We might want to support balancing in that mode later too, if we want to use it with a unipolar supply (i.e. in a islanded inverter fed from a 48V battery scenario) */
+
+	if(inverter.operation_mode == MODE_CONSTANT_AC_CURRENT_OL){ /* If the mode is Open Loop constant AC current  */
+		inverter.I_balance = 0.0f; /* No balance current in this mode */
+	}else{
+		inverter.I_balance = err_V_DC_diff; /* Use the balance current calculated by the control loop */
+	}
 
 }
 
 
-void inverter_mode_change(void){
+void inverter_mode_change_req_serv(void){
 
 	static uint32_t delay_off_for_mode_change_cnt;
 
